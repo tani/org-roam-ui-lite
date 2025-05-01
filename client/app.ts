@@ -4,6 +4,16 @@ import coseBilkent from "cytoscape-cose-bilkent";
 
 cytoscape.use(coseBilkent);
 
+function pickColor(key: string): string {
+	// simple hash: 各文字コードを足して 360 で割った余りを色相に
+	let hash = 0;
+	for (let i = 0; i < key?.length; i++) {
+		hash = (hash + key?.charCodeAt(i)) % 360;
+	}
+	// 彩度 65%、明度 50% の HSL 表現を返す
+	return `hsl(${hash}, 65%, 50%)`;
+}
+
 Alpine.data("app", () => ({
 	graph: null as cytoscape.Core | null,
 	selected: {} as any,
@@ -25,9 +35,18 @@ Alpine.data("app", () => ({
 	async refreshGraph() {
 		const { nodes, edges } = await fetch("/graph").then((r) => r.json());
 		const elements = [
-			...nodes.map((n: any) => ({ data: { id: n.id, label: n.title } })),
+			...nodes.map((n: any) => ({
+				data: {
+					id: n.id,
+					label: n.title,
+					color: pickColor(n.file),
+				},
+			})),
 			...edges.map((e: any) => ({
-				data: { source: e.source, target: e.dest },
+				data: {
+					source: e.source,
+					target: e.dest,
+				},
 			})),
 		];
 		if (!this.graph) {
@@ -35,6 +54,16 @@ Alpine.data("app", () => ({
 				container: this.$refs.graph as HTMLElement,
 				elements,
 				layout: { name: "cose-bilkent" },
+				style: [
+					{
+						selector: "node",
+						style: {
+							color: "#eeeeee",
+							"background-color": "data(color)",
+							label: "data(label)",
+						},
+					},
+				],
 			});
 			this.graph.on("tap", "node", (ev) => this.open(ev.target.id()));
 		} else {

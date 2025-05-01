@@ -15,10 +15,17 @@ app.use("/client/*", serveStatic({ root: "dist/" }));
 /* ノード & エッジ一覧 */
 app.get("/graph", async (c) => {
 	const [ns, es] = await Promise.all([
-		db.select({ id: nodes.id, title: nodes.title }).from(nodes),
+		db
+			.select({ id: nodes.id, title: nodes.title, file: nodes.file })
+			.from(nodes),
 		db.select({ source: links.source, dest: links.dest }).from(links),
 	]);
-	return c.json({ nodes: ns, edges: es });
+	const cleanNodes = ns.map((n) => ({
+		id: n.id,
+		title: JSON.parse(n.title ?? ""),
+		file: JSON.parse(n.file ?? ""),
+	}));
+	return c.json({ nodes: cleanNodes, edges: es });
 });
 
 /* ノード詳細 + Org ソース */
@@ -32,14 +39,27 @@ app.get("/node/:id", async (c) => {
 		.get();
 
 	if (!row) return c.json({ error: "not_found" }, 404);
+	const cleanRow = {
+		id: row.id,
+		title: JSON.parse(row.title ?? ""),
+		file: JSON.parse(row.file),
+	};
 
 	const raw = await readFile(JSON.parse(row.file), "utf8");
 	const backlinks = await db
-		.select({ source: links.source })
+		.select({
+			source: links.source,
+			title: nodes.title,
+		})
 		.from(links)
+		.innerJoin(nodes, eq(links.source, nodes.id))
 		.where(eq(links.dest, id));
+	const cleanBacklinks = backlinks.map((node) => ({
+		title: JSON.parse(node.title ?? ""),
+		source: node.source,
+	}));
 
-	return c.json({ ...row, raw, backlinks });
+	return c.json({ ...cleanRow, raw, backlinks: cleanBacklinks });
 });
 
 /* 起動 */

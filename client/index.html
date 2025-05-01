@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="ja" data-theme="light">
+	<head>
+		<meta charset="utf-8" />
+		<title>org-roam-ui (readonly)</title>
+		<style>
+                   /* --- 最小リセット & テーマ --- */
+                   *,*::before,*::after{box-sizing:border-box;margin:0}
+                   :root{--bg:#fff;--fg:#111;--border:#ccc;--code-bg:#222;--code-fg:#eee}
+                   body{background:var(--bg);color:var(--fg);font-family:system-ui,sans-serif;height:100vh;display:flex}
+                   .graph{flex:1}
+                   .pane{width:22rem;border-left:1px solid var(--border);padding:1rem;overflow:auto}
+                   .pane__code{background:var(--code-bg);color:var(--code-fg);padding:1rem;font:0.8rem/1.4 monospace;max-height:60vh;overflow:auto}
+                 </style>
+		<script type="module" src="./app.ts"></script>
+	</head>
+	<body x-data="app()" class="layout">
+		<div class="graph" x-ref="graph"></div>
+		<aside class="pane" x-show="selected">
+			<h2 x-text="selected.title"></h2>
+			<pre class="pane__code"><code x-text="selected.raw"></code></pre>
+			<section x-show="selected.backlinks?.length">
+				<h3>Backlinks</h3>
+				<ul>
+					<template x-for="b in selected.backlinks" :key="b.source">
+						<li>
+							<a href="#" @click.prevent="open(b.source)" x-text="b.source"></a>
+						</li>
+					</template>
+				</ul>
+			</section>
+		</aside>
+	</body>
+</html>

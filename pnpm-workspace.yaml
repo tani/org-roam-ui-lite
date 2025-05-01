@@ -1,2 +1,2 @@
-onlyBuiltDependencies:
-  - '@biomejs/biome'
+packages:
+  - "packages/*"

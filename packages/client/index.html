@@ -67,16 +67,8 @@
       right: 1rem;
       width: 350px;
     }
-    pre.pane-code {
-      background-color: var(--bs-dark);
-      color: var(--bs-light);
-      padding: 1rem;
-      border-radius: .25rem;
-      max-height: 50vh;
-      overflow:auto;
-    }
   </style>
-		<script type="module" src="./app.ts"></script>
+		<script type="module" src="./src/app.ts"></script>
 	</head>
 	<body x-data="app()" x-init="init()">
 		<!-- グラフ領域 -->
@@ -135,7 +127,7 @@
 				</button>
 			</div>
 			<div class="body">
-				<pre class="pane-code"><code x-text="selected.raw"></code></pre>
+				<div x-html="selected.html"></div>
 				<div x-show="selected.backlinks?.length" class="mt-3 text-light">
 					<h6>
 						<i class="bi bi-link-45deg"></i>Backlinks

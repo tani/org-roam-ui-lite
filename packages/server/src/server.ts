@@ -1,4 +1,6 @@
-import { readFile } from "node:fs/promises";
+import * as fs from "node:fs/promises";
+import * as path from "node:path";
+import * as url from "node:url";
 import { serve } from "@hono/node-server";
 import { serveStatic } from "@hono/node-server/serve-static";
 import { eq } from "drizzle-orm";
@@ -7,10 +9,21 @@ import { Hono } from "hono";
 import { db } from "./database.ts";
 import { files, links, nodes } from "./schema.ts";
 
+const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
+const clientDistPath = path.relative(
+	process.cwd(),
+	path.join(__dirname, "../../client/dist/"),
+);
+
 const app = new Hono();
 
 /* 静的ファイル (static/) */
-app.use("/client/*", serveStatic({ root: "dist/" }));
+app.use(
+	"/*",
+	serveStatic({
+		root: clientDistPath,
+	}),
+);
 
 /* ノード & エッジ一覧 */
 app.get("/graph", async (c) => {
@@ -45,7 +58,7 @@ app.get("/node/:id", async (c) => {
 		file: JSON.parse(row.file),
 	};
 
-	const raw = await readFile(JSON.parse(row.file), "utf8");
+	const raw = await fs.readFile(JSON.parse(row.file), "utf8");
 	const backlinks = await db
 		.select({
 			source: links.source,
@@ -64,5 +77,5 @@ app.get("/node/:id", async (c) => {
 
 /* 起動 */
 const port = Number(process.env.PORT) || 5174;
-console.log(`Launch at http://localhost:${port}/client/index.html`);
+console.log(`Launch at http://localhost:${port}/index.html`);
 serve({ fetch: app.fetch, port });

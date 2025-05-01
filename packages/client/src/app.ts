@@ -1,6 +1,17 @@
+import reorgParse from "@orgajs/reorg-parse";
+import reorgRehype from "@orgajs/reorg-rehype";
+import rehypeShiki from "@shikijs/rehype";
 import Alpine from "alpinejs";
 import cytoscape from "cytoscape";
 import coseBilkent from "cytoscape-cose-bilkent";
+import rehypeStringfy from "rehype-stringify";
+import { unified } from "unified";
+
+const processor = unified()
+	.use(reorgParse)
+	.use(reorgRehype)
+	.use(rehypeShiki, { theme: "vitesse-dark" })
+	.use(rehypeStringfy);
 
 cytoscape.use(coseBilkent);
 
@@ -74,7 +85,8 @@ Alpine.data("app", () => ({
 	},
 
 	async open(id: string) {
-		this.selected = await fetch(`/node/${id}`).then((r) => r.json());
+		const json = await fetch(`/node/${id}`).then((r) => r.json());
+		this.selected = { ...json, html: await processor.process(json.raw) };
 		this.showDetails = true;
 	},
 }));

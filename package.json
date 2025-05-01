@@ -1,11 +1,10 @@
 {
-  "name": "your-project-root",
+  "name": "org-roam-ui-lite",
   "private": true,
   "workspaces": [
     "packages/*"
   ],
   "devDependencies": {
-    "@biomejs/biome": "2.0.0-beta.2",
     "pnpm": "^8.0.0"
   },
   "scripts": {

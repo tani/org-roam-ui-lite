@@ -8,9 +8,6 @@ importers:
 
   .:
     devDependencies:
-      '@biomejs/biome':
-        specifier: 2.0.0-beta.2
-        version: 2.0.0-beta.2
       pnpm:
         specifier: ^8.0.0
         version: 8.15.9
@@ -54,6 +51,9 @@ importers:
         specifier: ^11.0.5
         version: 11.0.5
     devDependencies:
+      '@biomejs/biome':
+        specifier: 2.0.0-beta.2
+        version: 2.0.0-beta.2
       typescript:
         specifier: ^5.8.3
         version: 5.8.3
@@ -76,6 +76,9 @@ importers:
         specifier: ^4.7.8
         version: 4.7.8
     devDependencies:
+      '@biomejs/biome':
+        specifier: 2.0.0-beta.2
+        version: 2.0.0-beta.2
       tsx:
         specifier: ^4.19.4
         version: 4.19.4

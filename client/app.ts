@@ -8,6 +8,16 @@ Alpine.data("app", () => ({
 	graph: null as cytoscape.Core | null,
 	selected: {} as any,
 
+	// ← 追加する部分
+	showFilter: true,
+	showDetails: true,
+	toggleFilter() {
+		this.showFilter = !this.showFilter;
+	},
+	toggleDetails() {
+		this.showDetails = !this.showDetails;
+	},
+
 	async init() {
 		await this.refreshGraph();
 	},
@@ -36,6 +46,7 @@ Alpine.data("app", () => ({
 
 	async open(id: string) {
 		this.selected = await fetch(`/node/${id}`).then((r) => r.json());
+		this.showDetails = true;
 	},
 }));
 

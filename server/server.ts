@@ -10,8 +10,7 @@ import { files, links, nodes } from "./schema.ts";
 const app = new Hono();
 
 /* 静的ファイル (static/) */
-app.use("/client/*", serveStatic({root: "dist/"}));
-
+app.use("/client/*", serveStatic({ root: "dist/" }));
 
 /* ノード & エッジ一覧 */
 app.get("/graph", async (c) => {

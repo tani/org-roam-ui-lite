@@ -1,34 +1,170 @@
 <!doctype html>
-<html lang="ja" data-theme="light">
+<html lang="ja" data-bs-theme="dark">
 	<head>
 		<meta charset="utf-8" />
-		<title>org-roam-ui (readonly)</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>org-roam-ui</title>
+		<!-- Bootswatch Darkly Theme -->
+		<link
+			rel="stylesheet"
+			href="https://cdn.jsdelivr.net/npm/bootswatch@5/dist/darkly/bootstrap.min.css"
+		>
+		<!-- Bootstrap Icons -->
+		<link
+			rel="stylesheet"
+			href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1/font/bootstrap-icons.css"
+		>
 		<style>
-                   /* --- 最小リセット & テーマ --- */
-                   *,*::before,*::after{box-sizing:border-box;margin:0}
-                   :root{--bg:#fff;--fg:#111;--border:#ccc;--code-bg:#222;--code-fg:#eee}
-                   body{background:var(--bg);color:var(--fg);font-family:system-ui,sans-serif;height:100vh;display:flex}
-                   .graph{flex:1}
-                   .pane{width:22rem;border-left:1px solid var(--border);padding:1rem;overflow:auto}
-                   .pane__code{background:var(--code-bg);color:var(--code-fg);padding:1rem;font:0.8rem/1.4 monospace;max-height:60vh;overflow:auto}
-                 </style>
+    /* グラフを全画面に表示 */
+    body, html {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
+    #graph {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: var(--bs-gray-800);
+      z-index: 1;
+    }
+    /* フローティングパネル共通 */
+    .floating-panel {
+      position: absolute;
+      background-color: var(--bs-gray-900);
+      border: 1px solid var(--bs-border-color);
+      border-radius: .25rem;
+      z-index: 10;
+      max-height: 90%;
+      overflow-y: auto;
+      box-shadow: 0 0 .5rem rgba(0,0,0,0.5);
+    }
+    .floating-panel .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: .5rem;
+      border-bottom: 1px solid var(--bs-border-color);
+      background-color: var(--bs-gray-800);
+    }
+    .floating-panel .body {
+      padding: .75rem;
+      color: var(--bs-light);
+    }
+    /* 左パネル */
+    .panel-left {
+      top: 1rem;
+      left: 1rem;
+      width: 300px;
+    }
+    /* 右パネル */
+    .panel-right {
+      top: 1rem;
+      right: 1rem;
+      width: 350px;
+    }
+    pre.pane-code {
+      background-color: var(--bs-dark);
+      color: var(--bs-light);
+      padding: 1rem;
+      border-radius: .25rem;
+      max-height: 50vh;
+      overflow:auto;
+    }
+  </style>
 		<script type="module" src="./app.ts"></script>
 	</head>
-	<body x-data="app()" class="layout">
-		<div class="graph" x-ref="graph"></div>
-		<aside class="pane" x-show="selected">
-			<h2 x-text="selected.title"></h2>
-			<pre class="pane__code"><code x-text="selected.raw"></code></pre>
-			<section x-show="selected.backlinks?.length">
-				<h3>Backlinks</h3>
-				<ul>
-					<template x-for="b in selected.backlinks" :key="b.source">
-						<li>
-							<a href="#" @click.prevent="open(b.source)" x-text="b.source"></a>
-						</li>
-					</template>
-				</ul>
-			</section>
-		</aside>
+	<body x-data="app()" x-init="init()">
+		<!-- グラフ領域 -->
+		<div id="graph" x-ref="graph"></div>
+
+		<!-- 左フローティングパネル (Filter) -->
+		<div
+			class="floating-panel panel-left"
+			x-show="showFilter"
+			x-transition.opacity
+		>
+			<div class="header text-light">
+				<h6 class="m-0">
+					<i class="bi bi-funnel-fill"></i>Filter
+				</h6>
+				<button @click="toggleFilter()" class="btn btn-sm btn-outline-light">
+					<i class="bi bi-x-lg"></i>
+				</button>
+			</div>
+			<div class="body">
+				<!-- フィルタ内容 -->
+				<div x-data="{ open: true }">
+					<button @click="open = !open" class="btn btn-sm btn-link text-light">
+						<i
+							:class="open ? 'bi-caret-down-fill' : 'bi-caret-right-fill'"
+						></i>Tag Filters
+					</button>
+					<div x-show="open" class="mt-2"><!-- タグチェックボックス --></div>
+				</div>
+			</div>
+		</div>
+
+		<!-- 左パネル開閉ボタン -->
+		<button
+			x-show="!showFilter"
+			@click="toggleFilter()"
+			class="btn btn-light position-fixed"
+			style="top: 1rem; left: 1rem; z-index: 9;"
+		>
+			<i class="bi bi-funnel"></i>
+		</button>
+
+		<!-- 右フローティングパネル (Detail) -->
+		<div
+			class="floating-panel panel-right"
+			x-show="showDetails && selected"
+			x-transition.opacity
+		>
+			<div class="header text-light">
+				<h6 class="m-0">
+					<i class="bi bi-file-earmark-text"></i>
+					<span x-text="selected.title"></span>
+				</h6>
+				<button @click="toggleDetails()" class="btn btn-sm btn-outline-light">
+					<i class="bi bi-x-lg"></i>
+				</button>
+			</div>
+			<div class="body">
+				<pre class="pane-code"><code x-text="selected.raw"></code></pre>
+				<div x-show="selected.backlinks?.length" class="mt-3 text-light">
+					<h6>
+						<i class="bi bi-link-45deg"></i>Backlinks
+					</h6>
+					<ul class="list-unstyled">
+						<template x-for="b in selected.backlinks" :key="b.source">
+							<li>
+								<button
+									class="btn btn-sm btn-link text-light p-0"
+									@click="open(b.source)"
+								>
+									<i class="bi bi-chevron-right"></i>
+									<span x-text="b.source"></span>
+								</button>
+							</li>
+						</template>
+					</ul>
+				</div>
+			</div>
+		</div>
+
+		<!-- 右パネル開閉ボタン -->
+		<button
+			x-show="!showDetails"
+			@click="toggleDetails()"
+			class="btn btn-light position-fixed"
+			style="top: 1rem; right: 1rem; z-index: 9;"
+		>
+			<i class="bi bi-chevron-left"></i>
+		</button>
 	</body>
 </html>

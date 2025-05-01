@@ -26,7 +26,7 @@ app.use(
 );
 
 /* ノード & エッジ一覧 */
-app.get("/graph", async (c) => {
+app.get("/api/graph", async (c) => {
 	const [ns, es] = await Promise.all([
 		db
 			.select({ id: nodes.id, title: nodes.title, file: nodes.file })
@@ -42,7 +42,7 @@ app.get("/graph", async (c) => {
 });
 
 /* ノード詳細 + Org ソース */
-app.get("/node/:id", async (c) => {
+app.get("/api/node/:id", async (c) => {
 	const id = c.req.param("id");
 	const row = await db
 		.select({ id: nodes.id, title: nodes.title, file: files.file })

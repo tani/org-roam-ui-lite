@@ -3,11 +3,33 @@ import * as path from "node:path";
 import * as url from "node:url";
 import { serve } from "@hono/node-server";
 import { serveStatic } from "@hono/node-server/serve-static";
+import rehypeShikiFromHighlighter from "@shikijs/rehype/core";
 import { eq } from "drizzle-orm";
 import { Hono } from "hono";
-
+import rehypeStringfy from "rehype-stringify";
+import { bundledLanguages, bundledThemes, createHighlighter } from "shiki";
+import { createJavaScriptRegexEngine } from "shiki/engine/javascript";
+import { unified } from "unified";
+import uniorgParse from "uniorg-parse";
+import uniorgRehype from "uniorg-rehype";
 import { db } from "./database.ts";
 import { files, links, nodes } from "./schema.ts";
+
+const highlighter = await createHighlighter({
+	themes: Object.keys(bundledThemes),
+	langs: Object.keys(bundledLanguages),
+	engine: createJavaScriptRegexEngine({
+		forgiving: true, // 互換性の問題を許容
+	}),
+});
+
+const processor = unified()
+	.use(uniorgParse)
+	.use(uniorgRehype)
+	.use(rehypeShikiFromHighlighter, highlighter, {
+		theme: "vitesse-dark",
+	})
+	.use(rehypeStringfy);
 
 const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
 const clientDistPath = path.relative(
@@ -58,7 +80,9 @@ app.get("/api/node/:id", async (c) => {
 		file: JSON.parse(row.file),
 	};
 
-	const raw = await fs.readFile(JSON.parse(row.file), "utf8");
+	const raw = await fs.readFile(cleanRow.file, "utf8");
+	const result = await processor.process(raw);
+	const html = result.toString();
 	const backlinks = await db
 		.select({
 			source: links.source,
@@ -72,7 +96,7 @@ app.get("/api/node/:id", async (c) => {
 		source: node.source,
 	}));
 
-	return c.json({ ...cleanRow, raw, backlinks: cleanBacklinks });
+	return c.json({ ...cleanRow, html, backlinks: cleanBacklinks });
 });
 
 /* 起動 */

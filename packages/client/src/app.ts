@@ -1,22 +1,9 @@
-import reorgParse from "@orgajs/reorg-parse";
-import reorgRehype from "@orgajs/reorg-rehype";
 import Alpine from "alpinejs";
 import cytoscape from "cytoscape";
 import coseBilkent from "cytoscape-cose-bilkent";
-import { all } from "lowlight";
-import rehypeHighlight from "rehype-highlight";
-import rehypeStringfy from "rehype-stringify";
-import { unified } from "unified";
 import "bootswatch/dist/darkly/bootstrap.min.css";
 import "bootstrap-icons//font/bootstrap-icons.css";
-import "highlight.js/styles/github-dark.min.css";
 import "./app.css";
-
-const processor = unified()
-	.use(reorgParse)
-	.use(reorgRehype)
-	.use(rehypeHighlight, { languages: all, detect: true })
-	.use(rehypeStringfy);
 
 cytoscape.use(coseBilkent);
 
@@ -99,9 +86,9 @@ Alpine.data("app", () => ({
 	},
 
 	async open(id) {
-		const json = await fetch(`/api/node/${id}`).then((r) => r.json());
-		const processed = await processor.process(json.raw);
-		this.selected = { ...json, html: processed };
+		const response = await fetch(`/api/node/${id}`);
+		const jsonBody = await response.json();
+		this.selected = jsonBody;
 		this.showDetails = true;
 	},
 }));

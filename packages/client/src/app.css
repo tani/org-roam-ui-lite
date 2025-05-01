@@ -1,58 +1,62 @@
 /* グラフを全画面に表示 */
-body, html {
-  margin: 0;
-  padding: 0;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
+body,
+html {
+	margin: 0;
+	padding: 0;
+	width: 100%;
+	height: 100%;
+	overflow: hidden;
 }
 #graph {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: var(--bs-gray-800);
-  z-index: 1;
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background-color: var(--bs-gray-800);
+	z-index: 1;
 }
 /* フローティングパネル共通 */
 .floating-panel {
-  position: absolute;
-  background-color: var(--bs-gray-900);
-  border: 1px solid var(--bs-border-color);
-  border-radius: .25rem;
-  z-index: 10;
-  max-height: 90%;
-  /* リサイズ用 */
-  resize: both;
-  overflow: auto;
-  min-width: 150px;
-  min-height: 100px;
-  box-shadow: 0 0 .5rem rgba(0,0,0,0.5);
+	position: absolute;
+	background-color: var(--bs-gray-900);
+	border: 1px solid var(--bs-border-color);
+	border-radius: 0.25rem;
+	z-index: 10;
+	max-height: 90%;
+	/* リサイズ用 */
+	resize: both;
+	overflow: auto;
+	min-width: 150px;
+	min-height: 100px;
+	box-shadow: 0 0 0.5rem rgba(0, 0, 0, 0.5);
 }
 .floating-panel .header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: .5rem;
-  border-bottom: 1px solid var(--bs-border-color);
-  background-color: var(--bs-gray-800);
-  cursor: move;
-     user-select: none;
-   }
-   .floating-panel .body {
-     padding: .75rem;
-     color: var(--bs-light);
-   }
-   /* 左パネル */
-   .panel-left {
-     top: 1rem;
-     left: 1rem;
-     width: 300px;
-   }
-   /* 右パネル */
-   .panel-right {
-     top: 1rem;
-     right: 1rem;
-     width: 350px;
-   }
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 0.5rem;
+	border-bottom: 1px solid var(--bs-border-color);
+	background-color: var(--bs-gray-800);
+	cursor: move;
+	user-select: none;
+}
+.floating-panel .body {
+	padding: 0.75rem;
+	color: var(--bs-light);
+}
+/* 左パネル */
+.panel-left {
+	top: 1rem;
+	left: 1rem;
+	width: 300px;
+}
+/* 右パネル */
+.panel-right {
+	top: 1rem;
+	right: 1rem;
+	width: 350px;
+}
+.shiki {
+	padding: 10px;
+}

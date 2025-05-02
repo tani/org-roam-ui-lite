@@ -5,14 +5,19 @@
     "packages/*"
   ],
   "devDependencies": {
-    "pnpm": "^8.0.0"
+    "license-checker": "^25.0.1",
+    "npm-run-all": "^4.1.5",
+    "slugify": "^1.6.6",
+    "zx": "^8.5.3"
   },
   "scripts": {
-    "build": "pnpm -r run build && rm -rf dist && mkdir -p dist/{server,client} && cp -vR packages/client/dist dist/client/dist && cp -vR packages/server/dist dist/server/dist",
-    "dev": "pnpm -r run dev",
-    "lint": "pnpm -r run lint",
-    "lint:fix": "pnpm -r run lint:fix",
-    "check": "pnpm -r run check",
-    "test": "pnpm -r run test"
+    "build": "npm run build --workspaces && zx build.mjs",
+    "dev": "run-p dev:client dev:server",
+    "dev:client": "npm --workspace=packages/client run dev",
+    "dev:server": "npm --workspace=packages/server run dev",
+    "lint": "npm run lint --workspaces",
+    "lint:fix": "npm run lint:fix --workspaces",
+    "check": "npm run check --workspaces",
+    "test": "npm run test --workspaces"
   }
 }

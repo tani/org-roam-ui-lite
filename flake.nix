@@ -15,7 +15,6 @@
           devShells.default = pkgs.mkShell {
             buildInputs = with pkgs; [
               nodejs
-              pnpm
               tree
               typescript-language-server
             ];

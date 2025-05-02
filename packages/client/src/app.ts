@@ -1,4 +1,4 @@
- /// <reference lib="dom" /> 
+/// <reference lib="dom" />
 
 import Alpine from "alpinejs";
 import cytoscape from "cytoscape";
@@ -7,33 +7,32 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import "./app.css";
 import * as bootstrap from "bootstrap";
-import "@wooorm/starry-night/style/dimmed";
+import { z } from "zod";
 
-interface NodeData {
-  id: string;
-  title: string;
-  file: string;
-}
-interface EdgeData {
-  source: string;
-  dest: string;
-}
-interface GraphResponse {
-  nodes: NodeData[];
-  edges: EdgeData[];
-}
-interface Backlink {
-  source: string;
-  title: string;
-}
-interface NodeResponse {
-  id: string;
-  title: string;
-  file: string;
-  raw: string;
-  backlinks?: Backlink[];
-}
+// Zod schemas and TS types
+const NodeDataSchema = z.object({
+	id: z.string(),
+	title: z.string(),
+	file: z.string(),
+});
 
+const EdgeDataSchema = z.object({ source: z.string(), dest: z.string() });
+
+const GraphResponseSchema = z.object({
+	nodes: z.array(NodeDataSchema),
+	edges: z.array(EdgeDataSchema),
+});
+
+const BacklinkSchema = z.object({ source: z.string(), title: z.string() });
+
+const NodeResponseSchema = z.object({
+	id: z.string(),
+	title: z.string(),
+	file: z.string(),
+	raw: z.string(),
+	backlinks: z.array(BacklinkSchema).optional(),
+});
+type NodeResponse = z.infer<typeof NodeResponseSchema>;
 
 async function createOrgHtmlProcessor() {
 	// 並列で import() しておく
@@ -88,7 +87,7 @@ function pickColor(key: string): string {
 
 Alpine.data("app", () => ({
 	graph: null as cytoscape.Core | null,
-	selected: {} as (NodeResponse & { html: string }) | null,
+	selected: null as (NodeResponse & { html: string }) | null,
 	detailsCanvas: new bootstrap.Offcanvas(
 		document.getElementById("offcanvasDetails")!,
 	),
@@ -98,14 +97,16 @@ Alpine.data("app", () => ({
 	},
 
 	async refreshGraph() {
-		const { nodes, edges } = await fetch("/api/graph").then((r) => r.json()) as GraphResponse;
-		const elements = [
+		// 型チェック付きフェッチ
+		const response = await fetch("/api/graph");
+		const json = await response.json();
+		const { nodes, edges } = GraphResponseSchema.parse(json);
+
+		const elements: cytoscape.ElementDefinition[] = [
 			...nodes.map((n) => ({
 				data: { id: n.id, label: n.title, color: pickColor(n.file) },
 			})),
-			...edges.map((e) => ({
-				data: { source: e.source, target: e.dest },
-			})),
+			...edges.map((e) => ({ data: { source: e.source, target: e.dest } })),
 		];
 
 		if (!this.graph) {
@@ -133,13 +134,15 @@ Alpine.data("app", () => ({
 	},
 
 	async open(id: string) {
-		const [jsonBody, processor] = await Promise.all([
-			fetch(`/api/node/${id}`).then((r) => r.json()),
-			createOrgHtmlProcessor(),
-		]);
-		const html = String(await processor.process(jsonBody.raw));
-		this.selected = { ...jsonBody, html };
-		this.detailsCanvas?.show();
+		// 型チェック付きフェッチ
+		const nodeRes = await fetch(`/api/node/${id}`);
+		const jsonBody = await nodeRes.json();
+		const data = NodeResponseSchema.parse(jsonBody);
+
+		const processor = await createOrgHtmlProcessor();
+		const html = String(await processor.process(data.raw));
+		this.selected = { ...data, html };
+		this.detailsCanvas.show();
 	},
 }));
 

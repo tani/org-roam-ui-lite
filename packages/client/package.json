@@ -25,7 +25,8 @@
 		"rehype-stringify": "^10.0.1",
 		"unified": "^11.0.5",
 		"uniorg-parse": "^3.2.0",
-		"uniorg-rehype": "^2.2.0"
+		"uniorg-rehype": "^2.2.0",
+		"zod": "^3.24.3"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "2.0.0-beta.2",

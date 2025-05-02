@@ -12,6 +12,7 @@
     "dev": "pnpm -r run dev",
     "lint": "pnpm -r run lint",
     "lint:fix": "pnpm -r run lint:fix",
+    "check": "pnpm -r run check",
     "test": "pnpm -r run test"
   }
 }

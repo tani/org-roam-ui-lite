@@ -1,14 +1,17 @@
 {
   "compilerOptions": {
     "target": "es2024",
-    "module": "esnext",
-    "moduleResolution": "node",
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
     "strict": true,
     "jsx": "preserve",
     "baseUrl": ".",
     "paths": {
       "@your-org/*": ["packages/*/src"]
-    }
+    },
+    "allowImportingTsExtensions": true,
+    "allowSyntheticDefaultImports": true,
+    "skipLibCheck": true
   },
   "exclude": ["node_modules", "dist"]
 }

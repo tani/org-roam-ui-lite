@@ -6,23 +6,18 @@
 	"scripts": {
 		"dev": "tsx src/server.ts",
 		"lint": "biome check **/*.ts *.json",
-		"lint:fix": "biome check --fix **/*.ts *.json"
+		"lint:fix": "biome check --fix **/*.ts *.json",
+		"check": "tsc --noEmit"
 	},
 	"dependencies": {
 		"@hono/node-server": "^1.14.1",
 		"@libsql/client": "^0.15.4",
-		"@shikijs/rehype": "^3.3.0",
 		"drizzle-orm": "^0.43.1",
-		"hono": "^4.7.8",
-		"rehype-parse": "^9.0.1",
-		"rehype-stringify": "^10.0.1",
-		"shiki": "^3.3.0",
-		"unified": "^11.0.5",
-		"uniorg-parse": "^3.2.0",
-		"uniorg-rehype": "^2.2.0"
+		"hono": "^4.7.8"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "2.0.0-beta.2",
+		"@types/node": "^22.15.3",
 		"tsx": "^4.19.4",
 		"typescript": "^5.8.3"
 	}

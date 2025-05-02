@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="ja" data-bs-theme="dark">
+<html lang="ja">
 	<head>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -10,80 +10,84 @@
 		<!-- グラフ領域 -->
 		<div id="graph" x-ref="graph"></div>
 
-		<!-- 左フローティングパネル (Filter) -->
+		<!-- 左 Offcanvas (Filter) -->
 		<div
-			class="floating-panel panel-left"
-			x-show="showFilter"
-			x-transition.opacity
+			class="offcanvas offcanvas-start"
+			tabindex="-1"
+			id="offcanvasFilter"
+			aria-labelledby="offcanvasFilterLabel"
 		>
-			<div
-				class="header text-light"
-				x-on:mousedown="startDrag($event)"
-				x-on:mousemove.window="onDrag($event)"
-				x-on:mouseup.window="endDrag($event)"
-			>
-				<h6 class="m-0">
+			<div class="offcanvas-header">
+				<h6 class="offcanvas-title ps-5" id="offcanvasFilterLabel">
 					<i class="bi bi-funnel-fill"></i>Filter
 				</h6>
-				<button @click="toggleFilter()" class="btn btn-sm btn-outline-light">
-					<i class="bi bi-x-lg"></i>
-				</button>
+				<button
+					type="button"
+					class="btn-close btn-close-white"
+					data-bs-dismiss="offcanvas"
+					aria-label="Close"
+				></button>
 			</div>
-			<div class="body">
-				<!-- フィルタ内容 -->
-				<div x-data="{ open: true }">
-					<button @click="open = !open" class="btn btn-sm btn-link text-light">
-						<i :class="open ? 'bi-caret-down-fill' : 'bi-caret-right-fill'"></i>
-						Tag Filters
-					</button>
-					<div x-show="open" class="mt-2"><!-- タグチェックボックス --></div>
+			<div class="offcanvas-body">
+				<!-- タグフィルター（Bootstrap Collapse） -->
+				<button
+					class="btn btn-sm btn-link d-flex align-items-center"
+					type="button"
+					data-bs-toggle="collapse"
+					data-bs-target="#tagFilters"
+					aria-expanded="true"
+					aria-controls="tagFilters"
+				>
+					<i class="bi bi-caret-down-fill me-1"></i>
+					Tag Filters
+				</button>
+				<div class="collapse show mt-2" id="tagFilters">
+					<!-- タグチェックボックス -->
 				</div>
 			</div>
 		</div>
 
 		<!-- 左パネル開閉ボタン -->
 		<button
-			x-show="!showFilter"
-			@click="toggleFilter()"
-			class="btn btn-light position-fixed"
-			style="top: 1rem; left: 1rem; z-index: 9;"
+			type="button"
+			class="btn btn-primary position-fixed"
+			style="top: 1rem; left: 1rem; z-index: 1050;"
+			data-bs-toggle="offcanvas"
+			data-bs-target="#offcanvasFilter"
+			aria-controls="offcanvasFilter"
 		>
 			<i class="bi bi-funnel"></i>
 		</button>
 
-		<!-- 右フローティングパネル (Detail) -->
+		<!-- 右 Offcanvas (Detail) -->
 		<div
-			class="floating-panel panel-right"
-			x-show="showDetails && selected"
-			x-transition.opacity
+			class="offcanvas offcanvas-end"
+			tabindex="-1"
+			id="offcanvasDetails"
+			aria-labelledby="offcanvasDetailsLabel"
 		>
-			<div
-				class="header text-light"
-				x-on:mousedown="startDrag($event)"
-				x-on:mousemove.window="onDrag($event)"
-				x-on:mouseup.window="endDrag($event)"
-			>
-				<h6 class="m-0">
+			<div class="offcanvas-header">
+				<h6 class="offcanvas-title pt-2" id="offcanvasDetailsLabel">
 					<i class="bi bi-file-earmark-text"></i>
 					<span x-text="selected.title"></span>
 				</h6>
-				<button @click="toggleDetails()" class="btn btn-sm btn-outline-light">
-					<i class="bi bi-x-lg"></i>
-				</button>
+				<button
+					type="button"
+					class="btn-close btn-close-white"
+					data-bs-dismiss="offcanvas"
+					aria-label="Close"
+				></button>
 			</div>
-			<div class="body">
+			<div class="offcanvas-body">
 				<div x-html="selected.html"></div>
-				<div x-show="selected.backlinks?.length" class="mt-3 text-light">
+				<div x-show="selected.backlinks?.length" class="mt-3">
 					<h6>
 						<i class="bi bi-link-45deg"></i>Backlinks
 					</h6>
 					<ul class="list-unstyled">
 						<template x-for="b in selected.backlinks" :key="b.source">
 							<li>
-								<button
-									class="btn btn-sm btn-link text-light p-0"
-									@click="open(b.source)"
-								>
+								<button class="btn btn-sm btn-link p-0" @click="open(b.source)">
 									<i class="bi bi-chevron-right"></i>
 									<span x-text="b.title"></span>
 								</button>
@@ -96,10 +100,12 @@
 
 		<!-- 右パネル開閉ボタン -->
 		<button
-			x-show="!showDetails"
-			@click="toggleDetails()"
-			class="btn btn-light position-fixed"
-			style="top: 1rem; right: 1rem; z-index: 9;"
+			type="button"
+			class="btn btn-primary position-fixed"
+			style="top: 1rem; right: 1rem; z-index: 1050;"
+			data-bs-toggle="offcanvas"
+			data-bs-target="#offcanvasDetails"
+			aria-controls="offcanvasDetails"
 		>
 			<i class="bi bi-chevron-left"></i>
 		</button>

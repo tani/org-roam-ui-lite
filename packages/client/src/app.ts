@@ -4,9 +4,10 @@ import coseBilkent from "cytoscape-cose-bilkent";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import "./app.css";
+import "./code.css";
 import * as bootstrap from "bootstrap";
 import { z } from "zod";
-import "@wooorm/starry-night/style/both";
+import "@microflash/rehype-starry-night/css";
 import type { RehypeMermaidOptions } from "rehype-mermaid";
 
 // --- Zod schemas ---
@@ -51,7 +52,7 @@ async function createOrgHtmlProcessor(theme: Theme) {
 		import("uniorg-rehype"),
 		import("rehype-mathjax"),
 		import("rehype-mermaid"),
-		import("rehype-starry-night"),
+		import("@microflash/rehype-starry-night"),
 		import("@wooorm/starry-night"),
 		import("rehype-stringify"),
 	]);

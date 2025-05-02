@@ -21,7 +21,7 @@
 		>
 			<div class="offcanvas-header">
 				<h4 class="offcanvas-title" id="offcanvasSettingsLabel">
-					<i class="bi bi-gear-fill"></i>設定
+					<i class="bi bi-gear-fill"></i> Settings
 				</h4>
 				<button
 					type="button"
@@ -33,7 +33,7 @@
 			<div class="offcanvas-body">
 				<!-- カラーテーマ切替：スイッチ -->
 				<div class="mb-4">
-					<h5>カラーテーマ</h5>
+					<h5>Theme</h5>
 					<div class="form-check form-switch">
 						<input
 							class="form-check-input"
@@ -43,14 +43,14 @@
 							:checked="theme === 'dark'"
 						>
 						<label class="form-check-label" for="themeSwitch">
-							ダークモード
+							Dark mode
 						</label>
 					</div>
 				</div>
 
 				<!-- ノードサイズ調整 -->
 				<div class="mb-4">
-					<h5>ノードサイズ</h5>
+					<h5>Node size</h5>
 					<input
 						type="range"
 						min="5"
@@ -59,13 +59,13 @@
 						@input="updateNodeSize()"
 					>
 					<div>
-						現在: <span x-text="nodeSize"></span>px
+					  Current: <span x-text="nodeSize"></span>px
 					</div>
 				</div>
 
 				<!-- ラベルのフォントサイズ調整 -->
 				<div class="mb-4">
-					<h5>ラベルのフォントサイズ</h5>
+					<h5>Font size</h5>
 					<input
 						type="range"
 						min="0.3"
@@ -75,7 +75,7 @@
 						@input="updateLabelScale()"
 					>
 					<div>
-						現在: <span x-text="labelScale.toFixed(1)"></span>em
+						Current: <span x-text="labelScale.toFixed(1)"></span>em
 					</div>
 				</div>
 			</div>
@@ -116,7 +116,7 @@
 				<div x-html="selected.html"></div>
 				<div x-show="selected.backlinks?.length" class="mt-3">
 					<h5>
-						<i class="bi bi-link-45deg"></i>Backlinks
+						<i class="bi bi-link-45deg"></i> Backlinks
 					</h5>
 					<ul class="list-unstyled">
 						<template x-for="b in selected.backlinks" :key="b.source">

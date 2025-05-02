@@ -3,14 +3,14 @@
 	<head>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
-		<title>org-roam-ui</title>
+		<title>Your Project Name</title>
 
-		<!-- Alpine.js / TS のビルド済みバンドル -->
+		<!-- バンドル名を refactored_app.ts に合わせてください -->
 		<script type="module" src="./src/app.ts"></script>
 	</head>
-	<body>
-		<!-- グラフ領域 -->
-		<div id="graph" x-ref="graph"></div>
+	<body class="vh-100 vw-100">
+		<!-- グラフだけを参照 -->
+		<div x-ref="graph" class="h-100 w-100"></div>
 
 		<!-- 左 Offcanvas (Settings) -->
 		<div
@@ -21,7 +21,7 @@
 		>
 			<div class="offcanvas-header">
 				<h4 class="offcanvas-title" id="offcanvasSettingsLabel">
-					<i class="bi bi-gear-fill"></i> Settings
+					<i class="bi bi-gear-fill"></i>Settings
 				</h4>
 				<button
 					type="button"
@@ -31,7 +31,7 @@
 				></button>
 			</div>
 			<div class="offcanvas-body">
-				<!-- カラーテーマ切替：スイッチ -->
+				<!-- Theme -->
 				<div class="mb-4">
 					<h5>Theme</h5>
 					<div class="form-check form-switch">
@@ -42,13 +42,10 @@
 							@change="toggleTheme()"
 							:checked="theme === 'dark'"
 						>
-						<label class="form-check-label" for="themeSwitch">
-							Dark mode
-						</label>
+						<label class="form-check-label" for="themeSwitch">Dark mode</label>
 					</div>
 				</div>
-
-				<!-- ノードサイズ調整 -->
+				<!-- Node size -->
 				<div class="mb-4">
 					<h5>Node size</h5>
 					<input
@@ -56,14 +53,13 @@
 						min="5"
 						max="30"
 						x-model.number="nodeSize"
-						@input="updateNodeSize()"
+						@input="onSizeChange()"
 					>
 					<div>
-					  Current: <span x-text="nodeSize"></span>px
+						Current: <span x-text="nodeSize"></span>px
 					</div>
 				</div>
-
-				<!-- ラベルのフォントサイズ調整 -->
+				<!-- Font size -->
 				<div class="mb-4">
 					<h5>Font size</h5>
 					<input
@@ -72,7 +68,7 @@
 						max="1.5"
 						step="0.1"
 						x-model.number="labelScale"
-						@input="updateLabelScale()"
+						@input="onScaleChange()"
 					>
 					<div>
 						Current: <span x-text="labelScale.toFixed(1)"></span>em
@@ -116,12 +112,16 @@
 				<div x-html="selected.html"></div>
 				<div x-show="selected.backlinks?.length" class="mt-3">
 					<h5>
-						<i class="bi bi-link-45deg"></i> Backlinks
+						<i class="bi bi-link-45deg"></i>Backlinks
 					</h5>
 					<ul class="list-unstyled">
 						<template x-for="b in selected.backlinks" :key="b.source">
 							<li>
-								<button class="btn btn-sm btn-link p-0" @click="open(b.source)">
+								<!-- 関数名を open から openNode に合わせる -->
+								<button
+									class="btn btn-sm btn-link p-0"
+									@click="openNode(b.source)"
+								>
 									<i class="bi bi-chevron-right"></i>
 									<span x-text="b.title"></span>
 								</button>

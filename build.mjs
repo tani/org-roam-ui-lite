@@ -1,8 +1,8 @@
 import slugify from "slugify";
 
 await $`rm -rf dist`;
-await $`mkdir -p dist/server dist/client dist/licenses`;
-await $`cp -vR emacs dist/emacs`;
+await $`mkdir -p dist/{server,client,licenses,emacs}`;
+await $`cp -vR emacs/* dist/emacs/`;
 await $`cp -vR packages/client/dist dist/client/dist`;
 await $`cp -vR packages/server/dist dist/server/dist`;
 const all = JSON.parse(await $`license-checker --json`);

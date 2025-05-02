@@ -11,7 +11,7 @@
       let
         pkgs = import nixpkgs { inherit system; };
         emacsPackages = pkgs.emacsPackagesFor pkgs.emacs;
-        org-roam-ui-lite-node = pkgs.buildNpmPackage rec {
+        node = pkgs.buildNpmPackage rec {
           pname = "org-roam-ui-lite-node";
           version = "0.0.0";
           src = ./.;
@@ -23,29 +23,26 @@
           };
           installPhase = "cp -r dist $out";
         };
-        org-roam-ui-lite-emacs = emacsPackages.trivialBuild {
-          pname = "org-roam-ui-lite-emacs";
+        cli = pkgs.writeShellScriptBin "org-roam-ui-lite-cli" ''
+          exec ${pkgs.nodejs}/bin/node ${node}/server/dist/server.mjs "$@"
+        '';
+        elisp = emacsPackages.trivialBuild {
+          pname = "org-roam-ui-lite-elisp";
           version = "0.0.0";
           src = ./.;
-          buildInputs = with pkgs; [
-            org-roam-ui-lite-node
-          ];
+          buildInputs = with pkgs; [ node ];
           installPhase = ''
-            mkdir -p $out/share/emacs/site-lisp
-            echo '(normal-top-level-add-subdirs-to-load-path)' > $out/share/emacs/site-lisp/subdirs
-            ln -s ${org-roam-ui-lite-node} $out/share/emacs/site-lisp/org-roam-ui-lite
+            install -d $out/share/emacs/site-lisp/
+            ln -s ${node}/emacs $out/share/emacs/site-lisp/emacs
+            ln -s ${node}/server $out/share/emacs/site-lisp/server
+            ln -s ${node}/client $out/share/emacs/site-lisp/client
           '';
         };
+        emacs = pkgs.emacs.pkgs.withPackages (epkgs: [ elisp ]);
       in {
-        packages.default = org-roam-ui-lite-emacs;
-
-        apps.default = flake-utils.lib.mkApp {
-          drv = pkgs.writeShellScriptBin "org-roam-ui-lite-emacs" ''
-            exec ${
-              (pkgs.emacs.pkgs.withPackages (epkgs: [ org-roam-ui-lite-emacs ]))
-            }/bin/emacs "$@"
-          '';
-        };
+        packages.emacs = emacs;
+        packages.elisp = elisp;
+        packages.cli = cli;
 
         devShells.default = pkgs.mkShell {
           buildInputs = with pkgs; [

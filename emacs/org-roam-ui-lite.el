@@ -1,3 +1,4 @@
+
 ;;; org-roam-ui-lite.el --- Lightweight UI for org-roam via Node.js -*- lexical-binding: t; -*-
 
 ;; Author: Masaya Taniguchi

@@ -10,7 +10,7 @@ import { files, links, nodes } from "./schema.ts";
 
 const clientDistPath = path.relative(
 	process.cwd(),
-	path.join(import.meta.dirname, "../client/dist/"),
+	path.join(import.meta.dirname, "../../client/dist/"),
 );
 
 const app = new Hono();

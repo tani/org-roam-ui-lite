@@ -1,6 +1,7 @@
 {
   "name": "org-roam-ui-lite",
   "private": true,
+  "type": "module",
   "workspaces": [
     "packages/*"
   ],
@@ -8,7 +9,7 @@
     "pnpm": "^8.0.0"
   },
   "scripts": {
-    "build": "pnpm -r run build",
+    "build": "pnpm -r run build && rm -rf dist && mkdir -p dist/{server,client} && cp -vR packages/client/dist dist/client/dist && cp -vR packages/server/dist dist/server/dist",
     "dev": "pnpm -r run dev",
     "lint": "pnpm -r run lint",
     "lint:fix": "pnpm -r run lint:fix",

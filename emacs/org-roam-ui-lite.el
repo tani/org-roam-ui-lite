@@ -5,7 +5,7 @@
 ;; Version: 0.0.0
 ;; Package-Requires: ((emacs "29.1"))
 ;; Keywords: org, convenience, tools
-;; URL: https://github.com/yourname/org-roam-ui-lite
+;; URL: https://github.com/tani/org-roam-ui-lite
 
 ;;; Commentary:
 

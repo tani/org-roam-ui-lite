@@ -1,12 +1,12 @@
 <!doctype html>
-<html lang="ja">
+<html lang="ja" x-data="app()" x-init="init()" :data-bs-theme="theme">
 	<head>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<title>org-roam-ui</title>
 		<script type="module" src="./src/app.ts"></script>
 	</head>
-	<body x-data="app()" x-init="init()">
+	<body>
 		<!-- グラフ領域 -->
 		<div id="graph" x-ref="graph"></div>
 
@@ -18,12 +18,12 @@
 			aria-labelledby="offcanvasFilterLabel"
 		>
 			<div class="offcanvas-header">
-				<h6 class="offcanvas-title ps-5" id="offcanvasFilterLabel">
+				<h4 class="offcanvas-title" id="offcanvasFilterLabel">
 					<i class="bi bi-funnel-fill"></i>Filter
-				</h6>
+				</h4>
 				<button
 					type="button"
-					class="btn-close btn-close-white"
+					class="btn-close"
 					data-bs-dismiss="offcanvas"
 					aria-label="Close"
 				></button>
@@ -50,8 +50,8 @@
 		<!-- 左パネル開閉ボタン -->
 		<button
 			type="button"
-			class="btn btn-primary position-fixed"
-			style="top: 1rem; left: 1rem; z-index: 1050;"
+			class="btn btn-secondary position-fixed"
+			style="top: 1rem; left: 1rem; z-index: 1;"
 			data-bs-toggle="offcanvas"
 			data-bs-target="#offcanvasFilter"
 			aria-controls="offcanvasFilter"
@@ -67,13 +67,13 @@
 			aria-labelledby="offcanvasDetailsLabel"
 		>
 			<div class="offcanvas-header">
-				<h6 class="offcanvas-title pt-2" id="offcanvasDetailsLabel">
+				<h4 class="offcanvas-title" id="offcanvasDetailsLabel">
 					<i class="bi bi-file-earmark-text"></i>
 					<span x-text="selected.title"></span>
-				</h6>
+				</h4>
 				<button
 					type="button"
-					class="btn-close btn-close-white"
+					class="btn-close"
 					data-bs-dismiss="offcanvas"
 					aria-label="Close"
 				></button>
@@ -81,9 +81,9 @@
 			<div class="offcanvas-body">
 				<div x-html="selected.html"></div>
 				<div x-show="selected.backlinks?.length" class="mt-3">
-					<h6>
+					<h4>
 						<i class="bi bi-link-45deg"></i>Backlinks
-					</h6>
+					</h4>
 					<ul class="list-unstyled">
 						<template x-for="b in selected.backlinks" :key="b.source">
 							<li>
@@ -101,8 +101,8 @@
 		<!-- 右パネル開閉ボタン -->
 		<button
 			type="button"
-			class="btn btn-primary position-fixed"
-			style="top: 1rem; right: 1rem; z-index: 1050;"
+			class="btn btn-secondary position-fixed"
+			style="top: 1rem; right: 1rem; z-index: 1;"
 			data-bs-toggle="offcanvas"
 			data-bs-target="#offcanvasDetails"
 			aria-controls="offcanvasDetails"

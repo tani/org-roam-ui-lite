@@ -8,6 +8,8 @@ import "bootstrap-icons/font/bootstrap-icons.css";
 import "./app.css";
 import * as bootstrap from "bootstrap";
 import { z } from "zod";
+import "@wooorm/starry-night/style/both";
+import type { RehypeMermaidOptions } from "rehype-mermaid";
 
 // Zod schemas and TS types
 const NodeDataSchema = z.object({
@@ -34,7 +36,9 @@ const NodeResponseSchema = z.object({
 });
 type NodeResponse = z.infer<typeof NodeResponseSchema>;
 
-async function createOrgHtmlProcessor() {
+type Theme = "dark" | "light";
+
+async function createOrgHtmlProcessor(theme: Theme) {
 	// 並列で import() しておく
 	const [
 		unifiedModule,
@@ -56,13 +60,13 @@ async function createOrgHtmlProcessor() {
 		import("rehype-stringify"),
 	]);
 
-	const { unified } = unifiedModule;
+	const unified = unifiedModule.unified;
 	const uniorgParse = uniorgParseModule.default;
 	const uniorgRehype = uniorgRehypeModule.default;
 	const rehypeMathjax = rehypeMathjaxModule.default;
 	const rehypeMermaid = rehypeMermaidModule.default;
 	const rehypeStarryNight = rehypeStarryNightModule.default;
-	const { all: grammars } = starryNightCoreModule;
+	const grammars = starryNightCoreModule.all;
 	const rehypeStringify = rehypeStringifyModule.default;
 
 	// パイプライン組み立て
@@ -70,7 +74,7 @@ async function createOrgHtmlProcessor() {
 		.use(uniorgParse)
 		.use(uniorgRehype)
 		.use(rehypeMathjax)
-		.use(rehypeMermaid)
+		.use(rehypeMermaid, { dark: theme === "dark" } as RehypeMermaidOptions)
 		.use(rehypeStarryNight, { grammars })
 		.use(rehypeStringify);
 }
@@ -86,8 +90,11 @@ function pickColor(key: string): string {
 }
 
 Alpine.data("app", () => ({
+	theme: matchMedia("(prefers-color-scheme: dark)").matches
+		? "dark"
+		: ("light" as Theme),
 	graph: null as cytoscape.Core | null,
-	selected: null as (NodeResponse & { html: string }) | null,
+	selected: {} as (NodeResponse & { html: string }) | Record<string, undefined>,
 	detailsCanvas: new bootstrap.Offcanvas(
 		document.getElementById("offcanvasDetails")!,
 	),
@@ -114,11 +121,14 @@ Alpine.data("app", () => ({
 				container: this.$refs.graph,
 				elements,
 				layout: { name: "cose-bilkent" },
+				zoom: 0.4,
+				minZoom: 0.2,
+				maxZoom: 2,
 				style: [
 					{
 						selector: "node",
 						style: {
-							color: "#666666",
+							color: this.theme === "dark" ? "#eeeeee" : "#666666",
 							"background-color": "data(color)",
 							label: "data(label)",
 						},
@@ -139,7 +149,7 @@ Alpine.data("app", () => ({
 		const jsonBody = await nodeRes.json();
 		const data = NodeResponseSchema.parse(jsonBody);
 
-		const processor = await createOrgHtmlProcessor();
+		const processor = await createOrgHtmlProcessor(this.theme);
 		const html = String(await processor.process(data.raw));
 		this.selected = { ...data, html };
 		this.detailsCanvas.show();

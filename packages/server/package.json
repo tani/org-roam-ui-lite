@@ -6,8 +6,8 @@
 	"scripts": {
 		"dev": "tsx src/server.ts",
 		"build": "tsdown",
-		"lint": "biome check **/*.ts *.json",
-		"lint:fix": "biome check --fix **/*.ts *.json",
+		"lint": "biome check **/*.ts *.{json,js}",
+		"lint:fix": "biome check --fix **/*.ts *.{json,js}",
 		"check": "tsc --noEmit"
 	},
 	"dependencies": {

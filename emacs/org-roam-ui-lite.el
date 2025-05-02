@@ -18,7 +18,7 @@
   :prefix "org-roam-ui-lite-"
   :group 'org)
 
-(defcustom org-roam-ui-lite-database "~/Roam/database.db"
+(defcustom org-roam-ui-lite-database (expand-file-name "~/Roam/database.db")
   "Path to the org-roam database file."
   :type 'file
   :group 'org-roam-ui-lite)
@@ -31,13 +31,16 @@
 (defvar org-roam-ui-lite--process nil
   "Process handle for the org-roam-ui-lite Node.js server.")
 
-(defun org-roam-ui-lite--project-root ()
-  "Return the root directory of this Emacs Lisp file."
-  (file-name-directory (or load-file-name buffer-file-name)))
+(defconst org-roam-ui-lite--this-file
+  (or load-file-name buffer-file-name)
+  "Absolute path to this file.")
+
+(defconst org-roam-ui-lite--project-root
+  (file-name-directory org-roam-ui-lite--this-file))
 
 (defun org-roam-ui-lite--server-script ()
   "Return the full path to server.mjs."
-  (expand-file-name "../server/dist/server.mjs" (org-roam-ui-lite--project-root)))
+  (expand-file-name "../server/dist/server.mjs" org-roam-ui-lite--project-root))
 
 (defun org-roam-ui-lite--start-server ()
   "Start the Node.js server."

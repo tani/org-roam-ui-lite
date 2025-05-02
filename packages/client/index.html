@@ -50,7 +50,7 @@
 		<!-- 左パネル開閉ボタン -->
 		<button
 			type="button"
-			class="btn btn-secondary position-fixed"
+			class="btn btn-outline-secondary position-fixed"
 			style="top: 1rem; left: 1rem; z-index: 1;"
 			data-bs-toggle="offcanvas"
 			data-bs-target="#offcanvasFilter"
@@ -81,9 +81,9 @@
 			<div class="offcanvas-body">
 				<div x-html="selected.html"></div>
 				<div x-show="selected.backlinks?.length" class="mt-3">
-					<h4>
+					<h5>
 						<i class="bi bi-link-45deg"></i>Backlinks
-					</h4>
+					</h5>
 					<ul class="list-unstyled">
 						<template x-for="b in selected.backlinks" :key="b.source">
 							<li>
@@ -101,7 +101,7 @@
 		<!-- 右パネル開閉ボタン -->
 		<button
 			type="button"
-			class="btn btn-secondary position-fixed"
+			class="btn btn-outline-secondary position-fixed"
 			style="top: 1rem; right: 1rem; z-index: 1;"
 			data-bs-toggle="offcanvas"
 			data-bs-target="#offcanvasDetails"

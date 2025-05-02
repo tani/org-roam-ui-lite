@@ -8,7 +8,6 @@ export default defineConfig({
   bundle: true,
   noExternal: [/.*/],
   sourcemap: true,
-  dts: true,
   outDir: 'dist',
   shims: true,
   fixedExtension: true, // use always .cjs or .mjs

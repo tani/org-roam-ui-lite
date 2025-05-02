@@ -105,7 +105,7 @@ async function createOrgHtmlProcessor(theme: Theme) {
 		.use(parse.default)
 		.use(rehypeOrg.default)
 		.use(mathjax.default)
-		.use(mermaid.default, { dark: theme === "dark" } as RehypeMermaidOptions)
+		.use(mermaid.default, { strategy: 'img-svg', dark: theme === "dark" } as RehypeMermaidOptions)
 		.use(starryNight.default, { grammars: starryCore.all })
 		.use(stringify.default);
 }

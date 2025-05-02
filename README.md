@@ -3,7 +3,7 @@
 *A lightweight, self‑contained web UI and server for visualising [Org‑roam](https://www.orgroam.com/) note graphs.*
 
 <p align="center">
-<img width="400" src="https://github.com/user-attachments/assets/a5000c20-ecb8-4198-97aa-03a873348fef" />
+<img width="400" src="https://github.com/user-attachments/assets/199dfabd-3bbf-42c3-8591-b3d61e5ad02c" />
 </p>
 
 ## 🎯 Design philosophy

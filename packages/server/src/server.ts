@@ -8,10 +8,9 @@ import { Hono } from "hono";
 import { db } from "./database.ts";
 import { files, links, nodes } from "./schema.ts";
 
-const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
 const clientDistPath = path.relative(
 	process.cwd(),
-	path.join(__dirname, "../../client/dist/"),
+	path.join(import.meta.dirname, "../client/dist/"),
 );
 
 const app = new Hono();

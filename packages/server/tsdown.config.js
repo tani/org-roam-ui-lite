@@ -11,7 +11,5 @@ export default defineConfig({
   dts: true,
   outDir: 'dist',
   shims: true,
-  outExtension({ format }) {
-    return { js: format === 'esm' ? '.mjs' : '.cjs' };
-  },
+  fixedExtension: true, // use always .cjs or .mjs
 });

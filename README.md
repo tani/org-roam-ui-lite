@@ -2,6 +2,10 @@
 
 *A lightweight, self‑contained web UI and server for visualising [Org‑roam](https://www.orgroam.com/) note graphs.*
 
+<p align="center">
+<img width="400" src="https://github.com/user-attachments/assets/a5000c20-ecb8-4198-97aa-03a873348fef" />
+</p>
+
 ## 🎯 Design philosophy
 
 * The original **org‑roam‑ui** was powerful but tightly coupled; this made it hard to keep pace with the rapid evolution of modern front‑end tooling.

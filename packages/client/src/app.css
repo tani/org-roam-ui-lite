@@ -15,10 +15,3 @@ html {
 	height: 100%;
 	z-index: 1;
 }
-/* Collapse トグルボタンのアイコンを回転させる */
-button[data-bs-toggle="collapse"] i {
-	transition: transform 0.2s ease-in-out;
-}
-button[data-bs-toggle="collapse"].collapsed i {
-	transform: rotate(-90deg);
-}

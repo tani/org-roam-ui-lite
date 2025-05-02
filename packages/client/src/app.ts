@@ -1,8 +1,7 @@
-/// <reference lib="dom" />
-
 import Alpine from "alpinejs";
 import cytoscape from "cytoscape";
 import coseBilkent from "cytoscape-cose-bilkent";
+// import "bootswatch/dist/united/bootstrap.min.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import "./app.css";
@@ -39,7 +38,7 @@ type NodeResponse = z.infer<typeof NodeResponseSchema>;
 type Theme = "dark" | "light";
 
 async function createOrgHtmlProcessor(theme: Theme) {
-	// 並列で import() しておく
+	// Load Rehype & friends in parallel
 	const [
 		unifiedModule,
 		uniorgParseModule,
@@ -69,7 +68,6 @@ async function createOrgHtmlProcessor(theme: Theme) {
 	const grammars = starryNightCoreModule.all;
 	const rehypeStringify = rehypeStringifyModule.default;
 
-	// パイプライン組み立て
 	return unified()
 		.use(uniorgParse)
 		.use(uniorgRehype)
@@ -81,12 +79,55 @@ async function createOrgHtmlProcessor(theme: Theme) {
 
 cytoscape.use(coseBilkent);
 
+function cssVar(name: string): string {
+	return getComputedStyle(document.documentElement)
+		.getPropertyValue(name)
+		.trim();
+}
+
+const accentVarNames = [
+	"--bs-primary",
+	"--bs-secondary",
+	"--bs-success",
+	"--bs-info",
+	"--bs-warning",
+	"--bs-danger",
+	"--bs-link-hover-color",
+] as const;
+
 function pickColor(key: string): string {
+	// Deterministic hash → index into accent palette
 	let hash = 0;
-	for (let i = 0; i < key.length; i++) {
-		hash = (hash + key.charCodeAt(i)) % 360;
-	}
-	return `hsl(${hash}, 65%, 50%)`;
+	for (let i = 0; i < key.length; i++)
+		hash = (hash + key.charCodeAt(i)) % accentVarNames.length;
+
+	const varName = accentVarNames[hash];
+	return cssVar(varName);
+}
+
+function dimOthers(graph: cytoscape.Core, focusId: string) {
+	const focus = graph.$id(focusId);
+	const neighbourhood = focus.closedNeighborhood();
+
+	graph.nodes().forEach((n) => {
+		const highlight = n.id() === focusId || neighbourhood.contains(n);
+		n.style("opacity", highlight ? 1 : 0.15);
+	});
+
+	graph.edges().forEach((e) => {
+		const highlight =
+			e.source().id() === focusId || e.target().id() === focusId;
+		e.style("opacity", highlight ? 1 : 0.05);
+	});
+}
+
+function resetHighlights(graph: cytoscape.Core) {
+	graph.nodes().forEach((n) => {
+		n.style("opacity", 1);
+	});
+	graph.edges().forEach((e) => {
+		e.style("opacity", 1);
+	});
 }
 
 Alpine.data("app", () => ({
@@ -101,10 +142,16 @@ Alpine.data("app", () => ({
 
 	async init() {
 		await this.refreshGraph();
+
+		// Restore full colour when the off‑canvas is hidden
+		document
+			.getElementById("offcanvasDetails")!
+			.addEventListener("hidden.bs.offcanvas", () => {
+				if (this.graph) resetHighlights(this.graph);
+			});
 	},
 
 	async refreshGraph() {
-		// 型チェック付きフェッチ
 		const response = await fetch("/api/graph");
 		const json = await response.json();
 		const { nodes, edges } = GraphResponseSchema.parse(json);
@@ -121,21 +168,34 @@ Alpine.data("app", () => ({
 				container: this.$refs.graph,
 				elements,
 				layout: { name: "cose-bilkent" },
-				zoom: 0.4,
-				minZoom: 0.2,
-				maxZoom: 2,
+				minZoom: 0.5,
+				maxZoom: 4,
 				style: [
+					{
+						selector: "edge",
+						style: {
+							width: 1,
+						},
+					},
 					{
 						selector: "node",
 						style: {
-							color: this.theme === "dark" ? "#eeeeee" : "#666666",
+							width: 10,
+							height: 10,
+							color: cssVar("--bs-body-color"),
 							"background-color": "data(color)",
 							label: "data(label)",
+							"font-size": "0.5em",
 						},
 					},
 				],
 			});
-			this.graph.on("tap", "node", (ev) => this.open(ev.target.id()));
+
+			this.graph.on("tap", "node", (ev) => {
+				const id = ev.target.id();
+				void this.open(id);
+				dimOthers(this.graph!, id);
+			});
 		} else {
 			this.graph.json({ elements: [] });
 			this.graph.add(elements);
@@ -144,7 +204,6 @@ Alpine.data("app", () => ({
 	},
 
 	async open(id: string) {
-		// 型チェック付きフェッチ
 		const nodeRes = await fetch(`/api/node/${id}`);
 		const jsonBody = await nodeRes.json();
 		const data = NodeResponseSchema.parse(jsonBody);

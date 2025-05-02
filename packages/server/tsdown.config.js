@@ -10,18 +10,8 @@ export default defineConfig({
   sourcemap: true,
   dts: true,
   outDir: 'dist',
+  shims: true,
   outExtension({ format }) {
     return { js: format === 'esm' ? '.mjs' : '.cjs' };
-  },
-  banner(ctx) {
-    if (ctx.format === "esm") {
-      return {
-        js: `
-          import { createRequire } from 'node:module';
-          const require = createRequire(import.meta.url);
-          const __dirname = import.meta.dirname;
-        `,
-      };
-    }
   },
 });

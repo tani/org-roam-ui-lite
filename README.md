@@ -60,7 +60,7 @@ $ node dist/server/dist/server.mjs -d /path/to/org-roam.db -p 5174
 
 ```bash
 # Run the CLI with an ad‑hoc env
-$ nix run .#org-roam-ui-lite-cli -- -d /path/to/org-roam.db
+$ nix run .#cli -- -d /path/to/org-roam.db
 
 # The UI is now served on 0.0.0.0:5174
 ```

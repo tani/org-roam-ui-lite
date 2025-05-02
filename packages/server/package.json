@@ -1,27 +1,27 @@
 {
-	"name": "@org-roam-ui-lite/server",
-	"version": "0.0.0",
-	"private": true,
-	"type": "module",
-	"scripts": {
-		"dev": "tsx src/server.ts",
-		"build": "tsup",
-		"lint": "biome check **/*.ts *.json",
-		"lint:fix": "biome check --fix **/*.ts *.json",
-		"check": "tsc --noEmit"
-	},
-	"dependencies": {
-		"@hono/node-server": "^1.14.1",
-		"@types/sql.js": "^1.4.9",
-		"drizzle-orm": "^0.43.1",
-		"hono": "^4.7.8",
-		"sql.js": "^1.13.0"
-	},
-	"devDependencies": {
-		"@biomejs/biome": "2.0.0-beta.2",
-		"@types/node": "^22.15.3",
-		"tsup": "^8.4.0",
-		"tsx": "^4.19.4",
-		"typescript": "^5.8.3"
-	}
+  "name": "@org-roam-ui-lite/server",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx src/server.ts",
+    "build": "tsdown",
+    "lint": "biome check **/*.ts *.json",
+    "lint:fix": "biome check --fix **/*.ts *.json",
+    "check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@hono/node-server": "^1.14.1",
+    "@types/sql.js": "^1.4.9",
+    "drizzle-orm": "^0.43.1",
+    "hono": "^4.7.8",
+    "sql.js": "^1.13.0"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.0.0-beta.2",
+    "@types/node": "^22.15.3",
+    "tsdown": "^0.10.2",
+    "tsx": "^4.19.4",
+    "typescript": "^5.8.3"
+  }
 }

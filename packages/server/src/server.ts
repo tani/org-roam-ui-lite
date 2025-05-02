@@ -1,16 +1,16 @@
 import * as fs from "node:fs/promises";
 import * as path from "node:path";
-import * as url from "node:url";
 import { serve } from "@hono/node-server";
 import { serveStatic } from "@hono/node-server/serve-static";
 import { eq } from "drizzle-orm";
 import { Hono } from "hono";
+import { args } from "./args.ts";
 import { db } from "./database.ts";
 import { files, links, nodes } from "./schema.ts";
 
 const clientDistPath = path.relative(
 	process.cwd(),
-	path.join(import.meta.dirname, "../../client/dist/"),
+	path.join(import.meta.dirname!, "../../client/dist/"),
 );
 
 const app = new Hono();
@@ -74,6 +74,6 @@ app.get("/api/node/:id", async (c) => {
 });
 
 /* 起動 */
-const port = Number(process.env.PORT) || 5174;
+const port = Number(args.values.port) || Number(process.env.PORT) || 5174;
 console.log(`Launch at http://localhost:${port}/index.html`);
 serve({ fetch: app.fetch, port });

@@ -4,22 +4,24 @@
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<title>org-roam-ui</title>
+
+		<!-- Alpine.js / TS のビルド済みバンドル -->
 		<script type="module" src="./src/app.ts"></script>
 	</head>
 	<body>
 		<!-- グラフ領域 -->
 		<div id="graph" x-ref="graph"></div>
 
-		<!-- 左 Offcanvas (Filter) -->
+		<!-- 左 Offcanvas (Settings) -->
 		<div
 			class="offcanvas offcanvas-start"
 			tabindex="-1"
-			id="offcanvasFilter"
-			aria-labelledby="offcanvasFilterLabel"
+			id="offcanvasSettings"
+			aria-labelledby="offcanvasSettingsLabel"
 		>
 			<div class="offcanvas-header">
-				<h4 class="offcanvas-title" id="offcanvasFilterLabel">
-					<i class="bi bi-funnel-fill"></i>Filter
+				<h4 class="offcanvas-title" id="offcanvasSettingsLabel">
+					<i class="bi bi-gear-fill"></i>設定
 				</h4>
 				<button
 					type="button"
@@ -29,20 +31,52 @@
 				></button>
 			</div>
 			<div class="offcanvas-body">
-				<!-- タグフィルター（Bootstrap Collapse） -->
-				<button
-					class="btn btn-sm btn-link d-flex align-items-center"
-					type="button"
-					data-bs-toggle="collapse"
-					data-bs-target="#tagFilters"
-					aria-expanded="true"
-					aria-controls="tagFilters"
-				>
-					<i class="bi bi-caret-down-fill me-1"></i>
-					Tag Filters
-				</button>
-				<div class="collapse show mt-2" id="tagFilters">
-					<!-- タグチェックボックス -->
+				<!-- カラーテーマ切替：スイッチ -->
+				<div class="mb-4">
+					<h5>カラーテーマ</h5>
+					<div class="form-check form-switch">
+						<input
+							class="form-check-input"
+							type="checkbox"
+							id="themeSwitch"
+							@change="toggleTheme()"
+							:checked="theme === 'dark'"
+						>
+						<label class="form-check-label" for="themeSwitch">
+							ダークモード
+						</label>
+					</div>
+				</div>
+
+				<!-- ノードサイズ調整 -->
+				<div class="mb-4">
+					<h5>ノードサイズ</h5>
+					<input
+						type="range"
+						min="5"
+						max="30"
+						x-model.number="nodeSize"
+						@input="updateNodeSize()"
+					>
+					<div>
+						現在: <span x-text="nodeSize"></span>px
+					</div>
+				</div>
+
+				<!-- ラベルのフォントサイズ調整 -->
+				<div class="mb-4">
+					<h5>ラベルのフォントサイズ</h5>
+					<input
+						type="range"
+						min="0.3"
+						max="1.5"
+						step="0.1"
+						x-model.number="labelScale"
+						@input="updateLabelScale()"
+					>
+					<div>
+						現在: <span x-text="labelScale.toFixed(1)"></span>em
+					</div>
 				</div>
 			</div>
 		</div>
@@ -53,10 +87,10 @@
 			class="btn btn-outline-secondary position-fixed"
 			style="top: 1rem; left: 1rem; z-index: 1;"
 			data-bs-toggle="offcanvas"
-			data-bs-target="#offcanvasFilter"
-			aria-controls="offcanvasFilter"
+			data-bs-target="#offcanvasSettings"
+			aria-controls="offcanvasSettings"
 		>
-			<i class="bi bi-funnel"></i>
+			<i class="bi bi-gear"></i>
 		</button>
 
 		<!-- 右 Offcanvas (Detail) -->

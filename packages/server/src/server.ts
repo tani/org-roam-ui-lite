@@ -27,14 +27,13 @@ app.use(
 app.get("/api/graph", async (c) => {
 	const [ns, es] = await Promise.all([
 		db
-			.select({ id: nodes.id, title: nodes.title, file: nodes.file })
+			.select({ id: nodes.id, title: nodes.title })
 			.from(nodes),
 		db.select({ source: links.source, dest: links.dest }).from(links),
 	]);
 	const cleanNodes = ns.map((n) => ({
 		id: n.id,
 		title: JSON.parse(n.title ?? ""),
-		file: JSON.parse(n.file ?? ""),
 	}));
 	return c.json({ nodes: cleanNodes, edges: es });
 });
@@ -42,7 +41,7 @@ app.get("/api/graph", async (c) => {
 /* ノード詳細 + Org ソース */
 app.get("/api/node/:id", async (c) => {
 	const id = c.req.param("id");
-	const row = await db
+	const row = db
 		.select({ id: nodes.id, title: nodes.title, file: files.file })
 		.from(nodes)
 		.innerJoin(files, eq(nodes.file, files.file))
@@ -50,13 +49,8 @@ app.get("/api/node/:id", async (c) => {
 		.get();
 
 	if (!row) return c.json({ error: "not_found" }, 404);
-	const cleanRow = {
-		id: row.id,
-		title: JSON.parse(row.title ?? ""),
-		file: JSON.parse(row.file),
-	};
 
-	const raw = await fs.readFile(cleanRow.file, "utf8");
+	const raw = await fs.readFile(JSON.parse(row.file), "utf8");
 	const backlinks = await db
 		.select({
 			source: links.source,
@@ -70,7 +64,12 @@ app.get("/api/node/:id", async (c) => {
 		source: node.source,
 	}));
 
-	return c.json({ ...cleanRow, raw, backlinks: cleanBacklinks });
+	return c.json({
+		id: row.id,
+		title: JSON.parse(row.title ?? ""),
+	  raw,
+	  backlinks: cleanBacklinks
+	});
 });
 
 /* 起動 */

@@ -18,7 +18,6 @@ cytoscape.use(coseBilkent);
 const NodeDataSchema = z.object({
 	id: z.string(),
 	title: z.string(),
-	file: z.string(),
 });
 const EdgeDataSchema = z.object({ source: z.string(), dest: z.string() });
 const GraphResponseSchema = z.object({
@@ -29,7 +28,6 @@ const BacklinkSchema = z.object({ source: z.string(), title: z.string() });
 const NodeResponseSchema = z.object({
 	id: z.string(),
 	title: z.string(),
-	file: z.string(),
 	raw: z.string(),
 	backlinks: z.array(BacklinkSchema).optional(),
 });
@@ -56,7 +54,7 @@ const ACCENT_VARS = [
 	"--bs-link-hover-color",
 ] as const;
 
-/** Deterministic color picker based on file key */
+/** Deterministic color picker based on id key */
 function pickColor(key: string): string {
 	let sum = 0;
 	for (const ch of key) sum = (sum + ch.charCodeAt(0)) % ACCENT_VARS.length;
@@ -123,7 +121,7 @@ async function fetchGraph(): Promise<ElementDefinition[]> {
 	// Map to Cytoscape elements
 	return [
 		...nodes.map((n) => ({
-			data: { id: n.id, label: n.title, color: pickColor(n.file) },
+			data: { id: n.id, label: n.title, color: pickColor(n.id) },
 		})),
 		...edges.map((e) => ({ data: { source: e.source, target: e.dest } })),
 	];

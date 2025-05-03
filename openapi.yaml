@@ -59,7 +59,7 @@ paths:
               schema:
                 type: string
 
-  /api/graph:
+  /api/graph.json:
     get:
       summary: Get full node-edge graph
       responses:
@@ -70,7 +70,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Graph'
 
-  /api/node/{id}:
+  /api/node/{id}.json:
     get:
       summary: Get single node and backlinks
       parameters:

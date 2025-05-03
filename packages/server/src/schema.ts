@@ -1,18 +1,34 @@
-import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
+import { integer, sqliteTable, text, customType } from "drizzle-orm/sqlite-core";
+
+const jsonText = customType<{
+  data: string;
+  driverData: string;
+}>({
+  dataType() {
+    return "text";
+  },
+  fromDriver(value) {
+    try {
+      return JSON.parse(value); // 取得時
+    } catch {
+      return value;
+    }
+  },
+});
 
 export const files = sqliteTable("files", {
-	file: text("file").primaryKey(),
-	title: text("title"),
+	file: jsonText().primaryKey(),
+	title: jsonText(),
 });
 
 export const nodes = sqliteTable("nodes", {
-	id: text("id").primaryKey(),
-	file: text("file").references(() => files.file),
-	title: text("title"),
+	id: jsonText().primaryKey(),
+	file: jsonText().references(() => files.file),
+	title: jsonText(),
 	pos: integer("pos"),
 });
 
 export const links = sqliteTable("links", {
-	source: text("source").references(() => nodes.id),
-	dest: text("dest").references(() => nodes.id),
+	source: jsonText().references(() => nodes.id),
+	dest: jsonText().references(() => nodes.id),
 });

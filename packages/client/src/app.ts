@@ -112,7 +112,7 @@ async function createOrgHtmlProcessor(theme: Theme) {
 // --- Graph Data & Rendering ---
 
 export async function fetchGraph(): Promise<ElementDefinition[]> {
-	const { data, error } = await api.GET("/api/graph");
+	const { data, error } = await api.GET("/api/graph.json");
 
 	if (error) throw new Error(`API error: ${error}`);
 
@@ -239,7 +239,7 @@ Alpine.data("app", () => ({
 	},
 
 	async openNode(id: string) {
-		const { data, error } = await api.GET("/api/node/{id}", {
+		const { data, error } = await api.GET("/api/node/{id}.json", {
 			params: { path: { id } },
 		});
 

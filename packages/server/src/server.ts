@@ -31,7 +31,7 @@ app.use(
 );
 
 /* ノード & エッジ一覧 */
-app.get("/api/graph", async (c) => {
+app.get("/api/graph.json", async (c) => {
 	const db = await createDatabase();
 
 	const [ns, es] = await Promise.all([
@@ -40,12 +40,12 @@ app.get("/api/graph", async (c) => {
 	]);
 
 	const cleanNodes = ns.map((n) => ({
-		id: n.id,
-		title: JSON.parse(n.title ?? ""),
+		id: (n.id),
+		title: (n.title),
 	}));
 
 	// dest が UUID のみ許可
-	const cleanEdges = es.filter((e) => isUuid(JSON.parse(e.dest!)));
+	const cleanEdges = es.filter((e) => isUuid((e.dest))).map(({source, dest})=>({ source: (source), dest: (dest)}));
 
 	return c.json({
 		nodes: cleanNodes,
@@ -53,20 +53,21 @@ app.get("/api/graph", async (c) => {
 	});
 });
 
+
 /* ノード詳細 + Org ソース */
-app.get("/api/node/:id", async (c) => {
+app.get('/api/node/:id{[^.]+\\.json}', async (c) => {
 	const db = await createDatabase();
-	const id = c.req.param("id");
+	const id = c.req.param("id").replace(".json", '');
 	const row = db
 		.select({ id: nodes.id, title: nodes.title, file: files.file })
 		.from(nodes)
 		.innerJoin(files, eq(nodes.file, files.file))
-		.where(eq(nodes.id, id))
+		.where(eq(nodes.id, `"${id}"`))
 		.get();
 
 	if (!row) return c.json({ error: "not_found" }, 404);
 
-	const raw = await fs.readFile(JSON.parse(row.file), "utf8");
+	const raw = await fs.readFile((row.file), "utf8");
 	const backlinks = await db
 		.select({
 			source: links.source,
@@ -74,15 +75,15 @@ app.get("/api/node/:id", async (c) => {
 		})
 		.from(links)
 		.innerJoin(nodes, eq(links.source, nodes.id))
-		.where(eq(links.dest, id));
+		.where(eq(links.dest, `"${id}"`));
 	const cleanBacklinks = backlinks.map((node) => ({
-		title: JSON.parse(node.title ?? ""),
-		source: node.source,
+		title: (node.title),
+		source: (node.source),
 	}));
 
 	return c.json({
-		id: row.id,
-		title: JSON.parse(row.title ?? ""),
+		id: (row.id),
+		title: (row.title),
 		raw,
 		backlinks: cleanBacklinks,
 	});

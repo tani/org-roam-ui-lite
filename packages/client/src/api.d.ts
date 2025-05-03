@@ -126,7 +126,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/graph": {
+    "/api/graph.json": {
         parameters: {
             query?: never;
             header?: never;
@@ -162,7 +162,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/node/{id}": {
+    "/api/node/{id}.json": {
         parameters: {
             query?: never;
             header?: never;

@@ -26,6 +26,7 @@ const Themes = [
 	{ value: "dark", label: "Dark" },
 	{ value: "nord-dark", label: "Nord Dark" },
 	{ value: "gruvbox-dark", label: "Gruvbox Dark" },
+  { value: "dracula-dark", label: "Dracula Dark" },
 ] as const;
 
 type Theme = (typeof Themes)[number]["value"];

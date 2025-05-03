@@ -75,11 +75,22 @@
                             (org-roam-node-title n)))
           (org-roam-node-list)))
 
+(defun org-roam-ui-lite--valid-uuid-p (str)
+  "Return non-nil if STR looks like a UUID."
+  (and (stringp str)
+       (string-match-p
+        "^[0-9a-fA-F]\\{8\\}-[0-9a-fA-F]\\{4\\}-[1-5][0-9a-fA-F]\\{3\\}-[89abAB][0-9a-fA-F]\\{3\\}-[0-9a-fA-F]\\{12\\}$"
+        str)))
+
 (defun org-roam-ui-lite--links ()
-  "Return list of (SOURCE . DEST) where DEST is a valid node id."
-  (mapcar (pcase-lambda (`(,src ,dst)) (cons src dst))
-          (org-roam-db-query
-           "SELECT source, dest FROM links WHERE dest IN (SELECT id FROM nodes);")))
+  "Return list of (SOURCE . DEST) where DEST is a valid UUID node id."
+  (cl-remove-if-not
+   (lambda (pair)
+     (org-roam-ui-lite--valid-uuid-p (cdr pair)))
+   (mapcar (pcase-lambda (`(,src ,dst)) (cons src dst))
+           (org-roam-db-query
+            "SELECT source, dest FROM links WHERE dest IN (SELECT id FROM nodes);"))))
+
 
 (defun org-roam-ui-lite--node-row (id)
   "Return single row (id title file pos) or nil."

@@ -119,7 +119,7 @@ The `*org-roam-ui-lite*` buffer prints server logs—useful when hacking on the 
 
 1. **Fork** the repo and create a feature branch.
 2. Keep commits atomic and descriptive (Conventional Commits preferred).
-3. Run `npm test`, `npm run lint`, and `nix flake check` if applicable.
+3. Run `npm run lint` if applicable.
 4. Open a PR and fill out the template.
 
 

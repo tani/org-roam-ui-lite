@@ -15,6 +15,13 @@ const clientDistPath = path.relative(
 
 const app = new Hono();
 
+const UUID_REGEX =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
+function isUuid(str: unknown): str is string {
+  return typeof str === "string" && UUID_REGEX.test(str);
+}
+
 /* 静的ファイル (static/) */
 app.use(
 	"/*",
@@ -26,15 +33,24 @@ app.use(
 /* ノード & エッジ一覧 */
 app.get("/api/graph", async (c) => {
 	const db = await createDatabase();
+
 	const [ns, es] = await Promise.all([
 		db.select({ id: nodes.id, title: nodes.title }).from(nodes),
 		db.select({ source: links.source, dest: links.dest }).from(links),
 	]);
+
 	const cleanNodes = ns.map((n) => ({
 		id: n.id,
 		title: JSON.parse(n.title ?? ""),
 	}));
-	return c.json({ nodes: cleanNodes, edges: es });
+
+	// dest が UUID のみ許可
+	const cleanEdges = es.filter((e) => isUuid(JSON.parse(e.dest!)));
+
+	return c.json({
+		nodes: cleanNodes,
+		edges: cleanEdges,
+	});
 });
 
 /* ノード詳細 + Org ソース */

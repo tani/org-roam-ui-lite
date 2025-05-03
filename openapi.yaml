@@ -1,0 +1,156 @@
+openapi: 3.0.3
+info:
+  title: Org-roam UI Lite Server
+  version: "0.1.0"
+  description: >
+    Lightweight server exposing Org-roam note graphs via a JSON API and serving a static UI
+    (typically compiled from Vite to `dist/`).
+
+servers:
+  - url: http://localhost:5174
+    description: Local development server
+
+paths:
+  /:
+    get:
+      summary: Serve index.html
+      description: >
+        Serves the main front-end UI page (usually `index.html`), located in `org-roam-ui-lite-static-root`.
+        This acts as the SPA entry point and loads the graph viewer client.
+      responses:
+        '200':
+          description: Static HTML page
+          content:
+            text/html:
+              schema:
+                type: string
+                example: "<!DOCTYPE html><html>...</html>"
+
+  /index.html:
+    get:
+      summary: Serve index.html explicitly
+      description: >
+        Alias to `/`. Loads the same static HTML file that bootstraps the UI.
+      responses:
+        '200':
+          description: HTML file
+          content:
+            text/html:
+              schema:
+                type: string
+
+  /assets/{file}:
+    get:
+      summary: Serve static asset (JS, CSS, images)
+      description: >
+        Serves JavaScript, CSS, fonts, or other frontend assets under the static root.
+      parameters:
+        - name: file
+          in: path
+          required: true
+          schema:
+            type: string
+            example: app.js
+      responses:
+        '200':
+          description: Static file
+          content:
+            "*/*":
+              schema:
+                type: string
+
+  /api/graph:
+    get:
+      summary: Get full node-edge graph
+      responses:
+        '200':
+          description: Graph data returned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Graph'
+
+  /api/node/{id}:
+    get:
+      summary: Get single node and backlinks
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Node found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Node'
+        '404':
+          description: Node not found
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [error]
+                properties:
+                  error:
+                    type: string
+                    example: not_found
+
+components:
+  schemas:
+    Graph:
+      type: object
+      required: [nodes, edges]
+      properties:
+        nodes:
+          type: array
+          items:
+            $ref: '#/components/schemas/NodeSummary'
+        edges:
+          type: array
+          items:
+            $ref: '#/components/schemas/Edge'
+
+    NodeSummary:
+      type: object
+      required: [id, title]
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+
+    Edge:
+      type: object
+      required: [source, dest]
+      properties:
+        source:
+          type: string
+        dest:
+          type: string
+
+    Backlink:
+      type: object
+      required: [source, title]
+      properties:
+        source:
+          type: string
+        title:
+          type: string
+
+    Node:
+      type: object
+      required: [id, title, raw]
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        raw:
+          type: string
+        backlinks:
+          type: array
+          items:
+            $ref: '#/components/schemas/Backlink'

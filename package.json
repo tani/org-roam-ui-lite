@@ -16,8 +16,8 @@
 		"dev": "run-p dev:client dev:server",
 		"dev:client": "npm --workspace=packages/client run dev",
 		"dev:server": "npm --workspace=packages/server run dev",
-		"lint": "biome check *.json *.mjs && npm run lint --workspaces",
-		"lint:fix": "biome check --fix *.json *.mjs && npm run lint:fix --workspaces",
+		"lint": "biome check *.{json,mjs,yaml} && npm run lint --workspaces",
+		"lint:fix": "biome check --fix *.{json,mjs,yaml} && npm run lint:fix --workspaces",
 		"check": "npm run check --workspaces",
 		"test": "npm run test --workspaces"
 	}

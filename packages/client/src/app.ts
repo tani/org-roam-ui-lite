@@ -1,42 +1,26 @@
 // --- Imports & Setup ---
-import Alpine from "alpinejs";
+
 import persist from "@alpinejs/persist";
+import Alpine from "alpinejs";
 import * as bootstrap from "bootstrap";
 import cytoscape, { Core, ElementDefinition } from "cytoscape";
 import coseBilkent from "cytoscape-cose-bilkent";
-import { z } from "zod";
 import "./app.css";
 import "./code.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import "@microflash/rehype-starry-night/css";
+import createClient from "openapi-fetch";
 import type { RehypeMermaidOptions } from "rehype-mermaid";
+import type { components, paths } from "./api";
+
+const api = createClient<paths>();
 
 Alpine.plugin(persist);
 
 // Register Cytoscape extensions
 cytoscape.use(coseBilkent);
 
-// --- Schemas ---
-const NodeDataSchema = z.object({
-	id: z.string(),
-	title: z.string(),
-});
-const EdgeDataSchema = z.object({ source: z.string(), dest: z.string() });
-const GraphResponseSchema = z.object({
-	nodes: z.array(NodeDataSchema),
-	edges: z.array(EdgeDataSchema),
-});
-const BacklinkSchema = z.object({ source: z.string(), title: z.string() });
-const NodeResponseSchema = z.object({
-	id: z.string(),
-	title: z.string(),
-	raw: z.string(),
-	backlinks: z.array(BacklinkSchema).optional(),
-});
-
-// Types
-type NodeResponse = z.infer<typeof NodeResponseSchema>;
 const Themes = [
 	{ value: "light", label: "Light" },
 	{ value: "dark", label: "Dark" },
@@ -44,7 +28,7 @@ const Themes = [
 	{ value: "gruvbox-dark", label: "Gruvbox Dark" },
 ] as const;
 
-type Theme = typeof Themes[number]["value"];
+type Theme = (typeof Themes)[number]["value"];
 
 // --- Utility Functions ---
 /** Read CSS variable value */
@@ -55,16 +39,16 @@ function getCssVar(name: string): string {
 }
 
 const ACCENT_VARS = [
-  "--bs-blue",
-  "--bs-indigo",
-  "--bs-purple",
-  "--bs-pink",
-  "--bs-red",
-  "--bs-orange",
-  "--bs-yellow",
-  "--bs-green",
-  "--bs-teal",
-  "--bs-cyan",
+	"--bs-blue",
+	"--bs-indigo",
+	"--bs-purple",
+	"--bs-pink",
+	"--bs-red",
+	"--bs-orange",
+	"--bs-yellow",
+	"--bs-green",
+	"--bs-teal",
+	"--bs-cyan",
 ] as const;
 
 /** Deterministic color picker based on id key */
@@ -118,20 +102,22 @@ async function createOrgHtmlProcessor(theme: Theme) {
 		.use(mathjax.default)
 		.use(mermaid.default, {
 			strategy: "img-svg",
-			dark: theme.endsWith("dark")
+			dark: theme.endsWith("dark"),
 		} as RehypeMermaidOptions)
 		.use(starryNight.default, { grammars: starryCore.all })
 		.use(stringify.default);
 }
 
 // --- Graph Data & Rendering ---
-/** Fetch and parse graph JSON */
-async function fetchGraph(): Promise<ElementDefinition[]> {
-	const res = await fetch("/api/graph");
-	const json = await res.json();
-	const { nodes, edges } = GraphResponseSchema.parse(json);
 
-	// Map to Cytoscape elements
+export async function fetchGraph(): Promise<ElementDefinition[]> {
+	const { data, error } = await api.GET("/api/graph");
+
+	if (error) throw new Error(`API error: ${error}`);
+
+	const nodes = data.nodes;
+	const edges = data.edges;
+
 	return [
 		...nodes.map((n) => ({
 			data: { id: n.id, label: n.title, color: pickColor(n.id) },
@@ -183,16 +169,15 @@ async function renderGraph(
 
 // --- Alpine App ---
 Alpine.data("app", () => ({
-  themes: Themes,
-  theme: Alpine.$persist<Theme>(
-	  matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light"
-  ),
+	themes: Themes,
+	theme: Alpine.$persist<Theme>(
+		matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light",
+	),
 	nodeSize: 10,
 	labelScale: 0.5,
 	graph: null as Core | null,
-	selected: {} as NodeResponse & { html: string },
+	selected: {} as components["schemas"]["Node"] & { html?: string },
 	offcanvas: null as bootstrap.Offcanvas | null,
-  
 
 	async init() {
 		this.offcanvas = new bootstrap.Offcanvas(
@@ -233,11 +218,11 @@ Alpine.data("app", () => ({
 	},
 
 	// Toggle between dark/light theme
-  setTheme(newTheme: Theme) {
-	  this.theme = newTheme;
-	  void this.refresh();
-  },
-  
+	setTheme(newTheme: Theme) {
+		this.theme = newTheme;
+		void this.refresh();
+	},
+
 	// Called when node size slider changes
 	onSizeChange() {
 		this.graph?.nodes().style({ width: this.nodeSize, height: this.nodeSize });
@@ -248,11 +233,17 @@ Alpine.data("app", () => ({
 		this.graph?.nodes().style("font-size", `${this.labelScale}em`);
 	},
 
-	// Fetch node details and render
 	async openNode(id: string) {
-		const res = await fetch(`/api/node/${id}`);
-		const json = await res.json();
-		const data = NodeResponseSchema.parse(json);
+		const { data, error } = await api.GET("/api/node/{id}", {
+			params: { path: { id } },
+		});
+
+		if (error) {
+			console.warn("Node not found");
+			return;
+		}
+
+		if (error) throw new Error(`API error ${error}`);
 
 		const processor = await createOrgHtmlProcessor(this.theme);
 		const html = String(await processor.process(data.raw));

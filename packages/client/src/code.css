@@ -5,7 +5,7 @@
 /*
  * Modified by Masaya Taniguchi for org-roam-ui-light
  */
-[data-bs-theme="light"] {
+[data-bs-theme$="light"] {
 	--color-prettylights-syntax-comment: #59636e;
 	--color-prettylights-syntax-constant: #0550ae;
 	--color-prettylights-syntax-constant-other-reference-link: #0a3069;
@@ -37,7 +37,7 @@
 	--color-prettylights-syntax-meta-diff-range: #8250df;
 	--color-prettylights-syntax-sublimelinter-gutter-mark: #818b98;
 }
-[data-bs-theme="dark"] {
+[data-bs-theme$="dark"] {
 	--color-prettylights-syntax-comment: #9198a1;
 	--color-prettylights-syntax-constant: #79c0ff;
 	--color-prettylights-syntax-constant-other-reference-link: #a5d6ff;
@@ -194,7 +194,7 @@
  * Microflash extension
  * Added by Masaya Taniguchi for org-roam-ui-light
  */
-[data-bs-theme="light"] {
+[data-bs-theme$="light"] {
 	/* light theme variables specific to rehype-starry-night plugin */
 	--hl-background-color: hsl(220, 23%, 97%);
 	--hl-background-color-inline: var(--hl-background-color);
@@ -207,7 +207,7 @@
 	--hl-line-number-added-color: hsl(106, 59%, 27%);
 	--hl-line-number-removed-color: hsl(355, 67%, 41%);
 }
-[data-bs-theme="dark"] {
+[data-bs-theme$="dark"] {
 	/* dark theme variables specific to rehype-starry-night plugin */
 	--hl-background-color: hsl(216, 18%, 11%);
 	--hl-border-color: hsl(215, 11%, 22%);

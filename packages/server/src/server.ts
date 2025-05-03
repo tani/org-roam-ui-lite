@@ -5,7 +5,7 @@ import { serveStatic } from "@hono/node-server/serve-static";
 import { eq } from "drizzle-orm";
 import { Hono } from "hono";
 import { args } from "./args.ts";
-import { db } from "./database.ts";
+import { createDatabase } from "./database.ts";
 import { files, links, nodes } from "./schema.ts";
 
 const clientDistPath = path.relative(
@@ -25,10 +25,9 @@ app.use(
 
 /* ノード & エッジ一覧 */
 app.get("/api/graph", async (c) => {
+	const db = await createDatabase();
 	const [ns, es] = await Promise.all([
-		db
-			.select({ id: nodes.id, title: nodes.title })
-			.from(nodes),
+		db.select({ id: nodes.id, title: nodes.title }).from(nodes),
 		db.select({ source: links.source, dest: links.dest }).from(links),
 	]);
 	const cleanNodes = ns.map((n) => ({
@@ -40,6 +39,7 @@ app.get("/api/graph", async (c) => {
 
 /* ノード詳細 + Org ソース */
 app.get("/api/node/:id", async (c) => {
+	const db = await createDatabase();
 	const id = c.req.param("id");
 	const row = db
 		.select({ id: nodes.id, title: nodes.title, file: files.file })
@@ -67,8 +67,8 @@ app.get("/api/node/:id", async (c) => {
 	return c.json({
 		id: row.id,
 		title: JSON.parse(row.title ?? ""),
-	  raw,
-	  backlinks: cleanBacklinks
+		raw,
+		backlinks: cleanBacklinks,
 	});
 });
 

@@ -11,6 +11,7 @@
 		"check": "tsc --noEmit"
 	},
 	"dependencies": {
+		"@alpinejs/persist": "^3.14.9",
 		"@microflash/rehype-starry-night": "^7.3.1",
 		"@wooorm/starry-night": "^3.7.0",
 		"alpinejs": "^3.14.9",
@@ -31,6 +32,7 @@
 	"devDependencies": {
 		"@biomejs/biome": "2.0.0-beta.2",
 		"@types/alpinejs": "^3.13.11",
+		"@types/alpinejs__persist": "^3.13.4",
 		"@types/bootstrap": "^5.2.10",
 		"typescript": "^5.8.3",
 		"vite": "^6.3.4"

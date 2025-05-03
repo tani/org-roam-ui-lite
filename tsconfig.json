@@ -1,7 +1,8 @@
 {
 	"compilerOptions": {
-		"module": "nodenext",
-		"moduleResolution": "nodenext",
+		"esModuleInterop": true,
+		"module": "es2022",
+		"moduleResolution": "node",
 		"strict": true,
 		"allowImportingTsExtensions": true,
 		"skipLibCheck": true

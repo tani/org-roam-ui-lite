@@ -1,5 +1,6 @@
 // --- Imports & Setup ---
 import Alpine from "alpinejs";
+import persist from "@alpinejs/persist";
 import * as bootstrap from "bootstrap";
 import cytoscape, { Core, ElementDefinition } from "cytoscape";
 import coseBilkent from "cytoscape-cose-bilkent";
@@ -10,6 +11,8 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import "@microflash/rehype-starry-night/css";
 import type { RehypeMermaidOptions } from "rehype-mermaid";
+
+Alpine.plugin(persist);
 
 // Register Cytoscape extensions
 cytoscape.use(coseBilkent);
@@ -34,7 +37,14 @@ const NodeResponseSchema = z.object({
 
 // Types
 type NodeResponse = z.infer<typeof NodeResponseSchema>;
-type Theme = "dark" | "light";
+const Themes = [
+	{ value: "light", label: "Light" },
+	{ value: "dark", label: "Dark" },
+	{ value: "nord-dark", label: "Nord Dark" },
+	{ value: "gruvbox-dark", label: "Gruvbox Dark" },
+] as const;
+
+type Theme = typeof Themes[number]["value"];
 
 // --- Utility Functions ---
 /** Read CSS variable value */
@@ -45,13 +55,16 @@ function getCssVar(name: string): string {
 }
 
 const ACCENT_VARS = [
-	"--bs-primary",
-	"--bs-secondary",
-	"--bs-success",
-	"--bs-info",
-	"--bs-warning",
-	"--bs-danger",
-	"--bs-link-hover-color",
+  "--bs-blue",
+  "--bs-indigo",
+  "--bs-purple",
+  "--bs-pink",
+  "--bs-red",
+  "--bs-orange",
+  "--bs-yellow",
+  "--bs-green",
+  "--bs-teal",
+  "--bs-cyan",
 ] as const;
 
 /** Deterministic color picker based on id key */
@@ -105,7 +118,7 @@ async function createOrgHtmlProcessor(theme: Theme) {
 		.use(mathjax.default)
 		.use(mermaid.default, {
 			strategy: "img-svg",
-			dark: theme === "dark",
+			dark: theme.endsWith("dark")
 		} as RehypeMermaidOptions)
 		.use(starryNight.default, { grammars: starryCore.all })
 		.use(stringify.default);
@@ -170,14 +183,16 @@ async function renderGraph(
 
 // --- Alpine App ---
 Alpine.data("app", () => ({
-	theme: matchMedia("(prefers-color-scheme: dark)").matches
-		? ("dark" as Theme)
-		: ("light" as Theme),
+  themes: Themes,
+  theme: Alpine.$persist<Theme>(
+	  matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light"
+  ),
 	nodeSize: 10,
 	labelScale: 0.5,
 	graph: null as Core | null,
 	selected: {} as NodeResponse & { html: string },
 	offcanvas: null as bootstrap.Offcanvas | null,
+  
 
 	async init() {
 		this.offcanvas = new bootstrap.Offcanvas(
@@ -205,15 +220,6 @@ Alpine.data("app", () => ({
 				"hidden.bs.offcanvas",
 				() => this.graph && resetHighlights(this.graph),
 			);
-
-		// Theme change listener
-		matchMedia("(prefers-color-scheme: dark)").addEventListener(
-			"change",
-			(e) => {
-				this.theme = e.matches ? "dark" : "light";
-				void this.refresh();
-			},
-		);
 	},
 
 	// Refresh graph with current settings
@@ -227,11 +233,11 @@ Alpine.data("app", () => ({
 	},
 
 	// Toggle between dark/light theme
-	toggleTheme() {
-		this.theme = this.theme === "dark" ? "light" : "dark";
-		void this.refresh();
-	},
-
+  setTheme(newTheme: Theme) {
+	  this.theme = newTheme;
+	  void this.refresh();
+  },
+  
 	// Called when node size slider changes
 	onSizeChange() {
 		this.graph?.nodes().style({ width: this.nodeSize, height: this.nodeSize });

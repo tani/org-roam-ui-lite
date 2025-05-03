@@ -6,7 +6,7 @@ export default defineConfig({
 		outDir: "dist/",
 		emptyOutDir: true,
 		sourcemap: true,
-		target: "es2024",
+		target: "es2022",
 		rollupOptions: {
 			input: "index.html",
 		},

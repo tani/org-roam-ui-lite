@@ -3,7 +3,7 @@
 	<head>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
-		<title>Your Project Name</title>
+		<title>Org Roam UI Lite</title>
 
 		<!-- バンドル名を refactored_app.ts に合わせてください -->
 		<script type="module" src="./src/app.ts"></script>
@@ -34,16 +34,15 @@
 				<!-- Theme -->
 				<div class="mb-4">
 					<h5>Theme</h5>
-					<div class="form-check form-switch">
-						<input
-							class="form-check-input"
-							type="checkbox"
-							id="themeSwitch"
-							@change="toggleTheme()"
-							:checked="theme === 'dark'"
-						>
-						<label class="form-check-label" for="themeSwitch">Dark mode</label>
-					</div>
+					<select class="form-select" x-model="theme" @change="setTheme(theme)">
+						<template x-for="t in themes" :key="t.value">
+							<option
+								:value="t.value"
+								x-text="t.label"
+								:selected="t.value === theme"
+							></option>
+						</template>
+					</select>
 				</div>
 				<!-- Node size -->
 				<div class="mb-4">

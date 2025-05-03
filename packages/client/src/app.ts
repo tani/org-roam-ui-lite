@@ -3,7 +3,7 @@
 import persist from "@alpinejs/persist";
 import Alpine from "alpinejs";
 import * as bootstrap from "bootstrap";
-import cytoscape, { Core, ElementDefinition } from "cytoscape";
+import cytoscape, { Core, ElementDefinition, BaseLayoutOptions } from "cytoscape";
 import coseBilkent from "cytoscape-cose-bilkent";
 import "./app.css";
 import "./code.css";
@@ -154,7 +154,11 @@ async function renderGraph(
 		return cytoscape({
 			container,
 			elements,
-			layout: { name: "cose-bilkent" },
+			layout: {
+        name: "cose-bilkent",
+        randomize: true,
+        tile: false,
+      } as BaseLayoutOptions,
 			minZoom: 0.5,
 			maxZoom: 4,
 			style,

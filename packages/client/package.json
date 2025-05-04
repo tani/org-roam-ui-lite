@@ -12,7 +12,6 @@
 	},
 	"dependencies": {
 		"@alpinejs/persist": "^3.14.9",
-		"@libsql/client-wasm": "^0.15.4",
 		"@microflash/rehype-starry-night": "^7.3.1",
 		"@wooorm/starry-night": "^3.7.0",
 		"alpinejs": "^3.14.9",

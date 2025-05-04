@@ -17,7 +17,6 @@
 		"alpinejs": "^3.14.9",
 		"bootstrap": "^5.3.5",
 		"bootstrap-icons": "^1.11.3",
-		"bootswatch": "^5.3.5",
 		"cytoscape": "^3.31.4",
 		"openapi-fetch": "^0.13.5",
 		"rehype-mathjax": "^7.1.0",

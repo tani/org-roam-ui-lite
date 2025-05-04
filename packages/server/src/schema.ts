@@ -1,19 +1,24 @@
-import { integer, sqliteTable, text, customType } from "drizzle-orm/sqlite-core";
+import {
+	customType,
+	integer,
+	sqliteTable,
+	text,
+} from "drizzle-orm/sqlite-core";
 
 const jsonText = customType<{
-  data: string;
-  driverData: string;
+	data: string;
+	driverData: string;
 }>({
-  dataType() {
-    return "text";
-  },
-  fromDriver(value) {
-    try {
-      return JSON.parse(value); // 取得時
-    } catch {
-      return value;
-    }
-  },
+	dataType() {
+		return "text";
+	},
+	fromDriver(value) {
+		try {
+			return JSON.parse(value); // 取得時
+		} catch {
+			return value;
+		}
+	},
 });
 
 export const files = sqliteTable("files", {

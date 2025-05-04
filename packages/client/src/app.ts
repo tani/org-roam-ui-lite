@@ -3,8 +3,11 @@
 import persist from "@alpinejs/persist";
 import Alpine from "alpinejs";
 import * as bootstrap from "bootstrap";
-import cytoscape, { Core, ElementDefinition, BaseLayoutOptions } from "cytoscape";
-import coseBilkent from "cytoscape-cose-bilkent";
+import cytoscape, {
+	BaseLayoutOptions,
+	Core,
+	ElementDefinition,
+} from "cytoscape";
 import "./app.css";
 import "./code.css";
 import "bootstrap/dist/css/bootstrap.min.css";
@@ -18,15 +21,12 @@ const api = createClient<paths>();
 
 Alpine.plugin(persist);
 
-// Register Cytoscape extensions
-cytoscape.use(coseBilkent);
-
 const Themes = [
 	{ value: "light", label: "Light" },
 	{ value: "dark", label: "Dark" },
 	{ value: "nord-dark", label: "Nord Dark" },
 	{ value: "gruvbox-dark", label: "Gruvbox Dark" },
-  { value: "dracula-dark", label: "Dracula Dark" },
+	{ value: "dracula-dark", label: "Dracula Dark" },
 ] as const;
 
 type Theme = (typeof Themes)[number]["value"];
@@ -156,10 +156,9 @@ async function renderGraph(
 			container,
 			elements,
 			layout: {
-        name: "cose-bilkent",
-        randomize: true,
-        tile: false,
-      } as BaseLayoutOptions,
+				name: "cose",
+				randomize: true,
+			},
 			minZoom: 0.5,
 			maxZoom: 4,
 			style,

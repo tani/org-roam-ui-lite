@@ -1,9 +1,9 @@
 // scripts/dump-json.ts
 import * as fs from "node:fs/promises";
 import * as path from "node:path";
-import { createDatabase } from "./database.ts";
-import { files, nodes, links } from "./schema.ts";
 import { eq } from "drizzle-orm";
+import { db } from "./database.ts";
+import { files, links, nodes } from "./schema.ts";
 
 const outDir = path.resolve("../dist/api");
 
@@ -14,8 +14,6 @@ function isUuid(str: unknown): str is string {
 }
 
 async function dumpGraphJson() {
-	const db = await createDatabase();
-
 	const [ns, es] = await Promise.all([
 		db.select({ id: nodes.id, title: nodes.title }).from(nodes),
 		db.select({ source: links.source, dest: links.dest }).from(links),
@@ -26,10 +24,12 @@ async function dumpGraphJson() {
 		title: n.title,
 	}));
 
-	const cleanEdges = es.filter((e) => isUuid(e.dest)).map(({ source, dest }) => ({
-		source,
-		dest,
-	}));
+	const cleanEdges = es
+		.filter((e) => isUuid(e.dest))
+		.map(({ source, dest }) => ({
+			source,
+			dest,
+		}));
 
 	await fs.mkdir(outDir, { recursive: true });
 	await fs.writeFile(
@@ -39,8 +39,6 @@ async function dumpGraphJson() {
 }
 
 async function dumpNodeJsons() {
-	const db = await createDatabase();
-
 	const allNodes = await db
 		.select({ id: nodes.id, title: nodes.title, file: files.file })
 		.from(nodes)
@@ -70,7 +68,7 @@ async function dumpNodeJsons() {
 			raw,
 			backlinks: cleanBacklinks,
 		};
-    await fs.mkdir(path.join(outDir, "node"), { recursive: true })
+		await fs.mkdir(path.join(outDir, "node"), { recursive: true });
 		await fs.writeFile(
 			path.join(outDir, `node/${id}.json`),
 			JSON.stringify(nodeJson, null, 2),

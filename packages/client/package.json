@@ -12,6 +12,7 @@
 	},
 	"dependencies": {
 		"@alpinejs/persist": "^3.14.9",
+		"@libsql/client-wasm": "^0.15.4",
 		"@microflash/rehype-starry-night": "^7.3.1",
 		"@wooorm/starry-night": "^3.7.0",
 		"alpinejs": "^3.14.9",
@@ -19,7 +20,6 @@
 		"bootstrap-icons": "^1.11.3",
 		"bootswatch": "^5.3.5",
 		"cytoscape": "^3.31.4",
-		"cytoscape-cose-bilkent": "^4.1.0",
 		"openapi-fetch": "^0.13.5",
 		"rehype-mathjax": "^7.1.0",
 		"rehype-mermaid": "^3.0.0",

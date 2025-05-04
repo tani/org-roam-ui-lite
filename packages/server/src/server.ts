@@ -5,7 +5,7 @@ import { serveStatic } from "@hono/node-server/serve-static";
 import { eq } from "drizzle-orm";
 import { Hono } from "hono";
 import { args } from "./args.ts";
-import { createDatabase } from "./database.ts";
+import { db } from "./database.ts";
 import { files, links, nodes } from "./schema.ts";
 
 const clientDistPath = path.relative(
@@ -16,10 +16,10 @@ const clientDistPath = path.relative(
 const app = new Hono();
 
 const UUID_REGEX =
-  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+	/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 function isUuid(str: unknown): str is string {
-  return typeof str === "string" && UUID_REGEX.test(str);
+	return typeof str === "string" && UUID_REGEX.test(str);
 }
 
 /* 静的ファイル (static/) */
@@ -32,20 +32,20 @@ app.use(
 
 /* ノード & エッジ一覧 */
 app.get("/api/graph.json", async (c) => {
-	const db = await createDatabase();
-
 	const [ns, es] = await Promise.all([
 		db.select({ id: nodes.id, title: nodes.title }).from(nodes),
 		db.select({ source: links.source, dest: links.dest }).from(links),
 	]);
 
 	const cleanNodes = ns.map((n) => ({
-		id: (n.id),
-		title: (n.title),
+		id: n.id,
+		title: n.title,
 	}));
 
 	// dest が UUID のみ許可
-	const cleanEdges = es.filter((e) => isUuid((e.dest))).map(({source, dest})=>({ source: (source), dest: (dest)}));
+	const cleanEdges = es
+		.filter((e) => isUuid(e.dest))
+		.map(({ source, dest }) => ({ source: source, dest: dest }));
 
 	return c.json({
 		nodes: cleanNodes,
@@ -53,11 +53,9 @@ app.get("/api/graph.json", async (c) => {
 	});
 });
 
-
 /* ノード詳細 + Org ソース */
-app.get('/api/node/:id{[^.]+\\.json}', async (c) => {
-	const db = await createDatabase();
-	const id = c.req.param("id").replace(".json", '');
+app.get("/api/node/:id{[^.]+\\.json}", async (c) => {
+	const id = c.req.param("id").replace(".json", "");
 	const row = db
 		.select({ id: nodes.id, title: nodes.title, file: files.file })
 		.from(nodes)
@@ -67,7 +65,7 @@ app.get('/api/node/:id{[^.]+\\.json}', async (c) => {
 
 	if (!row) return c.json({ error: "not_found" }, 404);
 
-	const raw = await fs.readFile((row.file), "utf8");
+	const raw = await fs.readFile(row.file, "utf8");
 	const backlinks = await db
 		.select({
 			source: links.source,
@@ -77,13 +75,13 @@ app.get('/api/node/:id{[^.]+\\.json}', async (c) => {
 		.innerJoin(nodes, eq(links.source, nodes.id))
 		.where(eq(links.dest, `"${id}"`));
 	const cleanBacklinks = backlinks.map((node) => ({
-		title: (node.title),
-		source: (node.source),
+		title: node.title,
+		source: node.source,
 	}));
 
 	return c.json({
-		id: (row.id),
-		title: (row.title),
+		id: row.id,
+		title: row.title,
 		raw,
 		backlinks: cleanBacklinks,
 	});

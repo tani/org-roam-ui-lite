@@ -155,7 +155,7 @@ async function renderGraph(
 		name: "fcose",
 		randomize: true,
 	};
-        
+
 	if (!existingGraph) {
     const args = {
 			container,

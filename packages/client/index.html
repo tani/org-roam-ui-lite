@@ -1,5 +1,11 @@
 <!doctype html>
-<html lang="ja" x-data="app()" x-init="init()" :data-bs-theme="theme.replace(/.*-/, '')" :data-theme="theme">
+<html
+	lang="ja"
+	x-data="app()"
+	x-init="init()"
+	:data-bs-theme="theme.replace(/.*-/, '')"
+	:data-theme="theme"
+>
 	<head>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -105,8 +111,7 @@
 					class="btn-close"
 					data-bs-dismiss="offcanvas"
 					aria-label="Close"
-				>
-        </button>
+				></button>
 			</div>
 			<div class="offcanvas-body">
 				<div x-html="selected.html"></div>

@@ -1,19 +1,16 @@
 import persist from "@alpinejs/persist";
 import Alpine from "alpinejs";
 import * as bootstrap from "bootstrap";
-import cytoscape, {
-	Core,
-	ElementDefinition,
-} from "cytoscape";
+import cytoscape, { Core, ElementDefinition } from "cytoscape";
 import "./app.css";
 import "./code.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import "@microflash/rehype-starry-night/css";
+import fcose from "cytoscape-fcose";
 import createClient from "openapi-fetch";
 import type { RehypeMermaidOptions } from "rehype-mermaid";
 import type { components, paths } from "./api";
-import fcose from "cytoscape-fcose";
 
 cytoscape.use(fcose);
 
@@ -151,29 +148,29 @@ async function renderGraph(
 		},
 	];
 
-  const layout = {
+	const layout = {
 		name: "fcose",
 		randomize: true,
 	};
 
 	if (!existingGraph) {
-    const args = {
+		const args = {
 			container,
 			elements,
-      layout,
+			layout,
 			minZoom: 0.5,
 			maxZoom: 4,
 			style,
 		};
 		const cy = cytoscape(args);
-    return cy;
+		return cy;
 	}
-  existingGraph.batch(() => {
-    existingGraph.elements().remove();
-    existingGraph.add(elements);
-    existingGraph.style(style);
-    existingGraph.layout(layout).run();
-  });
+	existingGraph.batch(() => {
+		existingGraph.elements().remove();
+		existingGraph.add(elements);
+		existingGraph.style(style);
+		existingGraph.layout(layout).run();
+	});
 	return existingGraph;
 }
 
@@ -208,7 +205,7 @@ Alpine.data("app", () => ({
 			void this.openNode(id);
 			dimOthers(this.graph!, id);
 		});
-    
+
 		document
 			.getElementById("offcanvasDetails")!
 			.addEventListener(

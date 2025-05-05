@@ -5,7 +5,7 @@
 	"type": "module",
 	"scripts": {
 		"dev": "tsx src/server.ts",
-		"build": "tsup",
+		"build": "rm -rf dist && tsup",
 		"lint": "biome check **/*.ts *.{json,js}",
 		"lint:fix": "biome check --fix **/*.ts *.{json,js}",
 		"check": "tsc --noEmit"

@@ -1,10 +1,7 @@
-// --- Imports & Setup ---
-
 import persist from "@alpinejs/persist";
 import Alpine from "alpinejs";
 import * as bootstrap from "bootstrap";
 import cytoscape, {
-	BaseLayoutOptions,
 	Core,
 	ElementDefinition,
 } from "cytoscape";
@@ -152,7 +149,7 @@ async function renderGraph(
 	];
 
 	if (!existingGraph) {
-		return cytoscape({
+    const args = {
 			container,
 			elements,
 			layout: {
@@ -162,12 +159,15 @@ async function renderGraph(
 			minZoom: 0.5,
 			maxZoom: 4,
 			style,
-		});
+		}
+		const cy = cytoscape(args);
+    return cy
 	}
-
-	existingGraph.json({ elements: [], style });
-	existingGraph.add(elements);
-	existingGraph.layout({ name: "cose-bilkent" }).run();
+  existingGraph.batch(() => {
+    existingGraph.elements().remove();   // ① 要素をすべて消す
+    existingGraph.add(elements);         // ② 新しい要素を流し込む
+    existingGraph.style(style);          // ③ スタイル適用
+  });
 	return existingGraph;
 }
 

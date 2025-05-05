@@ -18,6 +18,7 @@
 		"bootstrap": "^5.3.5",
 		"bootstrap-icons": "^1.11.3",
 		"cytoscape": "^3.31.4",
+		"cytoscape-fcose": "^2.2.0",
 		"openapi-fetch": "^0.13.5",
 		"rehype-mathjax": "^7.1.0",
 		"rehype-mermaid": "^3.0.0",
@@ -32,6 +33,7 @@
 		"@types/alpinejs": "^3.13.11",
 		"@types/alpinejs__persist": "^3.13.4",
 		"@types/bootstrap": "^5.2.10",
+		"@types/cytoscape-fcose": "^2.2.4",
 		"openapi-typescript": "^7.6.1",
 		"typescript": "^5.8.3",
 		"vite": "^6.3.4"

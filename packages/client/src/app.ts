@@ -13,6 +13,9 @@ import "@microflash/rehype-starry-night/css";
 import createClient from "openapi-fetch";
 import type { RehypeMermaidOptions } from "rehype-mermaid";
 import type { components, paths } from "./api";
+import fcose from "cytoscape-fcose";
+
+cytoscape.use(fcose);
 
 const api = createClient<paths>();
 
@@ -153,20 +156,20 @@ async function renderGraph(
 			container,
 			elements,
 			layout: {
-				name: "cose",
-				randomize: true,
+			 	name: "fcose",
+			 	randomize: true,
 			},
 			minZoom: 0.5,
 			maxZoom: 4,
 			style,
 		}
 		const cy = cytoscape(args);
-    return cy
+    return cy;
 	}
   existingGraph.batch(() => {
-    existingGraph.elements().remove();   // ① 要素をすべて消す
-    existingGraph.add(elements);         // ② 新しい要素を流し込む
-    existingGraph.style(style);          // ③ スタイル適用
+    existingGraph.elements().remove();
+    existingGraph.add(elements);
+    existingGraph.style(style);
   });
 	return existingGraph;
 }
@@ -202,7 +205,7 @@ Alpine.data("app", () => ({
 			void this.openNode(id);
 			dimOthers(this.graph!, id);
 		});
-
+    
 		document
 			.getElementById("offcanvasDetails")!
 			.addEventListener(

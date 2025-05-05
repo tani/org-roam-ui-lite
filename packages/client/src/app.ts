@@ -151,18 +151,20 @@ async function renderGraph(
 		},
 	];
 
+  const layout = {
+		name: "fcose",
+		randomize: true,
+	};
+        
 	if (!existingGraph) {
     const args = {
 			container,
 			elements,
-			layout: {
-			 	name: "fcose",
-			 	randomize: true,
-			},
+      layout,
 			minZoom: 0.5,
 			maxZoom: 4,
 			style,
-		}
+		};
 		const cy = cytoscape(args);
     return cy;
 	}
@@ -170,6 +172,7 @@ async function renderGraph(
     existingGraph.elements().remove();
     existingGraph.add(elements);
     existingGraph.style(style);
+    existingGraph.layout(layout).run();
   });
 	return existingGraph;
 }

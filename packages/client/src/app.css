@@ -47,7 +47,7 @@ html {
 		max-width: 800px;
 	}
 }
-:root[data-bs-theme="nord-dark"] {
+:root[data-theme="nord-dark"] {
 	/* Nord base colors */
 	--nord0: #2e3440;
 	--nord1: #3b4252;
@@ -104,7 +104,7 @@ html {
 	--bs-body-color: var(--nord6);
 }
 
-:root[data-bs-theme="gruvbox-dark"] {
+:root[data-theme="gruvbox-dark"] {
 	/* Gruvbox base colors */
 	--gruvbox-bg: #1d2021; /* background */
 	--gruvbox-bg-soft: #282828;
@@ -156,7 +156,7 @@ html {
 	--bs-body-bg: var(--gruvbox-bg);
 	--bs-body-color: var(--gruvbox-fg);
 }
-:root[data-bs-theme="dracula-dark"] {
+:root[data-theme="dracula-dark"] {
 	/* Dracula base colors */
 	--dracula-bg: #282a36;
 	--dracula-current-line: #44475a;

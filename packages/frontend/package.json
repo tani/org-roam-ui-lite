@@ -11,7 +11,9 @@
 		"check": "tsc"
 	},
 	"overrides": {
-		"rollup": "npm:@rollup/wasm-node"
+		"vite": {
+			"rollup": "npm:@rollup/wasm-node"
+		}
 	},
 	"dependencies": {
 		"@alpinejs/persist": "^3.14.9",

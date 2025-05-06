@@ -27,43 +27,38 @@ org-roam-ui-lite/
 
 * Quick start (npm)
 #+begin_src bash
-# Clone & enter
-git clone https://github.com/tani/org-roam-ui-lite.git
-cd org-roam-ui-lite
-
-# Install deps & start both servers with hot-reload
-npm install
-npm run dev
-# → Frontend  http://localhost:5173
-# → Backend   http://localhost:5174
+$ git clone https://github.com/tani/org-roam-ui-lite.git
+$ cd org-roam-ui-lite
+$ npm install
+$ npm run dev
 #+end_src
 
 Open [[http://localhost:5173][http://localhost:5173]] and start clicking nodes!
 
 ** Building a static-site (npm)
 #+begin_src bash
-git clone github.com/tani/org-roam-ui-lite.git
-cd org-roam-ui-lite
-npm install
-DATABASE=/path/to/database.db npm run export
-python3 -m http.server -d public/
+$ git clone github.com/tani/org-roam-ui-lite.git
+$ cd org-roam-ui-lite
+$ npm install
+$ DATABASE=/path/to/database.db npm run export
+$ python3 -m http.server -d public/
 #+end_src
 
 The output ends up in ~public/~.
 
 * Quick start (nix)
 #+begin_src bash
-nix run github:tani/org-roam-ui-lite#serve -- -d /path/to/database.db
-# nix run .#serve -- -d /path/to/database.db
+$ nix run github:tani/org-roam-ui-lite#serve -- -d /path/to/database.db
+$ # nix run .#serve -- -d /path/to/database.db
 #+end_src
 
 Open [[http://localhost:5173][http://localhost:5173]] and start clicking nodes!
 
 * Building a static-site (Nix)
 #+begin_src bash
-nix run github:tani/org-roam-ui-lite#export -- -d /path/to/database.db -o /path/to/output
-nix run .#export -- -d /path/to/database.db -o /path/to/output
-python3 -m http.server -d /path/to/output
+$ nix run github:tani/org-roam-ui-lite#export -- -d /path/to/database.db -o /path/to/output
+$ # nix run .#export -- -d /path/to/database.db -o /path/to/output
+$ python3 -m http.server -d /path/to/output
 #+end_src
 
 The output ends up in ~public/~.

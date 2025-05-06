@@ -179,7 +179,6 @@ async function renderGraph(
 
 	const layout = {
 		name: layoutName,
-		randomize: true,
 		tile: false,
 	} as LayoutOptions;
 

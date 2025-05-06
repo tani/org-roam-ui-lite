@@ -1,135 +1,117 @@
-# org‑roam‑ui‑lite
+# Org‑roam UI Lite
 
-*A lightweight, self‑contained web UI and backend for visualising [Org‑roam](https://www.orgroam.com/) note graphs.*
+A **self‑contained, zero‑config graph viewer** for your [Org‑roam](https://www.orgroam.com) notes.  Run it either as a tiny Node server or straight from Emacs, then open a browser and explore your knowledge graph with a snappy Cytoscape‑powered UI.
 
-<p align="center">
-<img width="400" src="https://github.com/user-attachments/assets/199dfabd-3bbf-42c3-8591-b3d61e5ad02c" />
-</p>
+---
 
-## 🎯 Design philosophy
+## Features
 
-* The original **org‑roam‑ui** was powerful but tightly coupled; this made it hard to keep pace with the rapid evolution of modern front‑end tooling.
-* **org‑roam‑ui‑lite** deliberately scales down to **read‑only** features, keeps the dependency graph lean, and aims for "hard to break, easy to update".
-* A **backend–frontend architecture** with a minimal **JSON protocol** means any backend (Rust, Go, etc.) can be swapped in as long as it fulfils the same contract.
+* **Dual back‑ends**
+  • **Node (Hono)** – fast, serves JSON + static assets.
+  • **Emacs (simple‑httpd)** – one‑file drop‑in; perfect for local use.
+* **Themeable** – Nord Dark, Gruvbox Dark, Dracula Dark, plus light/dark.
+* **Deterministic node colours** based on UUID for easy visual grouping.
+* **Interactive layout switching** (fcose, concentric, grid, …).
+* **Backlink panel** with Org‑styled rendering (MathJax, Mermaid, syntax highlighting with copy button).
+* **Offline export** – dump the JSON once, host on any static server.
 
-## ✨ Features
+---
 
-| Area                              | Highlights                                                                                                                  |
-| --------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
-| **Graph visualisation**           | ⚡️ Real‑time, interactive graph built with **Cytoscape** and the **cose‑bilkent** layout algorithm.                         |
-| **Markdown & Org‑mode rendering** | Supports *Org‑mode* → HTML (uniorg‑parse → rehype) with **MathJax**, **Mermaid**, and **Starry Night** syntax highlighting. |
-| **Zero‑config database**          | Ships with **SQL.js** – just point the backend at an SQLite file produced by `org‑roam`.                                     |
-| **Single‑binary CLI**             | `org‑roam‑ui‑lite-cli` starts both the API and static UI – perfect for sharing or SSH port‑forwarding.                      |
-| **Emacs integration**             | Optional elisp helpers so you can jump to the web UI straight from Org‑roam buffers.                                        |
-| **Nix flake**                     | Reproducible build (Node, TypeScript, Emacs) in one command: `nix run .#org‑roam‑ui‑lite-cli`.                              |
+## Repository layout
 
+```
+org-roam-ui-lite/
+├── packages/
+│   ├── backend/    ← Node + Hono JSON API
+│   ├── frontend/   ← Vite + Alpine.js + Cytoscape SPA
+│   └── emacs/      ← org-roam-ui-lite.el (single‑file server)
+├── scripts/        ← build & export helpers (zx)
+├── flake.nix       ← reproducible dev env (Nix ≥2.18)
+└── openapi.yaml    ← shared API contract (typed via openapi‑typescript)
+```
 
-## **Nix flake** exports three packages:
+---
 
-* `cli` – runnable binary (`node backend/dist/backend.mjs`).
-* `elisp` – Emacs package embedding the CLI.
-* `emacs` – A full Emacs with the package pre‑installed for quick hacking.
-
-## 🚀 Quick start
-
-### 1. Development
+## Quick start (Nix + npm)
 
 ```bash
-# Clone & install deps
-$ git clone https://github.com/tani/org‑roam‑ui‑lite.git
-$ cd org‑roam‑ui‑lite
+# Clone & enter
+$ git clone https://github.com/tani/org-roam-ui-lite.git
+$ cd org-roam-ui-lite
+
+# Drop into a ready‑made dev shell (Node 20, TS, etc.)
+$ nix develop
+🟢  Node v20.x / npm v10.x ready!
+
+# Install deps & start both servers with hot‑reload
 $ npm install
-
-# Start the backends
 $ npm run dev
-
-# Open http://localhost:5173
+# → Frontend  http://localhost:5173
+# → Backend   http://localhost:5174
 ```
 
-### 2. Production build
+Open [http://localhost:5173](http://localhost:5173) and start clicking nodes!
+
+### Building a production bundle
 
 ```bash
-# Build once (frontend + backend)
-$ npm run build  # runs vite build & tsup
+# Compile frontend + backend + Emacs package + licences
+$ npm run build
 
-# Launch
-$ node dist/backend/dist/backend.mjs -d /path/to/org-roam.db -p 5174
+# Optionally dump the graph and copy assets to ./public
+$ npm run export
 ```
 
-### 3. Nix users
+The output ends up in `dist/` (full artefact) or `public/` (static‑site mode).
 
-```bash
-# Run the CLI with an ad‑hoc env
-$ nix run .#cli -- -d /path/to/org-roam.db
+---
 
-# The UI is now served on 0.0.0.0:5174
+## Using the Emacs back‑end only
+
+Add this to your `init.el` (requires Emacs 29.1 + Org‑roam ≥2.2.2):
+
+```elisp
+(require 'org-roam-ui-lite)
+(setq org-roam-ui-lite-port 5174)      ;; optional
+(org-roam-ui-lite-mode)                ;; starts server + opens browser
 ```
 
+Visit [http://localhost:5174/index.html](http://localhost:5174/index.html) – that’s all.
 
-## 🛠️ Configuration
+---
 
-| Flag / env                        | Default              | Purpose                             |
-| --------------------------------- | -------------------- | ----------------------------------- |
-| `-d`, `--database`, `ORU_DB_PATH` | `$(pwd)/database.db` | Path to the Org‑roam SQLite DB.     |
-| `-p`, `--port`, `PORT`            | `5174`               | TCP port for the API/static backend. |
+## API overview
 
-> [!TIP]
-> In development the Vite backend (`packages/frontend`) proxies `/api` → `http://localhost:5174`. If you change the API port, update `vite.config.ts` accordingly.
+| Endpoint                  | Description                 | Response                |
+| ------------------------- | --------------------------- | ----------------------- |
+| `GET /api/graph.json`     | Whole graph (nodes + edges) | `Graph` object          |
+| `GET /api/node/{id}.json` | One node + backlinks        | `Node` or `404 {error}` |
 
-## 📦 NPM scripts cheat‑sheet
+The full contract is defined in [`openapi.yaml`](openapi.yaml) and kept in sync with TypeScript types via **openapi‑typescript**.
 
-| Workspace  | Command              | Description                                    |
-| ---------- | -------------------- | ---------------------------------------------- |
-| **frontend** | `npm run dev`        | Launch Vite dev backend with hot‑reload.        |
-|            | `npm run build`      | Produce static assets in `dist/`.              |
-|            | `npm run lint[:fix]` | Lint CSS/TS/HTML via **Biome**.                |
-| **backend** | `npm run dev`        | Start API with automatic restarts via **tsx**. |
-|            | `npm run build`      | Bundle to ESM with **tsup**.                   |
-|            | `npm run lint[:fix]` | Lint TS/JSON via **Biome**.                    |
+---
 
-## 🖇️ Emacs package usage
+## Contributing
 
-### Nix and Emacs
+1. Fork & create a feature branch.
+2. `npm run lint && npm run check` must pass.
+3. Open a PR – make sure to explain *why*.
 
-Because the repository is a **flake**, you can consume both the CLI **and** the elisp helpers without building anything yourself.
+All code is formatted/linted by **Biome**; commits that fail CI will be rejected automatically.
 
-#### 1. Quick CLI only
+---
 
-```bash
-$ nix run github:tani/org-roam-ui-lite#cli -- -d ~/org-roam.db
-```
+## Licence
 
-#### 2. Ephemeral dev shell with Emacs pre‑wired
+© 2025 Masaya Taniguchi
+Released under the **GNU GPL v3 or later** – see [`LICENSE.org`](LICENSE.org).
 
-```bash
-$ nix develop github:tani/org-roam-ui-lite#emacs
-```
+---
 
-### Emacs usage guide
+## Acknowledgements
 
-| Action                    | Command / Key                                          | What happens                                                                   |
-| ------------------------- | ------------------------------------------------------ | ------------------------------------------------------------------------------ |
-| Start / stop backend       | `M-x org-roam-ui-lite-mode`                            | Toggles the Node.js backend and shows or kills the `*org-roam-ui-lite*` buffer. |
-| Open the UI               | Manually visit the printed URL (`browse-url` can help) | Displays the graph centred on the last visited node.                           |
-| Customise variables       | `M-x customize-group RET org-roam-ui-lite`             | Change database path or port without touching init.el.                         |
+* [Org‑roam](https://github.com/org-roam/org-roam) for the database & inspiration.
+* [Hono](https://hono.dev), [Cytoscape.js](https://js.cytoscape.org), [Alpine.js](https://alpinejs.dev).
+* Colour palettes from **Nord**, **Gruvbox** and **Dracula** themes.
 
-The `*org-roam-ui-lite*` buffer prints backend logs—useful when hacking on the backend.
-
-## 🤝 Contributing
-
-1. **Fork** the repo and create a feature branch.
-2. Keep commits atomic and descriptive (Conventional Commits preferred).
-3. Run `npm run lint` if applicable.
-4. Open a PR and fill out the template.
-
-
-> [!TIP]
-> Development tips:
->
-> * The database lives in memory; restart the backend to pick up fresh exports.
-> * Enable HMR in Vite to iterate on the UI without losing graph state.
-
-
-## 📄 Licence
-
-Released under the **GPLv3**. Third‑party licences are reproduced under `dist/licenses/` by the packaging script.
+Happy note‑exploring! 🎈

@@ -15,7 +15,7 @@
           pname = "org-roam-ui-lite-node";
           version = "0.0.0";
           src = ./.;
-          npmDepsHash = "sha256-otA0BN9OTKsQKLh77nCCbePdDhxzj/T9aNhKPNRx1gw=";
+          npmDepsHash = "sha256-KCrOt3ypdsfXqSl4i4fbyuMENvFJysjlliBgVQOLHDE=";
           npmDeps = pkgs.fetchNpmDeps {
             inherit src;
             name = "${pname}-${version}-npm-deps";

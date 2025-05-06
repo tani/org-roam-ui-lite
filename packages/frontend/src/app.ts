@@ -95,6 +95,7 @@ async function createOrgHtmlProcessor(theme: Theme) {
 		prettyCode,
 		{ transformerCopyButton },
 		stringify,
+		classNames,
 	] = await Promise.all([
 		import("unified"),
 		import("uniorg-parse"),
@@ -104,6 +105,7 @@ async function createOrgHtmlProcessor(theme: Theme) {
 		import("rehype-pretty-code"),
 		import("@rehype-pretty/transformers"),
 		import("rehype-stringify"),
+		import("rehype-class-names")
 	]);
 	return unified()
 		.use(parse.default)
@@ -121,6 +123,9 @@ async function createOrgHtmlProcessor(theme: Theme) {
 					feedbackDuration: 3_000,
 				}),
 			],
+		})
+		.use(classNames.default, {
+			table: 'table table-bordered table-hover'
 		})
 		.use(stringify.default);
 }

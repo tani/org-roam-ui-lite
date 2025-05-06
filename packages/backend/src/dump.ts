@@ -2,9 +2,9 @@
 import * as fs from "node:fs/promises";
 import * as path from "node:path";
 import { eq } from "drizzle-orm";
+import { args } from "./args.ts";
 import { db } from "./database.ts";
 import { files, links, nodes } from "./schema.ts";
-import { args } from "./args.ts";
 
 const outDir = args.values.output;
 

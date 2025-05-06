@@ -9,7 +9,8 @@ import { db } from "./database.ts";
 import { files, links, nodes } from "./schema.ts";
 
 function isUuid(str: unknown): str is string {
-	const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+	const UUID_REGEX =
+		/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 	return typeof str === "string" && UUID_REGEX.test(str);
 }
 
@@ -86,7 +87,7 @@ export function serve() {
 		});
 	});
 
-	const port = Number(args.values.port)
+	const port = Number(args.values.port);
 	console.log(`Launch at http://localhost:${port}/index.html`);
 	nodeServer.serve({ fetch: app.fetch, port });
 }

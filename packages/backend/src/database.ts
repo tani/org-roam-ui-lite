@@ -10,6 +10,8 @@ const SQL = await Promise.resolve()
 	.then((wasmURL) => initSqlJs({ locateFile: () => wasmURL }))
 	.catch(() => initSqlJs());
 
-const database = new SQL.Database(new Uint8Array(await fs.readFile(args.values.database)));
+const database = new SQL.Database(
+	new Uint8Array(await fs.readFile(args.values.database)),
+);
 
 export const db = drizzle(database, { schema });

@@ -21,6 +21,7 @@
             name = "${pname}-${version}-npm-deps";
             hash = npmDepsHash;
           };
+          NODE_OPTIONS = "--max_old_space_size=1024";
           npmFlags = [ "--ignore-scripts" "--offline" "--no-audit" ];
           installPhase = "cp -r dist $out";
         };

@@ -1,3 +1,4 @@
+import * as esbuildWasm from "esbuild-wasm";
 import { defineConfig } from "tsup";
 
 export default defineConfig({
@@ -13,6 +14,7 @@ export default defineConfig({
 	loader: {
 		".wasm": "file",
 	},
+	esbuildInstance: esbuildWasm,
 	outExtension({ format }) {
 		return { js: format === "esm" ? ".mjs" : ".cjs" };
 	},

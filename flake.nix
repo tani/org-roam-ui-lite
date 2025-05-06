@@ -15,7 +15,7 @@
           pname = "org-roam-ui-lite-node";
           version = "0.0.0";
           src = ./.;
-          npmDepsHash = "sha256-dBFpBRlVmRLc3qQ+Ox2paEul7VHwfYfmecvBMrcxggc=";
+          npmDepsHash = "sha256-0y/yxxjm6qKwT/dnJkv5MVeKi1dtFvKgU7MElCLyxPs=";
           npmDeps = pkgs.fetchNpmDeps {
             inherit src;
             name = "${pname}-${version}-npm-deps";
@@ -23,9 +23,24 @@
           };
           installPhase = "cp -r dist $out";
         };
-        cli = pkgs.writeShellScriptBin "org-roam-ui-lite-cli" ''
-          exec ${pkgs.nodejs}/bin/node ${node}/backend/dist/backend.mjs "$@"
+        serve = pkgs.writeShellScriptBin "org-roam-ui-lite-serve" ''
+          ${pkgs.nodejs}/bin/node ${node}/backend/dist/backend.mjs -m serve "$@"
         '';
+        export = pkgs.stdenv.mkDerivation {
+          name = "org-roam-ui-lite-export";
+          src = ./scripts;
+
+          nativeBuildInputs = [ pkgs.makeWrapper ];
+
+          installPhase = ''
+            mkdir -p $out/bin
+            install -m755 export.sh $out/bin/org-roam-ui-lite-export
+
+            wrapProgram $out/bin/org-roam-ui-lite-export \
+              --set FRONTEND_DIR ${node}/frontend/dist \
+              --set BACKEND_MJS ${node}/backend/dist/backend.mjs
+          '';
+        };
         elisp = emacsPackages.trivialBuild {
           pname = "org-roam-ui-lite-elisp";
           version = "0.0.0";
@@ -42,7 +57,8 @@
       in {
         packages.emacs = emacs;
         packages.elisp = elisp;
-        packages.cli = cli;
+        packages.export = export;
+        packages.serve = serve;
 
         devShells.default = pkgs.mkShell {
           buildInputs = with pkgs; [

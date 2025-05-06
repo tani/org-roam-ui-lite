@@ -2,8 +2,6 @@
 
 A **self‑contained, zero‑config graph viewer** for your [Org‑roam](https://www.orgroam.com) notes.  Run it either as a tiny Node server or straight from Emacs, then open a browser and explore your knowledge graph with a snappy Cytoscape‑powered UI.
 
----
-
 ## Features
 
 * **Dual back‑ends**
@@ -14,8 +12,6 @@ A **self‑contained, zero‑config graph viewer** for your [Org‑roam](https:/
 * **Interactive layout switching** (fcose, concentric, grid, …).
 * **Backlink panel** with Org‑styled rendering (MathJax, Mermaid, syntax highlighting with copy button).
 * **Offline export** – dump the JSON once, host on any static server.
-
----
 
 ## Repository layout
 
@@ -30,18 +26,12 @@ org-roam-ui-lite/
 └── openapi.yaml    ← shared API contract (typed via openapi‑typescript)
 ```
 
----
-
-## Quick start (Nix + npm)
+## Quick start (npm)
 
 ```bash
 # Clone & enter
 $ git clone https://github.com/tani/org-roam-ui-lite.git
 $ cd org-roam-ui-lite
-
-# Drop into a ready‑made dev shell (Node 20, TS, etc.)
-$ nix develop
-🟢  Node v20.x / npm v10.x ready!
 
 # Install deps & start both servers with hot‑reload
 $ npm install
@@ -52,19 +42,36 @@ $ npm run dev
 
 Open [http://localhost:5173](http://localhost:5173) and start clicking nodes!
 
-### Building a production bundle
+### Building a static-site (npm)
 
 ```bash
-# Compile frontend + backend + Emacs package + licences
-$ npm run build
-
-# Optionally dump the graph and copy assets to ./public
-$ npm run export
+$ git clone github.com/tani/org-roam-ui-lite.git
+$ cd org-roam-ui-lite
+$ npm install
+$ DATABASE=/path/to/database.db npm run export
+$ python3 -m http.server -d public/
 ```
 
-The output ends up in `dist/` (full artefact) or `public/` (static‑site mode).
+The output ends up in `public/`.
 
----
+## Quick start (nix)
+
+```bash
+$ nix run github:tani/org-roam-ui-lite#serve -- -d /path/to/database.db
+$ # nix run .#serve -- -d /path/to/database.db
+```
+
+Open [http://localhost:5173](http://localhost:5173) and start clicking nodes!
+
+## Building a static-site (Nix)
+
+```bash
+$ nix run github:tani/org-roam-ui-lite#export -- -d /path/to/database.db -o /path/to/output
+$ nix run .#export -- -d /path/to/database.db -o /path/to/output
+$ python3 -m http.server -d /path/to/output
+```
+
+The output ends up in `public/`.
 
 ## Using the Emacs back‑end only
 

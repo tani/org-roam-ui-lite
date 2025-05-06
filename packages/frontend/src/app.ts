@@ -7,6 +7,7 @@ import "./app.css";
 import "./code.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
+import { LayoutOptions } from "cytoscape";
 import fcose from "cytoscape-fcose";
 import createClient from "openapi-fetch";
 import type { RehypeMermaidOptions } from "rehype-mermaid";
@@ -173,7 +174,8 @@ async function renderGraph(
 			elements,
 			layout: {
 				name: layout,
-			},
+				randomize: true,
+			} as LayoutOptions,
 			minZoom: 0.5,
 			maxZoom: 4,
 			style,
@@ -184,7 +186,9 @@ async function renderGraph(
 		existingGraph.elements().remove();
 		existingGraph.add(elements);
 		existingGraph.style(style);
-		existingGraph.layout({ name: layout }).run();
+		existingGraph
+			.layout({ name: layout, randomize: true } as LayoutOptions)
+			.run();
 	});
 	return existingGraph;
 }

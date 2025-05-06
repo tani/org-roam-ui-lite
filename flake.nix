@@ -21,6 +21,7 @@
             name = "${pname}-${version}-npm-deps";
             hash = npmDepsHash;
           };
+          ROLLUP_NO_BINARY = "1";
           installPhase = "cp -r dist $out";
         };
         serve = pkgs.writeShellScriptBin "org-roam-ui-lite-serve" ''

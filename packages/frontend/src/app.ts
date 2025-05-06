@@ -1,4 +1,3 @@
-/// <reference types="vite/client" />
 import persist from "@alpinejs/persist";
 import Alpine from "alpinejs";
 import * as bootstrap from "bootstrap";

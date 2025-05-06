@@ -145,7 +145,7 @@ export async function fetchGraph(): Promise<ElementDefinition[]> {
 
 /** Initialize or update the Cytoscape graph */
 async function renderGraph(
-	layout: Layout,
+	layoutName: Layout,
 	container: HTMLElement,
 	existingGraph: Core | undefined,
 	nodeSize: number,
@@ -168,14 +168,17 @@ async function renderGraph(
 		},
 	];
 
+	const layout = {
+		name: layoutName,
+		randomize: true,
+		title: false,
+	} as LayoutOptions;
+
 	if (!existingGraph) {
 		const cy = cytoscape({
 			container,
 			elements,
-			layout: {
-				name: layout,
-				randomize: true,
-			} as LayoutOptions,
+			layout,
 			minZoom: 0.5,
 			maxZoom: 4,
 			style,
@@ -186,9 +189,7 @@ async function renderGraph(
 		existingGraph.elements().remove();
 		existingGraph.add(elements);
 		existingGraph.style(style);
-		existingGraph
-			.layout({ name: layout, randomize: true } as LayoutOptions)
-			.run();
+		existingGraph.layout(layout).run();
 	});
 	return existingGraph;
 }

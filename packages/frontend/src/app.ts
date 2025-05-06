@@ -89,12 +89,13 @@ async function createOrgHtmlProcessor(theme: Theme) {
 	const [
 		{ unified },
 		parse,
-		rehypeOrg,
+		rehype,
 		mathjax,
 		mermaid,
 		prettyCode,
 		{ transformerCopyButton },
 		stringify,
+		raw,
 		classNames,
 	] = await Promise.all([
 		import("unified"),
@@ -105,11 +106,15 @@ async function createOrgHtmlProcessor(theme: Theme) {
 		import("rehype-pretty-code"),
 		import("@rehype-pretty/transformers"),
 		import("rehype-stringify"),
+		import("rehype-raw"),
 		import("rehype-class-names")
 	]);
 	return unified()
-		.use(parse.default)
-		.use(rehypeOrg.default)
+		.use(parse.default, {
+			
+		})
+		.use(rehype.default)
+		.use(raw.default)
 		.use(mathjax.default)
 		.use(mermaid.default, {
 			strategy: "img-svg",

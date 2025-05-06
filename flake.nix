@@ -15,12 +15,13 @@
           pname = "org-roam-ui-lite-node";
           version = "0.0.0";
           src = ./.;
-          npmDepsHash = "sha256-VJ3pTJz75nLthcVs41eFnZAfKMrdO/qvDsj+GZnSUms=";
+          npmDepsHash = "sha256-txaqSCCgbFtE7qUZx20V0FiNO9aajiT2RYU2QVcX/ZU=";
           npmDeps = pkgs.fetchNpmDeps {
             inherit src;
             name = "${pname}-${version}-npm-deps";
             hash = npmDepsHash;
           };
+          npmFlags = [ "--ignore-scripts" "--offline" "--no-audit" ];
           ROLLUP_NO_BINARY = "1";
           installPhase = "cp -r dist $out";
         };

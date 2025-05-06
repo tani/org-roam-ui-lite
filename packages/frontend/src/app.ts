@@ -110,9 +110,7 @@ async function createOrgHtmlProcessor(theme: Theme) {
 		import("rehype-class-names")
 	]);
 	return unified()
-		.use(parse.default, {
-			
-		})
+		.use(parse.default)
 		.use(rehype.default)
 		.use(raw.default)
 		.use(mathjax.default)

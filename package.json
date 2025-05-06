@@ -21,9 +21,7 @@
 		"lint": "biome check **/*.mjs *.{json,yaml} && npm run lint --workspaces",
 		"lint:fix": "biome check --fix **/*.mjs *.{json,yaml} && npm run lint:fix --workspaces",
 		"check": "npm run check --workspaces",
-		"test": "npm run test --workspaces",
-		"version:patch": "npm version --workspaces patch",
-		"version:minor": "npm version --workspaces minor"
+		"test": "npm run test --workspaces"
 	},
 	"version": "0.0.11"
 }

@@ -50,6 +50,18 @@
 						</template>
 					</select>
 				</div>
+				<div class="mb-4">
+					<h5>Layout</h5>
+					<select
+						class="form-select"
+						x-model="layout"
+						@change="setLayout(layout)"
+					>
+						<template x-for="l in layouts" :key="l">
+							<option :value="l" x-text="l" :selected="l === layout"></option>
+						</template>
+					</select>
+				</div>
 				<!-- Node size -->
 				<div class="mb-4">
 					<h5>Node size</h5>
@@ -99,12 +111,13 @@
 			class="offcanvas offcanvas-end responsive-wide"
 			tabindex="-1"
 			id="offcanvasDetails"
+			x-ref="offcanvas"
 			aria-labelledby="offcanvasDetailsLabel"
 		>
 			<div class="offcanvas-header">
 				<h4 class="offcanvas-title" id="offcanvasDetailsLabel">
 					<i class="bi bi-file-earmark-text"></i>
-					<span x-text="selected.title"></span>
+					<span x-text="selected.title ?? 'Click a node to view details'"></span>
 				</h4>
 				<button
 					type="button"
@@ -114,7 +127,7 @@
 				></button>
 			</div>
 			<div class="offcanvas-body">
-				<div x-html="selected.html"></div>
+				<div x-html="selected.html ?? ''" x-ref="rendered"></div>
 				<div x-show="selected.backlinks?.length" class="mt-3">
 					<h5>
 						<i class="bi bi-link-45deg"></i>Backlinks

@@ -1,3 +1,4 @@
+/// <reference types="vite/client" />
 import persist from "@alpinejs/persist";
 import Alpine from "alpinejs";
 import * as bootstrap from "bootstrap";
@@ -6,17 +7,27 @@ import "./app.css";
 import "./code.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
-import "@microflash/rehype-starry-night/css";
 import fcose from "cytoscape-fcose";
 import createClient from "openapi-fetch";
 import type { RehypeMermaidOptions } from "rehype-mermaid";
-import type { components, paths } from "./api";
+import type { components, paths } from "./api.d.ts";
 
 cytoscape.use(fcose);
 
 const api = createClient<paths>();
 
 Alpine.plugin(persist);
+
+const Layouts = [
+	"grid",
+	"fcose",
+	"circle",
+	"concentric",
+	"random",
+	"breadthfirst",
+];
+
+type Layout = (typeof Layouts)[number];
 
 const Themes = [
 	{ value: "light", label: "Light" },
@@ -80,8 +91,8 @@ async function createOrgHtmlProcessor(theme: Theme) {
 		rehypeOrg,
 		mathjax,
 		mermaid,
-		starryNight,
-		starryCore,
+		prettyCode,
+		{ transformerCopyButton },
 		stringify,
 	] = await Promise.all([
 		import("unified"),
@@ -89,11 +100,10 @@ async function createOrgHtmlProcessor(theme: Theme) {
 		import("uniorg-rehype"),
 		import("rehype-mathjax"),
 		import("rehype-mermaid"),
-		import("@microflash/rehype-starry-night"),
-		import("@wooorm/starry-night"),
+		import("rehype-pretty-code"),
+		import("@rehype-pretty/transformers"),
 		import("rehype-stringify"),
 	]);
-
 	return unified()
 		.use(parse.default)
 		.use(rehypeOrg.default)
@@ -102,7 +112,15 @@ async function createOrgHtmlProcessor(theme: Theme) {
 			strategy: "img-svg",
 			dark: theme.endsWith("dark"),
 		} as RehypeMermaidOptions)
-		.use(starryNight.default, { grammars: starryCore.all })
+		.use(prettyCode.default, {
+			theme: theme.endsWith("dark") ? "vitesse-dark" : "vitesse-light",
+			transformers: [
+				transformerCopyButton({
+					visibility: "always",
+					feedbackDuration: 3_000,
+				}),
+			],
+		})
 		.use(stringify.default);
 }
 
@@ -126,8 +144,9 @@ export async function fetchGraph(): Promise<ElementDefinition[]> {
 
 /** Initialize or update the Cytoscape graph */
 async function renderGraph(
+	layout: Layout,
 	container: HTMLElement,
-	existingGraph: Core | null,
+	existingGraph: Core | undefined,
 	nodeSize: number,
 	labelScale: number,
 ): Promise<Core> {
@@ -148,28 +167,24 @@ async function renderGraph(
 		},
 	];
 
-	const layout = {
-		name: "fcose",
-		randomize: true,
-	};
-
 	if (!existingGraph) {
-		const args = {
+		const cy = cytoscape({
 			container,
 			elements,
-			layout,
+			layout: {
+				name: layout,
+			},
 			minZoom: 0.5,
 			maxZoom: 4,
 			style,
-		};
-		const cy = cytoscape(args);
+		});
 		return cy;
 	}
 	existingGraph.batch(() => {
 		existingGraph.elements().remove();
 		existingGraph.add(elements);
 		existingGraph.style(style);
-		existingGraph.layout(layout).run();
+		existingGraph.layout({ name: layout }).run();
 	});
 	return existingGraph;
 }
@@ -182,17 +197,18 @@ Alpine.data("app", () => ({
 	),
 	nodeSize: 10,
 	labelScale: 0.5,
-	graph: null as Core | null,
+	layout: Alpine.$persist<Layout>("fcose"),
+	layouts: Layouts,
+	graph: undefined as Core | undefined,
 	selected: {} as components["schemas"]["Node"] & { html?: string },
-	offcanvas: null as bootstrap.Offcanvas | null,
+	offcanvas: undefined as bootstrap.Offcanvas | undefined,
 
 	async init() {
-		this.offcanvas = new bootstrap.Offcanvas(
-			document.getElementById("offcanvasDetails")!,
-		);
+		this.offcanvas = new bootstrap.Offcanvas(this.$refs.offcanvas);
 
 		// Initial graph render
 		this.graph = await renderGraph(
+			this.layout,
 			this.$refs.graph,
 			this.graph,
 			this.nodeSize,
@@ -206,22 +222,32 @@ Alpine.data("app", () => ({
 			dimOthers(this.graph!, id);
 		});
 
-		document
-			.getElementById("offcanvasDetails")!
-			.addEventListener(
-				"hidden.bs.offcanvas",
-				() => this.graph && resetHighlights(this.graph),
-			);
+		this.$refs.offcanvas.addEventListener("hidden.bs.offcanvas", () =>
+			resetHighlights(this.graph!),
+		);
+
+		this.$refs.rendered.addEventListener("click", (ev) => {
+			const a = (ev.target as HTMLElement).closest("a");
+			if (!a || !a.href.startsWith("id:")) return;
+			ev.preventDefault();
+			this.openNode(a.href.replace("id:", ""));
+		});
 	},
 
 	// Refresh graph with current settings
 	async refresh() {
 		this.graph = await renderGraph(
+			this.layout,
 			this.$refs.graph,
 			this.graph,
 			this.nodeSize,
 			this.labelScale,
 		);
+	},
+
+	setLayout(newLayout: Layout) {
+		this.layout = newLayout;
+		void this.refresh();
 	},
 
 	// Toggle between dark/light theme
@@ -253,6 +279,7 @@ Alpine.data("app", () => ({
 		if (error) throw new Error(`API error ${error}`);
 
 		const processor = await createOrgHtmlProcessor(this.theme);
+
 		const html = String(await processor.process(data.raw));
 		this.selected = { ...data, html };
 		this.offcanvas?.show();

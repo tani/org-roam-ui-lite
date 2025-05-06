@@ -69,9 +69,20 @@ The output ends up in ~public/~.
 
 * Using the Emacs back-end only
 
+** Build project (Emacs)
+
+#+begin_src bash
+$ git clone https://github.com/tani/org-roam-ui-lite.git
+$ cd org-roam-ui-lite
+$ npm run build
+#+end_src
+
+** Launch Emacs
+
 Add this to your ~init.el~ (requires Emacs 29.1 + Org-roam ≥2.2.2):
 
 #+begin_src emacs-lisp
+(add-to-list 'oad-path "/path/to/org-roam-ui-lite/dist/emacs")
 (require 'org-roam-ui-lite)
 (setq org-roam-ui-lite-port 5174)      ;; optional
 (org-roam-ui-lite-mode)                ;; starts server + opens browser

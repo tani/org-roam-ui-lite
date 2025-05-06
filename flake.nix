@@ -22,7 +22,6 @@
             hash = npmDepsHash;
           };
           npmFlags = [ "--ignore-scripts" "--offline" "--no-audit" ];
-          ROLLUP_NO_BINARY = "1";
           installPhase = "cp -r dist $out";
         };
         serve = pkgs.writeShellScriptBin "org-roam-ui-lite-serve" ''
@@ -39,6 +38,7 @@
             install -m755 export.sh $out/bin/org-roam-ui-lite-export
 
             wrapProgram $out/bin/org-roam-ui-lite-export \
+              --set PATH $PATH:${node}/bin \
               --set FRONTEND_DIR ${node}/frontend/dist \
               --set BACKEND_MJS ${node}/backend/dist/backend.mjs
           '';

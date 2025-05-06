@@ -94,7 +94,7 @@ Alternatively, you can download the pre-built Node.js script from GitHub Release
 Add this to your ~init.el~ (requires Emacs 29.1 + Org-roam ≥2.2.2):
 
 #+begin_src emacs-lisp
-(add-to-list 'load-path "/path/to/org-roam-ui-lite/dist/emacs")
+(add-to-list 'load-path "/path/to/org-roam-ui-lite")
 (require 'org-roam-ui-lite)
 (setq org-roam-ui-lite-port 5174)      ;; optional
 (org-roam-ui-lite-mode)                ;; starts server + opens browser

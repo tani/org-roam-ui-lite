@@ -59,7 +59,7 @@
   (file-name-directory org-roam-ui-lite--this-file))
 
 (defcustom org-roam-ui-lite-static-root
-  (expand-file-name "../frontend/dist/" org-roam-ui-lite--project-root)
+  (expand-file-name "./frontend/dist/" org-roam-ui-lite--project-root)
   "Directory containing *index.html* and bundled assets."
   :type 'directory
   :group 'org-roam-ui-lite)

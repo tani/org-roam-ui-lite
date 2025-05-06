@@ -1,8 +1,9 @@
 import slugify from "slugify";
 
 await $`rm -rf dist`;
-await $`mkdir -p dist/{backend,frontend,licenses,emacs}`;
-await $`cp -vR packages/emacs/* dist/emacs/`;
+await $`mkdir -p dist/{backend,frontend,licenses}`;
+await $`cp README.org LICENSE.org dist/`;
+await $`cp packages/*.el dist/`;
 await $`cp -vR packages/frontend/dist dist/frontend/dist`;
 await $`cp -vR packages/backend/dist dist/backend/dist`;
 const all = JSON.parse(await $`license-checker --json`);

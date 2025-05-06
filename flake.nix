@@ -38,7 +38,7 @@
             install -m755 export.sh $out/bin/org-roam-ui-lite-export
 
             wrapProgram $out/bin/org-roam-ui-lite-export \
-              --set PATH $PATH:${node}/bin \
+              --set PATH $PATH:${pkgs.nodejs}/bin \
               --set FRONTEND_DIR ${node}/frontend/dist \
               --set BACKEND_MJS ${node}/backend/dist/backend.mjs
           '';

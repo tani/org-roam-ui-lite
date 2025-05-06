@@ -130,7 +130,8 @@ async function createOrgHtmlProcessor(theme: Theme) {
 			],
 		})
 		.use(classNames.default, {
-			table: 'table table-bordered table-hover'
+			table: 'table table-bordered table-hover',
+			blockquote: 'blockquote'
 		})
 		.use(stringify.default);
 }

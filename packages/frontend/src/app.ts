@@ -107,7 +107,7 @@ async function createOrgHtmlProcessor(theme: Theme) {
 		import("@rehype-pretty/transformers"),
 		import("rehype-stringify"),
 		import("rehype-raw"),
-		import("rehype-class-names")
+		import("rehype-class-names"),
 	]);
 	return unified()
 		.use(parse.default)
@@ -128,8 +128,8 @@ async function createOrgHtmlProcessor(theme: Theme) {
 			],
 		})
 		.use(classNames.default, {
-			table: 'table table-bordered table-hover',
-			blockquote: 'blockquote'
+			table: "table table-bordered table-hover",
+			blockquote: "blockquote",
 		})
 		.use(stringify.default);
 }

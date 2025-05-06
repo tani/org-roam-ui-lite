@@ -4,8 +4,9 @@ import * as path from "node:path";
 import { eq } from "drizzle-orm";
 import { db } from "./database.ts";
 import { files, links, nodes } from "./schema.ts";
+import { args } from "./args.ts";
 
-const outDir = path.resolve("../dist/api");
+const outDir = args.values.output;
 
 function isUuid(str: unknown): str is string {
 	const UUID_REGEX =
@@ -76,13 +77,8 @@ async function dumpNodeJsons() {
 	}
 }
 
-async function main() {
+export async function dump() {
 	await dumpGraphJson();
 	await dumpNodeJsons();
 	console.log(`✅ All JSON files dumped to ${outDir}`);
 }
-
-main().catch((err) => {
-	console.error("❌ Failed to dump JSON:", err);
-	process.exit(1);
-});

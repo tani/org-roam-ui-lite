@@ -1,10 +1,10 @@
 import slugify from "slugify";
 
 await $`rm -rf dist`;
-await $`mkdir -p dist/{server,client,licenses,emacs}`;
+await $`mkdir -p dist/{backend,frontend,licenses,emacs}`;
 await $`cp -vR packages/emacs/* dist/emacs/`;
-await $`cp -vR packages/client/dist dist/client/dist`;
-await $`cp -vR packages/server/dist dist/server/dist`;
+await $`cp -vR packages/frontend/dist dist/frontend/dist`;
+await $`cp -vR packages/backend/dist dist/backend/dist`;
 const all = JSON.parse(await $`license-checker --json`);
 await $`mkdir -p dist/licenses`;
 for (const [key, value] of Object.entries(all)) {

@@ -10,7 +10,7 @@ import "bootstrap-icons/font/bootstrap-icons.css";
 import fcose from "cytoscape-fcose";
 import createClient from "openapi-fetch";
 import type { RehypeMermaidOptions } from "rehype-mermaid";
-import type { components, paths } from "./api.d.ts";
+import type { components, paths } from "./api";
 
 cytoscape.use(fcose);
 

@@ -1,5 +1,5 @@
 {
-	"name": "@org-roam-ui-lite/client",
+	"name": "@org-roam-ui-lite/frontend",
 	"version": "0.0.0",
 	"private": true,
 	"type": "module",

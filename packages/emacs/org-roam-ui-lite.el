@@ -13,7 +13,7 @@
 
 ;;; Commentary:
 ;; This single file turns Emacs into a tiny JSON API server that the
-;; org‑roam‑ui‑lite front‑end (compiled into ../client/dist/) can consume.
+;; org‑roam‑ui‑lite front‑end (compiled into ../frontend/dist/) can consume.
 ;;
 ;; ────────────────────────────────────────────────────────────────────────────
 ;;  ENDPOINTS
@@ -22,7 +22,7 @@
 ;;
 ;;  QUICK START
 ;;  ───────────
-;;  1.  Place the built front‑end under ../client/dist/ relative to this file.
+;;  1.  Place the built front‑end under ../frontend/dist/ relative to this file.
 ;;  2.  Add to init.el:
 ;;        (require 'org-roam-ui-lite)
 ;;        ;; Optional custom port/root:
@@ -59,7 +59,7 @@
   (file-name-directory org-roam-ui-lite--this-file))
 
 (defcustom org-roam-ui-lite-static-root
-  (expand-file-name "../client/dist/" org-roam-ui-lite--project-root)
+  (expand-file-name "../frontend/dist/" org-roam-ui-lite--project-root)
   "Directory containing *index.html* and bundled assets."
   :type 'directory
   :group 'org-roam-ui-lite)

@@ -12,10 +12,11 @@
 		"zx": "^8.5.3"
 	},
 	"scripts": {
-		"build": "npm run build --workspaces && zx build.mjs",
-		"dev": "run-p dev:client dev:server",
-		"dev:client": "npm --workspace=packages/client run dev",
-		"dev:server": "npm --workspace=packages/server run dev",
+		"build": "npm run build --workspaces && zx ./scripts/build.mjs",
+		"export": "npm run build && zx ./scripts/export.mjs",
+		"dev": "run-p dev:frontend dev:backend",
+		"dev:frontend": "npm --workspace=packages/frontend run dev",
+		"dev:backend": "npm --workspace=packages/backend run dev",
 		"lint": "biome check *.{json,mjs,yaml} && npm run lint --workspaces",
 		"lint:fix": "biome check --fix *.{json,mjs,yaml} && npm run lint:fix --workspaces",
 		"check": "npm run check --workspaces",

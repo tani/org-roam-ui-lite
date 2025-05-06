@@ -1,7 +1,7 @@
 import { defineConfig } from "tsup";
 
 export default defineConfig({
-	entry: ["src/server.ts"],
+	entry: ["src/backend.ts"],
 	platform: "node",
 	target: "node20",
 	format: ["esm"],
@@ -20,9 +20,9 @@ export default defineConfig({
 		if (ctx.format === "esm") {
 			return {
 				js: `
-          import { createRequire } from 'node:module';
-          const require = createRequire(import.meta.url);
-        `,
+					import { createRequire } from 'node:module';
+					const require = createRequire(import.meta.url);
+				`,
 			};
 		}
 	},

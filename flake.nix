@@ -24,7 +24,7 @@
           installPhase = "cp -r dist $out";
         };
         cli = pkgs.writeShellScriptBin "org-roam-ui-lite-cli" ''
-          exec ${pkgs.nodejs}/bin/node ${node}/server/dist/server.mjs "$@"
+          exec ${pkgs.nodejs}/bin/node ${node}/backend/dist/backend.mjs "$@"
         '';
         elisp = emacsPackages.trivialBuild {
           pname = "org-roam-ui-lite-elisp";
@@ -34,8 +34,8 @@
           installPhase = ''
             install -d $out/share/emacs/site-lisp/
             ln -s ${node}/emacs $out/share/emacs/site-lisp/emacs
-            ln -s ${node}/server $out/share/emacs/site-lisp/server
-            ln -s ${node}/client $out/share/emacs/site-lisp/client
+            ln -s ${node}/backend $out/share/emacs/site-lisp/backend
+            ln -s ${node}/frontend $out/share/emacs/site-lisp/frontend
           '';
         };
         emacs = pkgs.emacs.pkgs.withPackages (epkgs: [ elisp ]);

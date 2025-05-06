@@ -35,7 +35,7 @@ $ npm run dev
 
 Open [[http://localhost:5173][http://localhost:5173]] and start clicking nodes!
 
-** Building a static-site (npm)
+* Building a static-site (npm)
 #+begin_src bash
 $ git clone github.com/tani/org-roam-ui-lite.git
 $ cd org-roam-ui-lite
@@ -46,7 +46,10 @@ $ python3 -m http.server -d public/
 
 The output ends up in ~public/~.
 
-* Quick start (nix)
+* For Nix users
+
+** Quick start (Nix)
+
 #+begin_src bash
 $ nix run github:tani/org-roam-ui-lite#serve -- -d /path/to/database.db
 $ # nix run .#serve -- -d /path/to/database.db
@@ -54,7 +57,8 @@ $ # nix run .#serve -- -d /path/to/database.db
 
 Open [[http://localhost:5173][http://localhost:5173]] and start clicking nodes!
 
-* Building a static-site (Nix)
+** Building a static-site (Nix)
+
 #+begin_src bash
 $ nix run github:tani/org-roam-ui-lite#export -- -d /path/to/database.db -o /path/to/output
 $ # nix run .#export -- -d /path/to/database.db -o /path/to/output

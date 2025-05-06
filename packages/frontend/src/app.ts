@@ -171,7 +171,7 @@ async function renderGraph(
 	const layout = {
 		name: layoutName,
 		randomize: true,
-		tite: false,
+		tile: false,
 	} as LayoutOptions;
 
 	if (!existingGraph) {

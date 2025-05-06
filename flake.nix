@@ -11,9 +11,10 @@
       let
         pkgs = import nixpkgs { inherit system; };
         emacsPackages = pkgs.emacsPackagesFor pkgs.emacs;
+        packageJson = builtins.fromJSON (builtins.readFile ./package.json);
         node = pkgs.buildNpmPackage rec {
           pname = "org-roam-ui-lite-node";
-          version = "0.0.0";
+          version = packageJson.version;
           src = ./.;
           npmDepsHash = "sha256-66+gI7CEm3LjwNXqYP/NLGcQnCM9j2X/Aer1Qua9ayo=";
           npmDeps = pkgs.fetchNpmDeps {

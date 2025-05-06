@@ -1,9 +1,4 @@
-import {
-	customType,
-	integer,
-	sqliteTable,
-	text,
-} from "drizzle-orm/sqlite-core";
+import { customType, integer, sqliteTable } from "drizzle-orm/sqlite-core";
 
 const jsonText = customType<{
 	data: string;

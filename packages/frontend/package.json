@@ -8,7 +8,7 @@
 		"build": "rm -rf dist && openapi-typescript ../../openapi.yaml --output src/api.d.ts && vite build",
 		"lint": "biome check **/*.{css,ts} *.{ts,json,html}",
 		"lint:fix": "biome check --fix **/*.{css,ts} *.{ts,json,html}",
-		"check": "tsc --noEmit"
+		"check": "tsc"
 	},
 	"dependencies": {
 		"@alpinejs/persist": "^3.14.9",

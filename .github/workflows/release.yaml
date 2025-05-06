@@ -1,5 +1,9 @@
 name: Build and Release
 
+permissions:
+  contents: write        # for your code and tags
+  releases: write        # for publishing the GitHub Release
+
 on:
   push:
     tags:

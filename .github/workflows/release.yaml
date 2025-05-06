@@ -1,54 +1,38 @@
 name: Build and Release
 
-permissions:
-  contents: write        # for your code and tags
-
 on:
   push:
     tags:
       - 'v*'
 
+permissions:
+  contents: write       # release を含む操作は contents スコープで OK
+
 jobs:
   build-and-release:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
-      - name: Setup Node
-        uses: actions/setup-node@v2
+      - uses: actions/setup-node@v4
         with:
-          node-version: '20.x'
+          node-version: '20'
 
-      - name: Install dependencies
-        run: npm install
+      - run: npm ci
+      - run: npm run build
 
-      - name: Build project
-        run: npm run build
-
-      - name: Zip dist directory
+      - name: Zip dist
         uses: vimtor/action-zip@v1.2
         with:
           files: dist/
           dest: dist.zip
 
-      - name: Create Release
-        id: create_release
-        uses: actions/create-release@v1
+      - name: Create release & upload asset
+        uses: softprops/action-gh-release@v2
+        if: github.ref_type == 'tag'     # タグ push だけで動かす
+        with:
+          tag_name: ${{ github.ref_name }}  # v0.0.3 など
+          name: Release ${{ github.ref_name }}
+          files: dist.zip                  # ← これ 1 行でアセットもアップロード
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
-          draft: false
-          prerelease: false
-
-      - name: Upload Release Asset
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./dist.zip
-          asset_name: dist.zip
-          asset_content_type: application/zip

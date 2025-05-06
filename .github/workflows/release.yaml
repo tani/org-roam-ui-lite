@@ -6,7 +6,7 @@ on:
       - 'v*'
 
 permissions:
-  contents: write       # release を含む操作は contents スコープで OK
+  contents: write
 
 jobs:
   build-and-release:
@@ -21,18 +21,27 @@ jobs:
       - run: npm ci
       - run: npm run build
 
-      - name: Zip dist
-        uses: vimtor/action-zip@v1.2
-        with:
-          files: dist/
-          dest: dist.zip
+      # ─── 追加：org-roam-ui-lite ディレクトリを組成 ───
+      - name: Prepare package directory
+        run: |
+          mkdir -p package/org-roam-ui-lite
+          cp README.org LICENSE.org package/org-roam-ui-lite/
+          cp -R dist package/org-roam-ui-lite/
+      # ────────────────────────────────────────────────
+
+      # ─── 追加：zip アーカイブを作成 ───
+      - name: Create zip archive
+        run: |
+          cd package
+          zip -r ../org-roam-ui-lite.zip org-roam-ui-lite
+      # ───────────────────────────────────
 
       - name: Create release & upload asset
         uses: softprops/action-gh-release@v2
-        if: github.ref_type == 'tag'     # タグ push だけで動かす
+        if: github.ref_type == 'tag'
         with:
-          tag_name: ${{ github.ref_name }}  # v0.0.3 など
+          tag_name: ${{ github.ref_name }}
           name: Release ${{ github.ref_name }}
-          files: dist.zip                  # ← これ 1 行でアセットもアップロード
+          files: org-roam-ui-lite.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

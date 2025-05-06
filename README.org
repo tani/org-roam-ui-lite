@@ -26,6 +26,7 @@ org-roam-ui-lite/
 #+end_src
 
 * Quick start (npm)
+
 #+begin_src bash
 $ git clone https://github.com/tani/org-roam-ui-lite.git
 $ cd org-roam-ui-lite
@@ -35,7 +36,13 @@ $ npm run dev
 
 Open [[http://localhost:5173][http://localhost:5173]] and start clicking nodes!
 
+#+begin_quote
+[!TIP]
+Alternatively, you can download the pre-built Node.js script from GitHub Releases.
+#+end_quote
+
 * Building a static-site (npm)
+
 #+begin_src bash
 $ git clone github.com/tani/org-roam-ui-lite.git
 $ cd org-roam-ui-lite
@@ -77,12 +84,17 @@ $ cd org-roam-ui-lite
 $ npm run build
 #+end_src
 
+#+begin_quote
+[!TIP]
+Alternatively, you can download the pre-built Node.js script from GitHub Releases.
+#+end_quote
+
 ** Launch Emacs
 
 Add this to your ~init.el~ (requires Emacs 29.1 + Org-roam ≥2.2.2):
 
 #+begin_src emacs-lisp
-(add-to-list 'oad-path "/path/to/org-roam-ui-lite/dist/emacs")
+(add-to-list 'load-path "/path/to/org-roam-ui-lite/dist/emacs")
 (require 'org-roam-ui-lite)
 (setq org-roam-ui-lite-port 5174)      ;; optional
 (org-roam-ui-lite-mode)                ;; starts server + opens browser

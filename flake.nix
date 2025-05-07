@@ -51,9 +51,11 @@
           src = ./.;
           buildInputs = with pkgs; [ node ];
           installPhase = ''
-            install -d $out/share/emacs/site-lisp/
-            ln -s ${node}/emacs/org-roam-ui-lite.el $out/share/emacs/site-lisp/org-roam-ui-lite.el
-            ln -s ${node}/frontend $out/share/emacs/site-lisp/frontend
+            runHook preInstall
+            install -d $out/share/emacs/site-lisp/org-roam-ui-lite
+            ln -s ${node}/emacs $out/share/emacs/site-lisp/org-roam-ui-lite/emacs
+            ln -s ${node}/frontend $out/share/emacs/site-lisp/org-roam-ui-lite/frontend
+            runHook postInstall
           '';
         };
         emacs = pkgs.emacs.pkgs.withPackages (epkgs: [ elisp ]);

@@ -1,6 +1,6 @@
 #+TITLE: Org-roam UI Lite
 
-[[https://github.com/user-attachments/assets/6cab8daa-b848-42d0-8dae-1f62ca2d90a5]]
+[[https://github-production-user-asset-6210df.s3.amazonaws.com/5019902/441021948-6cab8daa-b848-42d0-8dae-1f62ca2d90a5.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAVCODYLSA53PQK4ZA%2F20250507%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20250507T011448Z&X-Amz-Expires=300&X-Amz-Signature=6a026d454d9e7d47b8825780ce4e22e6aac329710de3d2a74453ba4e94c7ba68&X-Amz-SignedHeaders=host]]
 (thanks @takeokunn)
 
 A *self-contained, zero-config graph viewer* for your [[https://www.orgroam.com][Org-roam]] notes.  

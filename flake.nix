@@ -47,12 +47,12 @@
         };
         elisp = emacsPackages.trivialBuild {
           pname = "org-roam-ui-lite-elisp";
-          version = "0.0.0";
+          version = packageJson.version;
           src = ./.;
           buildInputs = with pkgs; [ node ];
           installPhase = ''
             install -d $out/share/emacs/site-lisp/
-            ln -s ${node}/org-roam-ui-lite.el $out/share/emacs/site-lisp/org-roam-ui-lite.el
+            ln -s ${node}/emacs/org-roam-ui-lite.el $out/share/emacs/site-lisp/org-roam-ui-lite.el
             ln -s ${node}/frontend $out/share/emacs/site-lisp/frontend
           '';
         };

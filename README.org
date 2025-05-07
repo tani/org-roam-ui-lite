@@ -1,5 +1,8 @@
 #+TITLE: Org-roam UI Lite
 
+[[https://github.com/user-attachments/assets/cdf61480-279b-47f3-9fc0-9c98c66cd638?.png]]
+(thanks @takeokunn)
+
 A *self-contained, zero-config graph viewer* for your [[https://www.orgroam.com][Org-roam]] notes.  
 Run it either as a tiny Node server or straight from Emacs, then open a browser and explore your knowledge graph with a snappy Cytoscape-powered UI.
 

@@ -1,6 +1,6 @@
 #+TITLE: Org-roam UI Lite
 
-[[https://github.com/user-attachments/assets/cdf61480-279b-47f3-9fc0-9c98c66cd638?.png]]
+[[https://github.com/user-attachments/assets/6cab8daa-b848-42d0-8dae-1f62ca2d90a5]]
 (thanks @takeokunn)
 
 A *self-contained, zero-config graph viewer* for your [[https://www.orgroam.com][Org-roam]] notes.  

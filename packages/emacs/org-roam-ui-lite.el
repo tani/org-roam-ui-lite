@@ -4,7 +4,7 @@
 ;;
 ;; Author: Masaya Taniguchi <masaya.taniguchi@riken.jp>
 ;; URL: https://github.com/tani/org-roam-ui-lite
-;; Package-Version: 0.1.0
+;; Package-Version: 0.0.0
 ;; Package-Requires: ((emacs "29.1") (simple-httpd "1.5.1") (org-roam "2.2.2"))
 ;; Keywords: hypermedia, tools, org
 ;; SPDX-License-Identifier: GPL-3.0-or-later
@@ -27,11 +27,9 @@
 ;;        (require 'org-roam-ui-lite)
 ;;        ;; Optional custom port/root:
 ;;        ;; (setq org-roam-ui-lite-port 8000)
-;;        (org-roam-ui-lite-server-start)
+;;        (org-roam-ui-lite-mode)
 ;;  3.  Browse to http://localhost:5174/index.html (or your port).
 ;;
-;;  Customise `org-roam-ui-lite-port' or `org-roam-ui-lite-static-root' if your
-;;  paths differ.
 ;; ────────────────────────────────────────────────────────────────────────────
 
 ;;; Code:

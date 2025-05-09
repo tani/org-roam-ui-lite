@@ -1,5 +1,4 @@
 import * as fs from "node:fs/promises";
-import * as path from "node:path";
 import * as nodeServer from "@hono/node-server";
 import { serveStatic } from "@hono/node-server/serve-static";
 import { eq } from "drizzle-orm";
@@ -15,10 +14,7 @@ function isUuid(str: unknown): str is string {
 }
 
 export function serve() {
-	const frontendDistPath = path.relative(
-		process.cwd(),
-		path.join(import.meta.dirname!, "../../frontend/dist/"),
-	);
+	const frontendDistPath = "../../frontend/dist";
 
 	const app = new Hono();
 
@@ -54,8 +50,8 @@ export function serve() {
 	});
 
 	/* ノード詳細 + Org ソース */
-	app.get("/api/node/:id{[^.]+\\.json}", async (c) => {
-		const id = c.req.param("id").replace(".json", "");
+	app.get("/api/node/:id", async (c) => {
+		const id = c.req.param("id").replace(/\.json$/, "");
 		const row = db
 			.select({ id: nodes.id, title: nodes.title, file: files.file })
 			.from(nodes)

@@ -17,18 +17,24 @@ const jsonText = customType<{
 });
 
 export const files = sqliteTable("files", {
-	file: jsonText().primaryKey(),
-	title: jsonText(),
+	file: jsonText().primaryKey().notNull(),
+	title: jsonText().notNull(),
 });
 
 export const nodes = sqliteTable("nodes", {
-	id: jsonText().primaryKey(),
-	file: jsonText().references(() => files.file),
-	title: jsonText(),
-	pos: integer("pos"),
+	id: jsonText().primaryKey().notNull(),
+	file: jsonText()
+		.references(() => files.file)
+		.notNull(),
+	title: jsonText().notNull(),
+	pos: integer("pos").notNull(),
 });
 
 export const links = sqliteTable("links", {
-	source: jsonText().references(() => nodes.id),
-	dest: jsonText().references(() => nodes.id),
+	source: jsonText()
+		.references(() => nodes.id)
+		.notNull(),
+	dest: jsonText()
+		.references(() => nodes.id)
+		.notNull(),
 });

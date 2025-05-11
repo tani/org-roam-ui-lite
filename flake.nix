@@ -33,22 +33,11 @@
         serve = pkgs.writeShellScriptBin "org-roam-ui-lite-serve" ''
           ${pkgs.nodejs}/bin/node ${nodepkg}/backend/dist/backend.mjs -m serve "$@"
         '';
-        export = pkgs.stdenv.mkDerivation {
-          name = "org-roam-ui-lite-export";
-          src = ./scripts;
-
-          nativeBuildInputs = [ pkgs.makeWrapper ];
-
-          installPhase = ''
-            mkdir -p $out/bin
-            install -m755 export.sh $out/bin/org-roam-ui-lite-export
-
-            wrapProgram $out/bin/org-roam-ui-lite-export \
-              --set PATH $PATH:${pkgs.nodejs}/bin \
-              --set FRONTEND_DIR ${nodepkg}/frontend/dist \
-              --set BACKEND_MJS ${nodepkg}/backend/dist/backend.mjs
-          '';
-        };
+        export = pkgs.writeShellScriptBin "org-roam-ui-lite-export" ''
+          export PATH=$PATH:${pkgs.nodejs}/bin
+          export ROOT_DIR=${nodepkg}
+          ${pkgs.nodePackages.zx}/bin/zx ${./scripts}/export.mjs "$@"
+        '';
         elisp = emacsPackages.trivialBuild {
           pname = "org-roam-ui-lite-elisp";
           version = packageJson.version;

@@ -33,11 +33,6 @@
         serve = pkgs.writeShellScriptBin "org-roam-ui-lite-serve" ''
           ${pkgs.nodejs}/bin/node ${nodepkg}/backend/dist/backend.mjs -m serve "$@"
         '';
-        update-npm-deps-hash = pkgs.writeShellScriptBin "org-roam-ui-lite-update-npm-deps-hash" ''
-          hash=$(prefetch-npm-deps package-lock.json)
-          echo "New npm-deps hash: $hash" >&2
-          sed -i "s|hash = \".*\";|hash = \"$hash\";|" flake.nix
-        '';
         export = pkgs.stdenv.mkDerivation {
           name = "org-roam-ui-lite-export";
           src = ./scripts;
@@ -68,6 +63,11 @@
           '';
         };
         emacs = pkgs.emacs.pkgs.withPackages (epkgs: [ elisp ]);
+        update-npm-deps-hash = pkgs.writeShellScriptBin "org-roam-ui-lite-update-npm-deps-hash" ''
+          hash=$(prefetch-npm-deps package-lock.json)
+          echo "New npm-deps hash: $hash" >&2
+          sed -i "s|hash = \".*\";|hash = \"$hash\";|" flake.nix
+        '';
       in {
         packages.emacs = emacs;
         packages.elisp = elisp;

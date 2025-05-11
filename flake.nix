@@ -16,7 +16,7 @@
           pname = "org-roam-ui-lite-nodepkg";
           version = packageJson.version;
           src = ./.;
-          npmDepsHash = "sha256-m1WDUCwsslaX+1VxEbFHkB+9l2YDiwJ6T2ja6SUg7wU=";
+          npmDepsHash = "sha256-cpDMGltCihA+iAq8nOz9CMBhyE6aIzRKwwpxLRoWxRw=";
           npmDeps = pkgs.fetchNpmDeps {
             inherit src;
             name = "${pname}-${version}-npm-deps";
@@ -66,7 +66,7 @@
         update-npm-deps-hash = pkgs.writeShellScriptBin "org-roam-ui-lite-update-npm-deps-hash" ''
           hash=$(prefetch-npm-deps package-lock.json)
           echo "New npm-deps hash: $hash" >&2
-          sed -i "s|hash = \".*\";|hash = \"$hash\";|" flake.nix
+          ${pkgs.gnused}/bin/sed -i "s|npmDepsHash = \".*\";|npmDepsHash = \"$hash\";|" flake.nix
         '';
       in {
         packages.emacs = emacs;

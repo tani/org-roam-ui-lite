@@ -19,7 +19,7 @@
 		"dev": "run-p dev:frontend dev:backend",
 		"dev:frontend": "npm --workspace=packages/frontend run dev",
 		"dev:backend": "npm --workspace=packages/backend run dev",
-		"lint": "biome check **/*.mjs *.{json,yaml} && npm run lint --workspaces",
+		"lint": "biome check **/*.ts *.{json,yaml} && npm run lint --workspaces",
 		"lint:fix": "biome check --fix **/*.mjs *.{json,yaml} && npm run lint:fix --workspaces",
 		"check": "npm run check --workspaces",
 		"test": "npm run test --workspaces"

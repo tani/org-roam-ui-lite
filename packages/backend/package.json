@@ -3,7 +3,7 @@
 	"private": true,
 	"type": "module",
 	"scripts": {
-		"dev": "tsx src/backend.ts",
+		"dev": "node src/backend.ts",
 		"build": "rm -rf dist && tsup",
 		"lint": "biome check **/*.ts *.{json,js}",
 		"lint:fix": "biome check --fix **/*.ts *.{json,js}",
@@ -21,7 +21,6 @@
 		"@types/sql.js": "^1.4.9",
 		"esbuild-wasm": "^0.25.4",
 		"tsup": "^8.4.0",
-		"tsx": "^4.19.4",
 		"typescript": "^5.8.3"
 	}
 }

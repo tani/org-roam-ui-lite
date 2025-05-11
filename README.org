@@ -30,6 +30,12 @@ org-roam-ui-lite/
 
 * Quick start (npm)
 
+#+begin_quote
+[!IMPORTANT]
+To run ~backend/~, You need to install Nodejs v23 or later
+#+end_quote
+
+
 #+begin_src bash
 $ git clone https://github.com/tani/org-roam-ui-lite.git
 $ cd org-roam-ui-lite

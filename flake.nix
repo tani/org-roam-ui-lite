@@ -12,22 +12,23 @@
         pkgs = import nixpkgs { inherit system; };
         emacsPackages = pkgs.emacsPackagesFor pkgs.emacs;
         packageJson = builtins.fromJSON (builtins.readFile ./package.json);
-        node = pkgs.buildNpmPackage rec {
-          pname = "org-roam-ui-lite-node";
+        nodejs = pkgs.node_23;
+        nodepkg = pkgs.buildNpmPackage rec {
+          pname = "org-roam-ui-lite-nodepkg";
           version = packageJson.version;
           src = ./.;
-          npmDepsHash = "sha256-J/90RRHEYz9N37YLd33Y5sB+EA3GbTdnOe5x3dFC27I=";
+          npmDepsHash = "sha256-ZYDKdXx6KqpdhgHEpjBHHR+SXjnhOnJFW7Bz1rtZl1o=";
           npmDeps = pkgs.fetchNpmDeps {
             inherit src;
             name = "${pname}-${version}-npm-deps";
             hash = npmDepsHash;
           };
-          NODE_OPTIONS = "--max_old_space_size=2048";
+          NODEPKG_OPTIONS = "--max_old_space_size=2048";
           npmFlags = [ "--ignore-scripts" "--offline" "--no-audit" ];
           installPhase = "cp -r dist $out";
         };
         serve = pkgs.writeShellScriptBin "org-roam-ui-lite-serve" ''
-          ${pkgs.nodejs}/bin/node ${node}/backend/dist/backend.mjs -m serve "$@"
+          ${nodejs}/bin/node ${nodepkg}/backend/dist/backend.mjs -m serve "$@"
         '';
         export = pkgs.stdenv.mkDerivation {
           name = "org-roam-ui-lite-export";
@@ -40,21 +41,21 @@
             install -m755 export.sh $out/bin/org-roam-ui-lite-export
 
             wrapProgram $out/bin/org-roam-ui-lite-export \
-              --set PATH $PATH:${pkgs.nodejs}/bin \
-              --set FRONTEND_DIR ${node}/frontend/dist \
-              --set BACKEND_MJS ${node}/backend/dist/backend.mjs
+              --set PATH $PATH:${nodejs}/bin \
+              --set FRONTEND_DIR ${nodepkg}/frontend/dist \
+              --set BACKEND_MJS ${nodepkg}/backend/dist/backend.mjs
           '';
         };
         elisp = emacsPackages.trivialBuild {
           pname = "org-roam-ui-lite-elisp";
           version = packageJson.version;
           src = ./.;
-          buildInputs = with pkgs; [ node ];
+          buildInputs = with pkgs; [ nodepkg ];
           installPhase = ''
             runHook preInstall
             install -d $out/share/emacs/site-lisp/org-roam-ui-lite
-            ln -s ${node}/emacs $out/share/emacs/site-lisp/org-roam-ui-lite/emacs
-            ln -s ${node}/frontend $out/share/emacs/site-lisp/org-roam-ui-lite/frontend
+            ln -s ${nodepkg}/emacs $out/share/emacs/site-lisp/org-roam-ui-lite/emacs
+            ln -s ${nodepkg}/frontend $out/share/emacs/site-lisp/org-roam-ui-lite/frontend
             runHook postInstall
           '';
         };
@@ -67,13 +68,13 @@
 
         devShells.default = pkgs.mkShell {
           buildInputs = with pkgs; [
-            nodejs
+            nodejs_23
             prefetch-npm-deps
             typescript-language-server
           ];
           shellHook = ''
-            export NODE_ENV=development
-            echo "🟢  Node $(node -v) / npm $(npm -v) ready!"
+            export NODEPKG_ENV=development
+            echo "🟢  Nodepkg $(node -v) / npm $(npm -v) ready!"
           '';
         };
       }

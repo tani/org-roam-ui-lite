@@ -12,12 +12,12 @@
         pkgs = import nixpkgs { inherit system; };
         emacsPackages = pkgs.emacsPackagesFor pkgs.emacs;
         packageJson = builtins.fromJSON (builtins.readFile ./package.json);
-        nodejs = pkgs.node_23;
+        nodejs = pkgs.nodejs_23;
         nodepkg = pkgs.buildNpmPackage rec {
           pname = "org-roam-ui-lite-nodepkg";
           version = packageJson.version;
           src = ./.;
-          npmDepsHash = "sha256-ZYDKdXx6KqpdhgHEpjBHHR+SXjnhOnJFW7Bz1rtZl1o=";
+          npmDepsHash = "sha256-yCallQsL7SZZjpr/AVRUudXXHqjU4nZa80wlOZ3mZF0=";
           npmDeps = pkgs.fetchNpmDeps {
             inherit src;
             name = "${pname}-${version}-npm-deps";

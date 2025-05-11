@@ -1,4 +1,5 @@
 import * as fs from "node:fs/promises";
+import * as path from "node:path";
 import * as nodeServer from "@hono/node-server";
 import { serveStatic } from "@hono/node-server/serve-static";
 import { eq } from "drizzle-orm";
@@ -14,7 +15,10 @@ function isUuid(str: unknown): str is string {
 }
 
 export function serve() {
-	const frontendDistPath = "../../frontend/dist";
+	const frontendDistPath = path.relative(
+		process.cwd(),
+		path.join(import.meta.dirname!, "../../frontend/dist"),
+	);
 
 	const app = new Hono();
 

@@ -5,8 +5,8 @@
 	"scripts": {
 		"dev": "node src/backend.ts",
 		"build": "rm -rf dist && tsup",
-		"lint": "biome check **/*.ts *.{json,js}",
-		"lint:fix": "biome check --fix **/*.ts *.{json,js}",
+		"lint": "biome check **/*.ts *.{json,ts}",
+		"lint:fix": "biome check --fix **/*.ts *.{json,ts}",
 		"check": "tsc"
 	},
 	"dependencies": {
@@ -19,7 +19,6 @@
 		"@biomejs/biome": "2.0.0-beta.2",
 		"@types/node": "^22.15.3",
 		"@types/sql.js": "^1.4.9",
-		"esbuild-wasm": "^0.25.4",
 		"tsup": "^8.4.0",
 		"typescript": "^5.8.3"
 	}

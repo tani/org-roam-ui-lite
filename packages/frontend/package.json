@@ -3,16 +3,11 @@
 	"private": true,
 	"type": "module",
 	"scripts": {
-		"dev": "vite",
-		"build": "rm -rf dist && openapi-typescript ../../openapi.yaml --output src/api.d.ts && vite build",
-		"lint": "biome check **/*.{css,ts} *.{ts,json,html}",
-		"lint:fix": "biome check --fix **/*.{css,ts} *.{ts,json,html}",
+		"dev": "tsup --watch",
+		"build": "rm -rf dist && openapi-typescript ../../openapi.yaml --output src/api.d.ts && tsup",
+		"lint": "biome check **/*.{css,ts,html} *.{ts,json}",
+		"lint:fix": "biome check --fix **/*.{css,ts,html} *.{ts,json}",
 		"check": "tsc"
-	},
-	"overrides": {
-		"vite": {
-			"rollup": "npm:@rollup/wasm-node"
-		}
 	},
 	"dependencies": {
 		"@alpinejs/persist": "^3.14.9",
@@ -35,12 +30,11 @@
 	},
 	"devDependencies": {
 		"@biomejs/biome": "2.0.0-beta.2",
-		"@rollup/wasm-node": "^4.40.2",
 		"@types/alpinejs": "^3.13.11",
 		"@types/alpinejs__persist": "^3.13.4",
 		"@types/bootstrap": "^5.2.10",
 		"openapi-typescript": "^7.6.1",
-		"typescript": "^5.8.3",
-		"vite": "^6.3.4"
+		"tsup": "^8.4.0",
+		"typescript": "^5.8.3"
 	}
 }

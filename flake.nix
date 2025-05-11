@@ -28,7 +28,7 @@
         };
         build = pkgs.writeShellScriptBin "org-roam-ui-lite-build" ''
           rm -rf ./dist
-          cp -r ${nodepkg} ./dist
+          cp -r --no-preserve=ownership ${nodepkg} ./dist
         '';
         serve = pkgs.writeShellScriptBin "org-roam-ui-lite-serve" ''
           ${pkgs.nodejs}/bin/node ${nodepkg}/backend/dist/backend.mjs -m serve "$@"

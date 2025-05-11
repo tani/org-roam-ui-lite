@@ -1,7 +1,7 @@
 import { $ } from "zx";
 
 // Dump json
-await $`node dist/backend/dist/backend.mjs -m dump -o dist/frontend/dist/api/`;
+await $`node dist/backend/dist/backend.js -m dump -o dist/frontend/dist/api/`;
 
 // Copy artifact to public
 await $`rm -rf public/`;

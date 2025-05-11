@@ -7,20 +7,17 @@ import "./code.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import { LayoutOptions } from "cytoscape";
-import fcose from "cytoscape-fcose";
 import createClient from "openapi-fetch";
 import type { RehypeMermaidOptions } from "rehype-mermaid";
 import type { components, paths } from "./api";
-
-cytoscape.use(fcose);
 
 const api = createClient<paths>();
 
 Alpine.plugin(persist);
 
 const Layouts = [
+	"cose",
 	"grid",
-	"fcose",
 	"circle",
 	"concentric",
 	"random",
@@ -176,9 +173,18 @@ async function renderGraph(
 		},
 	];
 
+	/*
+  Since we removed fcose, we now automatically fall back to cose.
+  However, starting with Cytoscape v4, cose may be dropped;
+  if that happens, we might bring fcose back.
+   */
+	layoutName = layoutName === "fcose" ? "cose" : layoutName;
+
 	const layout = {
 		name: layoutName,
 		tile: false,
+		animate: "end",
+		animationDuration: 700,
 	} as LayoutOptions;
 
 	if (!existingGraph) {
@@ -209,7 +215,7 @@ Alpine.data("app", () => ({
 	),
 	nodeSize: 10,
 	labelScale: 0.5,
-	layout: Alpine.$persist<Layout>("fcose"),
+	layout: Alpine.$persist<Layout>("cose"),
 	layouts: Layouts,
 	graph: undefined as Core | undefined,
 	selected: {} as components["schemas"]["Node"] & { html?: string },

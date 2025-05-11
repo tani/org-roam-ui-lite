@@ -1,22 +1,24 @@
 import { resolve } from "node:path";
 
-function usage(exitCode = 0){
-  console.log(`Usage: export.ts -d DB -o OUTPUT\n\n` +
-    `Options (short / long):\n` +
-    `  -d, --database  SQLite DB to export (required)\n` +
-    `  -o, --output    Destination folder     (required)\n` +
-    `  -h, --help      Show this help\n`);
-  process.exit(exitCode);
+function usage(exitCode = 0) {
+	console.log(
+		`Usage: export.ts -d DB -o OUTPUT\n\n` +
+			`Options (short / long):\n` +
+			`  -d, --database  SQLite DB to export (required)\n` +
+			`  -o, --output    Destination folder     (required)\n` +
+			`  -h, --help      Show this help\n`,
+	);
+	process.exit(exitCode);
 }
 
 const args = minimist(process.argv.slice(2), {
-  string: ["d", "database", "o", "output"],
-  boolean: ["h", "help"],
-  alias: {
-    d: "database",
-    o: "output",
-    h: "help",
-  },
+	string: ["d", "database", "o", "output"],
+	boolean: ["h", "help"],
+	alias: {
+		d: "database",
+		o: "output",
+		h: "help",
+	},
 });
 
 if (args.help) usage(0);
@@ -26,11 +28,11 @@ const out = args.output ?? "";
 
 if (!db || !out) usage(1);
 
-const ROOT_DIR = resolve(process.env.ROOT_DIR ?? "dist")
+const ROOT_DIR = resolve(process.env.ROOT_DIR ?? "dist");
 const OUTPUT_DIR = resolve(out);
 
-if (!await fs.exists(ROOT_DIR))
-  throw new Error(`ROOT_DIR not found: ${ROOT_DIR}`);
+if (!(await fs.exists(ROOT_DIR)))
+	throw new Error(`ROOT_DIR not found: ${ROOT_DIR}`);
 
 console.log(chalk.blueBright("Exporting Org-roam DB:"), db);
 console.log(chalk.blueBright("Destination:"), OUTPUT_DIR);

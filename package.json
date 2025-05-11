@@ -1,7 +1,7 @@
 {
 	"name": "org-roam-ui-lite",
 	"private": true,
-        "type": "module",
+	"type": "module",
 	"workspaces": [
 		"packages/*"
 	],

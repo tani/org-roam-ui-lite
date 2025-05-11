@@ -33,6 +33,11 @@
         serve = pkgs.writeShellScriptBin "org-roam-ui-lite-serve" ''
           ${pkgs.nodejs}/bin/node ${nodepkg}/backend/dist/backend.mjs -m serve "$@"
         '';
+        update-npm-deps-hash = pkgs.writeShellScriptBin "org-roam-ui-lite-update-npm-deps-hash" ''
+          hash=$(prefetch-npm-deps package-lock.json)
+          echo "New npm-deps hash: $hash" >&2
+          sed -i "s|hash = \".*\";|hash = \"$hash\";|" flake.nix
+        '';
         export = pkgs.stdenv.mkDerivation {
           name = "org-roam-ui-lite-export";
           src = ./scripts;
@@ -69,6 +74,7 @@
         packages.export = export;
         packages.serve = serve;
         packages.build = build;
+        packages.update-npm-deps-hash = update-npm-deps-hash;
 
         devShells.default = pkgs.mkShell {
           buildInputs = with pkgs; [

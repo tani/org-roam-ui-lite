@@ -15,7 +15,7 @@
 		"zx": "^8.5.3"
 	},
 	"scripts": {
-		"postversion": "nix run .#update-npm-deps-hash && git add flake.nix && git commit -m \"ci: update npm-deps hash\"",
+		"version": "nix run .#update-npm-deps-hash && git add flake.nix",
 		"build": "npm run build --workspaces && tsx ./scripts/build.ts",
 		"export": "npm run build && tsx ./scripts/export.ts",
 		"dev": "run-p dev:frontend dev:backend",

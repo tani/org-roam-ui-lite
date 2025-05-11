@@ -1,3 +1,4 @@
+import { $ } from 'zx';
 // Dump json
 await $`node dist/backend/dist/backend.mjs -m dump -o dist/frontend/dist/api/`;
 

@@ -4,7 +4,7 @@
 	"type": "module",
 	"scripts": {
 		"dev": "node src/backend.ts",
-		"build": "rm -rf dist && tsup",
+		"build": "node ./build.ts",
 		"lint": "biome check **/*.ts *.{json,ts}",
 		"lint:fix": "biome check --fix **/*.ts *.{json,ts}",
 		"check": "tsc"
@@ -19,7 +19,8 @@
 		"@biomejs/biome": "2.0.0-beta.2",
 		"@types/node": "^22.15.3",
 		"@types/sql.js": "^1.4.9",
-		"tsup": "^8.4.0",
-		"typescript": "^5.8.3"
+		"esbuild-wasm": "^0.25.4",
+		"typescript": "^5.8.3",
+		"zx": "^8.5.4"
 	}
 }

@@ -1,6 +1,7 @@
 {
 	"name": "org-roam-ui-lite",
 	"private": true,
+        "type": "module",
 	"workspaces": [
 		"packages/*"
 	],
@@ -13,8 +14,8 @@
 		"zx": "^8.5.3"
 	},
 	"scripts": {
-		"build": "npm run build --workspaces && zx ./scripts/build.mjs",
-		"export": "npm run build && zx ./scripts/export.mjs",
+		"build": "npm run build --workspaces && node ./scripts/build.ts",
+		"export": "npm run build && node ./scripts/export.ts",
 		"dev": "run-p dev:frontend dev:backend",
 		"dev:frontend": "npm --workspace=packages/frontend run dev",
 		"dev:backend": "npm --workspace=packages/backend run dev",

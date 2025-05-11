@@ -3,7 +3,7 @@
 	"private": true,
 	"type": "module",
 	"scripts": {
-		"dev": "npm run build",
+		"dev": "node --watch build.ts",
 		"prebuild": "openapi-typescript ../../openapi.yaml --output src/api.d.ts",
 		"build": "node build.ts",
 		"lint": "biome check **/*.{css,ts,html} *.{ts,json}",

@@ -56,7 +56,7 @@ Alternatively, you can download the pre-built Node.js script from GitHub Release
 $ git clone github.com/tani/org-roam-ui-lite.git
 $ cd org-roam-ui-lite
 $ npm install
-$ DATABASE=/path/to/database.db npm run export
+$ npm run export -- -d /path/to/database.db -o /path/to/output
 $ python3 -m http.server -d public/
 #+end_src
 

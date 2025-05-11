@@ -2,9 +2,11 @@
 
 import { builtinModules } from "node:module";
 import { build } from "esbuild-wasm";
-import { $ } from "zx";
+import { fs } from "zx";
 
-await $`rm -rf dist`;
+await fs.remove("./dist");
+await fs.mkdirp("./dist");
+await fs.copy("./public/index.html", "./dist/index.html");
 
 const builtins = [...builtinModules, ...builtinModules.map((m) => `node:${m}`)];
 
@@ -25,5 +27,3 @@ await build({
 	assetNames: "assets/[name]-[hash]",
 	logLevel: "info",
 });
-
-await $`cp public/index.html dist/`;

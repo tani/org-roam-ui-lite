@@ -1,27 +1,28 @@
 import slugify from "slugify";
-import { $, spinner } from "zx";
+import { $, fs, spinner } from "zx";
 
-await $`rm -rf dist`;
-await $`mkdir -p dist/{backend,frontend,emacs,licenses}`;
-await $`cp README.org LICENSE.org dist/`;
-await $`cp -vR packages/emacs/* dist/emacs`;
-await $`cp -vR packages/frontend/dist dist/frontend/dist`;
-await $`cp -vR packages/backend/dist dist/backend/dist`;
+await fs.remove("./dist");
+await fs.mkdirp("./dist");
+await fs.copy("README.org", "./dist/README.org");
+await fs.copy("LICENSE.org", "./dist/LICENSE.org");
+await fs.copy("packages/emacs", "./dist/emacs");
+await fs.mkdirp("./dist/frontend");
+await fs.copy("packages/frontend/dist", "./dist/frontend/dist");
+await fs.mkdirp("./dist/backend");
+await fs.copy("packages/backend/dist", "./dist/backend/dist");
 
 interface Licenses {
 	licenseFile?: string;
 }
 
 await spinner("copying license files", async () => {
-	await $`mkdir -p dist/licenses`;
+	await fs.mkdirp("./dist/licenses");
 	const output = await $`license-checker --json`;
 	const pairs = Object.entries(output.json<Licenses>());
-	await Promise.all(
-		pairs
-			.filter(([_, v]) => v.licenseFile)
-			.map(
-				([k, v]) =>
-					$`cp ${v.licenseFile} dist/licenses/${slugify.default(k, { strict: true })}`,
-			),
-	);
+	for (const [k, v] of pairs) {
+		if (v.licenseFile) {
+			const dest = `dist/licenses/${slugify.default(k, { strict: true })}`;
+			await fs.copy(v.licenseFile, dest);
+		}
+	}
 });

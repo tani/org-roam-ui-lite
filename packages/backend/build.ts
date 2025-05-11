@@ -2,9 +2,9 @@
 
 import { builtinModules } from "node:module";
 import { build } from "esbuild-wasm";
-import { $ } from "zx";
+import { fs } from "zx";
 
-await $`rm -rf ./dist`;
+await fs.remove("./dist");
 
 const builtins = [...builtinModules, ...builtinModules.map((m) => `node:${m}`)];
 

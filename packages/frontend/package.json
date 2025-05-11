@@ -3,9 +3,9 @@
 	"private": true,
 	"type": "module",
 	"scripts": {
-		"dev": "node --watch build.ts",
+		"dev": "tsx --watch build.ts",
 		"prebuild": "openapi-typescript ../../openapi.yaml --output src/api.d.ts",
-		"build": "node build.ts",
+		"build": "tsx build.ts",
 		"lint": "biome check **/*.{css,ts,html} *.{ts,json}",
 		"lint:fix": "biome check --fix **/*.{css,ts,html} *.{ts,json}",
 		"check": "tsc"
@@ -36,6 +36,7 @@
 		"@types/bootstrap": "^5.2.10",
 		"esbuild-wasm": "^0.25.4",
 		"openapi-typescript": "^7.6.1",
+		"tsx": "^4.19.4",
 		"typescript": "^5.8.3",
 		"zx": "^8.5.4"
 	}

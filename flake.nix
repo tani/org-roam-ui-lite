@@ -12,23 +12,26 @@
         pkgs = import nixpkgs { inherit system; };
         emacsPackages = pkgs.emacsPackagesFor pkgs.emacs;
         packageJson = builtins.fromJSON (builtins.readFile ./package.json);
-        nodejs = pkgs.nodejs_23;
         nodepkg = pkgs.buildNpmPackage rec {
           pname = "org-roam-ui-lite-nodepkg";
           version = packageJson.version;
           src = ./.;
-          npmDepsHash = "sha256-uEtKo1wwOTI2A7J91rcl28wa9LfdUKkp/Ku4gUQfRYQ=";
+          npmDepsHash = "sha256-B15OPS9HvcxilibJhHkRcX7nPJ56s+2VKNmfMkUZ1dk=";
           npmDeps = pkgs.fetchNpmDeps {
             inherit src;
             name = "${pname}-${version}-npm-deps";
             hash = npmDepsHash;
           };
-          NODEPKG_OPTIONS = "--max_old_space_size=2048";
+          NODEPKG_OPTIONS = "--max_old_space_size=2048 --";
           npmFlags = [ "--ignore-scripts" "--offline" "--no-audit" ];
           installPhase = "cp -r dist $out";
         };
+        build = pkgs.writeShellScriptBin "org-roam-ui-lite-build" ''
+          rm -rf ./dist
+          cp -r ${nodepkg} ./dist
+        '';
         serve = pkgs.writeShellScriptBin "org-roam-ui-lite-serve" ''
-          ${nodejs}/bin/node ${nodepkg}/backend/dist/backend.mjs -m serve "$@"
+          ${pkgs.nodejs}/bin/node ${nodepkg}/backend/dist/backend.mjs -m serve "$@"
         '';
         export = pkgs.stdenv.mkDerivation {
           name = "org-roam-ui-lite-export";
@@ -41,7 +44,7 @@
             install -m755 export.sh $out/bin/org-roam-ui-lite-export
 
             wrapProgram $out/bin/org-roam-ui-lite-export \
-              --set PATH $PATH:${nodejs}/bin \
+              --set PATH $PATH:${pkgs.nodejs}/bin \
               --set FRONTEND_DIR ${nodepkg}/frontend/dist \
               --set BACKEND_MJS ${nodepkg}/backend/dist/backend.mjs
           '';
@@ -65,10 +68,11 @@
         packages.elisp = elisp;
         packages.export = export;
         packages.serve = serve;
+        packages.build = build;
 
         devShells.default = pkgs.mkShell {
           buildInputs = with pkgs; [
-            nodejs_23
+            nodejs
             prefetch-npm-deps
             typescript-language-server
           ];

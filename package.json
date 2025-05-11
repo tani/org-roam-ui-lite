@@ -11,11 +11,12 @@
 		"license-checker": "^25.0.1",
 		"npm-run-all": "^4.1.5",
 		"slugify": "^1.6.6",
+		"tsx": "^4.19.4",
 		"zx": "^8.5.3"
 	},
 	"scripts": {
-		"build": "npm run build --workspaces && node ./scripts/build.ts",
-		"export": "npm run build && node ./scripts/export.ts",
+		"build": "npm run build --workspaces && tsx ./scripts/build.ts",
+		"export": "npm run build && tsx ./scripts/export.ts",
 		"dev": "run-p dev:frontend dev:backend",
 		"dev:frontend": "npm --workspace=packages/frontend run dev",
 		"dev:backend": "npm --workspace=packages/backend run dev",

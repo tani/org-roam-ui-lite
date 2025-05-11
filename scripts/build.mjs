@@ -1,5 +1,4 @@
 import slugify from "slugify";
-import { $, fs, spinner } from "zx";
 
 await fs.remove("./dist");
 await fs.mkdirp("./dist");
@@ -11,14 +10,10 @@ await fs.copy("packages/frontend/dist", "./dist/frontend/dist");
 await fs.mkdirp("./dist/backend");
 await fs.copy("packages/backend/dist", "./dist/backend/dist");
 
-interface Licenses {
-	licenseFile?: string;
-}
-
 await spinner("copying license files", async () => {
 	await fs.mkdirp("./dist/licenses");
 	const output = await $`license-checker --json`;
-	const pairs = Object.entries(output.json<Licenses>());
+	const pairs = Object.entries(output.json());
 	for (const [k, v] of pairs) {
 		if (v.licenseFile) {
 			const dest = `dist/licenses/${slugify.default(k, { strict: true })}`;

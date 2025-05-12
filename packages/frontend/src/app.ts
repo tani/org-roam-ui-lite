@@ -3,6 +3,7 @@ import Alpine from "alpinejs";
 import * as bootstrap from "bootstrap";
 import cytoscape, { Core, ElementDefinition } from "cytoscape";
 import "./app.css";
+import "./themes.css";
 import "./code.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";

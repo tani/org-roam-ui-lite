@@ -16,7 +16,7 @@
           pname = "org-roam-ui-lite-nodepkg";
           version = packageJson.version;
           src = ./.;
-          npmDepsHash = "sha256-lg8YQCxSBTZKk13YPN6tcUOtzLGki2ojubZSeG8GIpE=";
+          npmDepsHash = "sha256-LAHnoVcLdL3RFBzP+PJHSzq3Un43gSppvKPgvqBYGAo=";
           npmDeps = pkgs.fetchNpmDeps {
             inherit src;
             name = "${pname}-${version}-npm-deps";

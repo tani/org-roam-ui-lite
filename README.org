@@ -35,12 +35,11 @@ org-roam-ui-lite/
 To run ~backend/~, You need to install Nodejs v23 or later
 #+end_quote
 
-
 #+begin_src bash
 $ git clone https://github.com/tani/org-roam-ui-lite.git
 $ cd org-roam-ui-lite
 $ npm install
-$ npm run dev
+$ npm run dev -- -d /path/to/database.db
 #+end_src
 
 Open [[http://localhost:5173][http://localhost:5173]] and start clicking nodes!
@@ -130,7 +129,7 @@ All code is formatted/linted by *Biome*; commits that fail CI will be rejected a
 
 * Licence
 
-© 2025 Masaya Taniguchi  
+© 2025 Masaya Taniguchi
 Released under the *GNU GPL v3 or later* – see [[file:LICENSE.org][LICENSE.org]].
 
 * Acknowledgements

@@ -1,13 +1,13 @@
 import persist from "@alpinejs/persist";
 import Alpine from "alpinejs";
 import * as bootstrap from "bootstrap";
-import cytoscape, { Core, ElementDefinition } from "cytoscape";
+import cytoscape, { type Core, type ElementDefinition } from "cytoscape";
 import "./app.css";
 import "./themes.css";
 import "./code.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
-import { LayoutOptions } from "cytoscape";
+import type { LayoutOptions } from "cytoscape";
 import createClient from "openapi-fetch";
 import type { RehypeMermaidOptions } from "rehype-mermaid";
 import type { components, paths } from "./api";
@@ -66,18 +66,20 @@ function pickColor(key: string): string {
 }
 
 /** Dim unrelated nodes/edges */
-function dimOthers(graph: Core, focusId: string): void {
-	const focus = graph.$id(focusId);
-	const neighborhood = focus.closedNeighborhood();
-	graph.elements().forEach((el) => {
-		const isNeighbor = neighborhood.has(el);
-		el.style("opacity", isNeighbor ? 1 : el.isNode() ? 0.15 : 0.05);
-	});
+function dimOthers(graph: Core | undefined, focusId: string): void {
+	if (graph) {
+		const focus = graph.$id(focusId);
+		const neighborhood = focus?.closedNeighborhood();
+		graph.elements().forEach((el) => {
+			const isNeighbor = neighborhood.has(el);
+			el.style("opacity", isNeighbor ? 1 : el.isNode() ? 0.15 : 0.05);
+		});
+	}
 }
 
 /** Reset all styles */
-function resetHighlights(graph: Core): void {
-	graph.elements().style("opacity", 1);
+function resetHighlights(graph: Core | undefined): void {
+	graph?.elements().style("opacity", 1);
 }
 
 // --- Processor Factory ---
@@ -241,11 +243,11 @@ Alpine.data("app", () => ({
 		});
 
 		this.$refs.offcanvas.addEventListener("show.bs.offcanvas", () =>
-			dimOthers(this.graph!, this.selected.id),
+			dimOthers(this.graph, this.selected.id),
 		);
 
 		this.$refs.offcanvas.addEventListener("hidden.bs.offcanvas", () =>
-			resetHighlights(this.graph!),
+			resetHighlights(this.graph),
 		);
 
 		this.$refs.rendered.addEventListener("click", (ev) => {

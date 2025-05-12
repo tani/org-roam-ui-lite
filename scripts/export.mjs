@@ -1,4 +1,5 @@
 import { resolve } from "node:path";
+import process from "node:process";
 
 function usage(exitCode = 0) {
 	console.log(

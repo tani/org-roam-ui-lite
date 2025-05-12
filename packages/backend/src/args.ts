@@ -1,3 +1,4 @@
+import process from "node:process";
 import { parseArgs } from "node:util";
 
 export const args = parseArgs({

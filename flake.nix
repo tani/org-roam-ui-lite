@@ -34,7 +34,6 @@
           ${pkgs.bun}/bin/bun ${nodepkg}/backend/dist/backend.js -m serve "$@"
         '';
         export = pkgs.writeShellScriptBin "org-roam-ui-lite-export" ''
-          export PATH=$PATH:${pkgs.nodejs}/bin
           ${pkgs.bun}/bin/bun ${./scripts}/export.ts -r "${nodepkg}" "$@"
         '';
         elisp = emacsPackages.trivialBuild {

@@ -34,7 +34,7 @@
 		"@types/alpinejs": "^3.13.11",
 		"@types/alpinejs__persist": "^3.13.4",
 		"@types/bootstrap": "^5.2.10",
-		"esbuild-wasm": "^0.25.4",
+		"esbuild": "^0.25.4",
 		"openapi-typescript": "^7.6.1",
 		"tsx": "^4.19.4",
 		"typescript": "^5.8.3",

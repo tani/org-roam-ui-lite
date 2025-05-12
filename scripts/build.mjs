@@ -1,7 +1,7 @@
 await fs.remove("./dist");
 await fs.mkdirp("./dist");
-await fs.copy("README.org", "./dist/README.org");
-await fs.copy("LICENSE.org", "./dist/LICENSE.org");
+await fs.copy("README.md", "./dist/README.md");
+await fs.copy("LICENSE.md", "./dist/LICENSE.md");
 await fs.copy("packages/emacs", "./dist/emacs");
 await fs.mkdirp("./dist/frontend");
 await fs.copy("packages/frontend/dist", "./dist/frontend/dist");

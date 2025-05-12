@@ -1,7 +1,7 @@
 // esbuild.config.mjs
 
 import { builtinModules } from "node:module";
-import { build } from "esbuild-wasm";
+import { build } from "esbuild";
 import { fs } from "zx";
 
 await fs.remove("./dist");

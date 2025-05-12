@@ -297,8 +297,6 @@ Alpine.data("app", () => ({
 			return;
 		}
 
-		if (error) throw new Error(`API error ${error}`);
-
 		const processor = await createOrgHtmlProcessor(this.theme);
 
 		const html = String(await processor.process(data.raw));

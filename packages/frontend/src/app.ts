@@ -237,8 +237,11 @@ Alpine.data("app", () => ({
 		this.graph.on("tap", "node", ({ target }) => {
 			const id = target.id();
 			void this.openNode(id);
-			dimOthers(this.graph!, id);
 		});
+
+		this.$refs.offcanvas.addEventListener("show.bs.offcanvas", () =>
+			dimOthers(this.graph!, this.selected.id),
+		);
 
 		this.$refs.offcanvas.addEventListener("hidden.bs.offcanvas", () =>
 			resetHighlights(this.graph!),

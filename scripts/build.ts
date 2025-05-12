@@ -34,8 +34,8 @@ async function main() {
 	}
 
 	// ライセンスファイルをまとめて収集
-	const licenses = await $`bunx license-checker --json`.json(); // .json() で stdout をパース[1]
-	for (const [pkg, info] of Object.entries(licenses)) {
+	const licenses = await $`bun run license-checker --json`.json(); // .json() で stdout をパース[1]
+	for (const [pkg, info] of Object.entries<{ licenseFile?: string }>(licenses)) {
 		if (info.licenseFile) {
 			const dest = `dist/licenses/${slugify(pkg)}`;
 			await write(dest, file(info.licenseFile));

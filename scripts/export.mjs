@@ -4,6 +4,7 @@ function usage(exitCode = 0) {
 	console.log(
 		`Usage: export.ts -d DB -o OUTPUT\n\n` +
 			`Options (short / long):\n` +
+			`  -r, --resource   Resource folder (required)\n` +
 			`  -d, --database  SQLite DB to export (required)\n` +
 			`  -o, --output    Destination folder     (required)\n` +
 			`  -h, --help      Show this help\n`,
@@ -12,9 +13,10 @@ function usage(exitCode = 0) {
 }
 
 const args = minimist(process.argv.slice(2), {
-	string: ["d", "database", "o", "output"],
+	string: ["d", "database", "o", "output", "r", "resource"],
 	boolean: ["h", "help"],
 	alias: {
+		r: "resource",
 		d: "database",
 		o: "output",
 		h: "help",
@@ -25,10 +27,11 @@ if (args.help) usage(0);
 
 const db = args.database ?? "";
 const out = args.output ?? "";
+const res = args.resource ?? "";
 
 if (!db || !out) usage(1);
 
-const ROOT_DIR = resolve(process.env.ROOT_DIR ?? "dist");
+const ROOT_DIR = resolve(res);
 const OUTPUT_DIR = resolve(out);
 
 if (!(await fs.exists(ROOT_DIR)))

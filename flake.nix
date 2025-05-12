@@ -35,8 +35,7 @@
         '';
         export = pkgs.writeShellScriptBin "org-roam-ui-lite-export" ''
           export PATH=$PATH:${pkgs.nodejs}/bin
-          export ROOT_DIR=${nodepkg}
-          ${pkgs.nodePackages.zx}/bin/zx ${./scripts}/export.mjs "$@"
+          ${pkgs.nodePackages.zx}/bin/zx ${./scripts}/export.mjs -r "${nodepkg}" "$@"
         '';
         elisp = emacsPackages.trivialBuild {
           pname = "org-roam-ui-lite-elisp";

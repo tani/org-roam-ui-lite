@@ -28,13 +28,32 @@ org-roam-ui-lite/
 └── openapi.yaml    ← shared API contract (typed via openapi-typescript)
 #+end_src
 
+* Stable
+
+* Quick start (pre-built)
+
+#+begin_src bash
+$ curl -fsSLO https://github.com/tani/org-roam-ui-lite/releases/latest/download/org-roam-ui-lite.zip
+$ unzip ./org-roam-ui-lite.zip
+$ cd org-roam-ui-lite
+$ node ./backend/dist/backend.js -d /path/to/database.db
+#+end_src
+
+Open [[http://localhost:5173][http://localhost:5173]] and start clicking nodes!
+
+* Building a static-site (pre-built)
+
+#+begin_src bash
+$ curl -fsSLO https://github.com/tani/org-roam-ui-lite/releases/latest/download/org-roam-ui-lite.zip
+$ unzip ./org-roam-ui-lite.zip
+$ cd org-roam-ui-lite
+$ npx zx scripts/export.mjs -d /path/to/database.db -o /path/to/output
+$ python3 -m http.server -d /path/to/output
+#+end_src
+
+* HEAD
+
 * Quick start (npm)
-
-#+begin_quote
-[!IMPORTANT]
-To run ~backend/~, You need to install Nodejs v23 or later
-#+end_quote
-
 #+begin_src bash
 $ git clone https://github.com/tani/org-roam-ui-lite.git
 $ cd org-roam-ui-lite
@@ -44,11 +63,6 @@ $ npm run dev -- -d /path/to/database.db
 
 Open [[http://localhost:5173][http://localhost:5173]] and start clicking nodes!
 
-#+begin_quote
-[!TIP]
-Alternatively, you can download the pre-built Node.js script from GitHub Releases.
-#+end_quote
-
 * Building a static-site (npm)
 
 #+begin_src bash
@@ -56,12 +70,10 @@ $ git clone github.com/tani/org-roam-ui-lite.git
 $ cd org-roam-ui-lite
 $ npm install
 $ npm run export -- -d /path/to/database.db -o /path/to/output
-$ python3 -m http.server -d public/
+$ python3 -m http.server -d /path/to/output
 #+end_src
 
-The output ends up in ~public/~.
-
-* For Nix users
+* Nix
 
 ** Quick start (Nix)
 
@@ -80,22 +92,14 @@ $ # nix run .#export -- -d /path/to/database.db -o /path/to/output
 $ python3 -m http.server -d /path/to/output
 #+end_src
 
-The output ends up in ~public/~.
-
-* Using the Emacs back-end only
+* Emacs
 
 ** Build project (Emacs)
 
 #+begin_src bash
-$ git clone https://github.com/tani/org-roam-ui-lite.git
-$ cd org-roam-ui-lite
-$ npm run build
+$ curl -fsSLO https://github.com/tani/org-roam-ui-lite/releases/latest/download/org-roam-ui-lite.zip
+$ unzip ./org-roam-ui-lite.zip
 #+end_src
-
-#+begin_quote
-[!TIP]
-Alternatively, you can download the pre-built Node.js script from GitHub Releases.
-#+end_quote
 
 ** Launch Emacs
 
@@ -104,8 +108,7 @@ Add this to your ~init.el~ (requires Emacs 29.1 + Org-roam ≥2.2.2 + simple
 #+begin_src emacs-lisp
 (add-to-list 'load-path "/path/to/org-roam-ui-lite/emacs")
 (require 'org-roam-ui-lite)
-(setq org-roam-ui-lite-port 5174)      ;; optional
-(org-roam-ui-lite-mode)                ;; starts server + opens browser
+(org-roam-ui-lite-mode)
 #+end_src
 
 Visit [[http://localhost:5174/index.html]] – that’s all.

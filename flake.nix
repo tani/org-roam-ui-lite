@@ -31,11 +31,11 @@
           cp -r --no-preserve=ownership ${nodepkg} ./dist
         '';
         serve = pkgs.writeShellScriptBin "org-roam-ui-lite-serve" ''
-          ${pkgs.nodejs}/bin/node ${nodepkg}/backend/dist/backend.mjs -m serve "$@"
+          ${pkgs.bun}/bin/bun ${nodepkg}/backend/dist/backend.js -m serve "$@"
         '';
         export = pkgs.writeShellScriptBin "org-roam-ui-lite-export" ''
           export PATH=$PATH:${pkgs.nodejs}/bin
-          ${pkgs.nodePackages.zx}/bin/zx ${./scripts}/export.mjs -r "${nodepkg}" "$@"
+          ${pkgs.bun}/bin/bun ${./scripts}/export.ts -r "${nodepkg}" "$@"
         '';
         elisp = emacsPackages.trivialBuild {
           pname = "org-roam-ui-lite-elisp";
@@ -66,6 +66,7 @@
 
         devShells.default = pkgs.mkShell {
           buildInputs = with pkgs; [
+            bun
             nodejs
             prefetch-npm-deps
             typescript-language-server

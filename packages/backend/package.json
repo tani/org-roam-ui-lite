@@ -3,10 +3,10 @@
 	"private": true,
 	"type": "module",
 	"scripts": {
-		"dev": "tsx src/backend.ts",
-		"build": "tsx ./build.ts",
-		"lint": "biome check **/*.ts *.{json,ts}",
-		"lint:fix": "biome check --fix **/*.ts *.{json,ts}",
+		"dev": "bun --watch src/backend.ts",
+		"build": "bun build ./src/backend.ts --target node --outdir ./dist",
+		"lint": "biome check src/*.ts *.json",
+		"lint:fix": "biome check --fix src/*.ts *.json",
 		"check": "tsc"
 	},
 	"dependencies": {
@@ -17,11 +17,10 @@
 	},
 	"devDependencies": {
 		"@biomejs/biome": "2.0.0-beta.2",
+		"@types/bun": "^1.2.13",
 		"@types/node": "^22.15.3",
 		"@types/sql.js": "^1.4.9",
-		"esbuild": "^0.25.4",
-		"tsx": "^4.19.4",
-		"typescript": "^5.8.3",
-		"zx": "^8.5.4"
+		"bun": "^1.2.13",
+		"typescript": "^5.8.3"
 	}
 }

@@ -7,20 +7,20 @@
 	],
 	"devDependencies": {
 		"@biomejs/biome": "^2.0.0-beta.2",
+		"bun": "^1.2.13",
 		"lefthook": "^1.11.12",
 		"license-checker": "^25.0.1",
-		"npm-run-all": "^4.1.5",
-		"zx": "^8.5.3"
+		"npm-run-all": "^4.1.5"
 	},
 	"scripts": {
 		"version": "nix run .#update-npm-deps-hash && git add flake.nix",
-		"build": "npm run build --workspaces && zx ./scripts/build.mjs",
-		"export": "npm run build && zx ./scripts/export.mjs -r ./dist",
+		"build": "npm run build --workspaces && bun ./scripts/build.ts",
+		"export": "npm run build && bun ./scripts/export.ts -r ./dist",
 		"dev": "npm-run-all -p dev:frontend 'dev:backend -- {@}' --",
 		"dev:frontend": "npm --workspace=packages/frontend run dev --",
 		"dev:backend": "npm --workspace=packages/backend run dev --",
-		"lint": "biome check **/*.mjs *.{json,yaml} && npm run lint --workspaces",
-		"lint:fix": "biome check --fix **/*.mjs *.{json,yaml} && npm run lint:fix --workspaces",
+		"lint": "biome check **/*.ts *.{json,yaml} && npm run lint --workspaces",
+		"lint:fix": "biome check --fix **/*.ts *.{json,yaml} && npm run lint:fix --workspaces",
 		"check": "npm run check --workspaces",
 		"test": "npm run test --workspaces"
 	},

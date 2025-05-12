@@ -3,11 +3,11 @@
 	"private": true,
 	"type": "module",
 	"scripts": {
-		"dev": "tsx --watch build.ts",
+		"dev": "bun build --watch ./src/index.html --outdir ./dist",
 		"prebuild": "openapi-typescript ../../openapi.yaml --output src/api.d.ts",
-		"build": "tsx build.ts",
-		"lint": "biome check **/*.{css,ts,html} *.{ts,json}",
-		"lint:fix": "biome check --fix **/*.{css,ts,html} *.{ts,json}",
+		"build": "bun build ./src/index.html --outdir ./dist",
+		"lint": "biome check src/*.{css,ts,html} *.json",
+		"lint:fix": "biome check --fix src/*.{css,ts,html} *.json",
 		"check": "tsc"
 	},
 	"dependencies": {
@@ -34,10 +34,9 @@
 		"@types/alpinejs": "^3.13.11",
 		"@types/alpinejs__persist": "^3.13.4",
 		"@types/bootstrap": "^5.2.10",
-		"esbuild": "^0.25.4",
+		"@types/bun": "^1.2.13",
 		"openapi-typescript": "^7.6.1",
-		"tsx": "^4.19.4",
 		"typescript": "^5.8.3",
-		"zx": "^8.5.4"
+		"vyb": "^0.0.0"
 	}
 }

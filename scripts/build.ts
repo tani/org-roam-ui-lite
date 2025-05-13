@@ -19,7 +19,7 @@ const copies = [
 	["packages/emacs", "dist/emacs"],
 	["packages/frontend/dist", "dist/frontend/dist"],
 	["packages/backend/dist", "dist/backend/dist"],
-	["scripts/export.ts", "dist/scripts/export.ts"],
+	["scripts/export.js", "dist/scripts/export.js"],
 ] as const;
 
 // ファイル／ディレクトリをコピー

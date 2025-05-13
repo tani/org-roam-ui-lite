@@ -4,7 +4,7 @@
 	"type": "module",
 	"scripts": {
 		"dev": "bun build --watch ./src/index.html --outdir ./dist",
-		"prebuild": "openapi-typescript ../../openapi.yaml --output src/api.d.ts",
+		"prebuild": "openapi-typescript ../../openapi.yaml --output ./src/api.d.ts && biome format --write ./src/api.d.ts",
 		"build": "bun build ./src/index.html --outdir ./dist",
 		"lint": "biome check src/*.{css,ts,html} *.json",
 		"lint:fix": "biome check --fix src/*.{css,ts,html} *.json",

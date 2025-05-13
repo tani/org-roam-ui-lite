@@ -5,8 +5,7 @@ import * as nodeServer from "@hono/node-server";
 import { serveStatic } from "@hono/node-server/serve-static";
 import { eq } from "drizzle-orm";
 import { Hono } from "hono";
-import { args } from "./args.ts";
-import { db } from "./database.ts";
+import { createDatabase } from "./database.ts";
 import { files, links, nodes } from "./schema.ts";
 
 function isUuid(str: unknown): str is string {
@@ -15,7 +14,8 @@ function isUuid(str: unknown): str is string {
 	return typeof str === "string" && UUID_REGEX.test(str);
 }
 
-export function serve() {
+export async function serve(db_path: string, port: number) {
+	const db = await createDatabase(db_path);
 	const frontendDistPath = path.relative(
 		process.cwd(),
 		path.join(import.meta.dirname ?? "", "../../frontend/dist"),
@@ -88,7 +88,6 @@ export function serve() {
 		});
 	});
 
-	const port = Number(args.values.port);
 	console.log(`Launch at http://localhost:${port}/index.html`);
 	nodeServer.serve({ fetch: app.fetch, port });
 }

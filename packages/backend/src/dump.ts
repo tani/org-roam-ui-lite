@@ -2,11 +2,8 @@
 import * as fs from "node:fs/promises";
 import * as path from "node:path";
 import { eq } from "drizzle-orm";
-import { args } from "./args.ts";
-import { db } from "./database.ts";
+import { createDatabase } from "./database.ts";
 import { files, links, nodes } from "./schema.ts";
-
-const outDir = args.values.output;
 
 function isUuid(str: unknown): str is string {
 	const UUID_REGEX =
@@ -14,7 +11,8 @@ function isUuid(str: unknown): str is string {
 	return typeof str === "string" && UUID_REGEX.test(str);
 }
 
-async function dumpGraphJson() {
+async function dumpGraphJson(db_path: string, out_path: string) {
+	const db = await createDatabase(db_path);
 	const [ns, es] = await Promise.all([
 		db.select({ id: nodes.id, title: nodes.title }).from(nodes),
 		db.select({ source: links.source, dest: links.dest }).from(links),
@@ -32,14 +30,15 @@ async function dumpGraphJson() {
 			dest,
 		}));
 
-	await fs.mkdir(outDir, { recursive: true });
+	await fs.mkdir(out_path, { recursive: true });
 	await fs.writeFile(
-		path.join(outDir, "graph.json"),
+		path.join(out_path, "graph.json"),
 		JSON.stringify({ nodes: cleanNodes, edges: cleanEdges }, null, 2),
 	);
 }
 
-async function dumpNodeJsons() {
+async function dumpNodeJsons(db_path: string, out_path: string) {
+	const db = await createDatabase(db_path);
 	const allNodes = await db
 		.select({ id: nodes.id, title: nodes.title, file: files.file })
 		.from(nodes)
@@ -69,16 +68,16 @@ async function dumpNodeJsons() {
 			raw,
 			backlinks: cleanBacklinks,
 		};
-		await fs.mkdir(path.join(outDir, "node"), { recursive: true });
+		await fs.mkdir(path.join(out_path, "node"), { recursive: true });
 		await fs.writeFile(
-			path.join(outDir, `node/${id}.json`),
+			path.join(out_path, `node/${id}.json`),
 			JSON.stringify(nodeJson, null, 2),
 		);
 	}
 }
 
-export async function dump() {
-	await dumpGraphJson();
-	await dumpNodeJsons();
-	console.log(`✅ All JSON files dumped to ${outDir}`);
+export async function dump(db_path: string, out_path: string) {
+	await dumpGraphJson(db_path, out_path);
+	await dumpNodeJsons(db_path, out_path);
+	console.log(`✅ All JSON files dumped to ${out_path}`);
 }

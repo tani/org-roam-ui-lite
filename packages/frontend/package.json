@@ -36,7 +36,6 @@
 		"@types/bootstrap": "^5.2.10",
 		"bun": "^1.2.13",
 		"openapi-typescript": "^7.6.1",
-		"typescript": "^5.8.3",
-		"vyb": "^0.0.0"
+		"typescript": "^5.8.3"
 	}
 }

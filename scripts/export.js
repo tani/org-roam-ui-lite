@@ -4,9 +4,9 @@ import { join, resolve } from "node:path";
 import process from "node:process";
 import { parseArgs } from "node:util";
 
-// ────────────────────────────────────────────────────
-//  Usage        (short-flag ONLY)
-// ────────────────────────────────────────────────────
+/**
+ * @returns {never}
+ */
 function usage(exitCode = 0) {
 	console.log(
 		`Usage: export.ts -d DB -o OUTPUT -r DIR\n\n` +
@@ -19,9 +19,6 @@ function usage(exitCode = 0) {
 	process.exit(exitCode);
 }
 
-// ────────────────────────────────────────────────────
-//  Parse CLI  (short flags: -r -d -o -h)
-// ────────────────────────────────────────────────────
 const { values } = parseArgs({
 	args: process.argv.slice(2),
 	options: {
@@ -38,40 +35,25 @@ const res = values.r;
 const db = values.d;
 const out = values.o;
 
-if (!res || !db || !out) {
-	usage(1);
-} else {
-	// ────────────────────────────────────────────────────
-	//  Paths
-	// ────────────────────────────────────────────────────
-	const ROOT_DIR = resolve(res);
-	const OUTPUT_DIR = resolve(out);
+if (!res || !db || !out) usage(1);
 
-	// ────────────────────────────────────────────────────
-	//  Pre-flight checks
-	// ────────────────────────────────────────────────────
-	try {
-		await stat(ROOT_DIR);
-	} catch {
-		throw new Error(`ROOT_DIR not found: ${ROOT_DIR}`);
-	}
+const ROOT_DIR = resolve(res);
+const OUTPUT_DIR = resolve(out);
 
-	console.log("Exporting Org-roam DB:", db);
-	console.log("Destination:", OUTPUT_DIR);
-
-	// ────────────────────────────────────────────────────
-	//  Copy frontend bundle
-	// ────────────────────────────────────────────────────
-	console.log("Copying frontend bundle…");
-	await rm(OUTPUT_DIR, { recursive: true, force: true });
-	await cp(join(ROOT_DIR, "frontend", "dist"), OUTPUT_DIR, { recursive: true });
-	await chmod(OUTPUT_DIR, 0o777);
-
-	// ────────────────────────────────────────────────────
-	//  Generate JSON API
-	// ────────────────────────────────────────────────────
-	console.log("Generating JSON API…");
-
-	const { dump } = await import(join(ROOT_DIR, "backend", "dist", "dump.js"));
-	await dump(db, join(OUTPUT_DIR, "api"));
+try {
+	await stat(ROOT_DIR);
+} catch {
+	throw new Error(`ROOT_DIR not found: ${ROOT_DIR}`);
 }
+
+console.log("Exporting Org-roam DB:", db);
+console.log("Destination:", OUTPUT_DIR);
+
+console.log("Copying frontend bundle…");
+await rm(OUTPUT_DIR, { recursive: true, force: true });
+await cp(join(ROOT_DIR, "frontend", "dist"), OUTPUT_DIR, { recursive: true });
+await chmod(OUTPUT_DIR, 0o777);
+
+console.log("Generating JSON API…");
+const { dump } = await import(join(ROOT_DIR, "backend", "dist", "dump.js"));
+await dump(db, join(OUTPUT_DIR, "api"));

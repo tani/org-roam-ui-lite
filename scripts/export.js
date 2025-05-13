@@ -38,38 +38,40 @@ const res = values.r;
 const db = values.d;
 const out = values.o;
 
-if (!res || !db || !out) usage(1);
+if (!res || !db || !out) {
+	usage(1);
+} else {
+	// ────────────────────────────────────────────────────
+	//  Paths
+	// ────────────────────────────────────────────────────
+	const ROOT_DIR = resolve(res);
+	const OUTPUT_DIR = resolve(out);
 
-// ────────────────────────────────────────────────────
-//  Paths
-// ────────────────────────────────────────────────────
-const ROOT_DIR = resolve(res!);
-const OUTPUT_DIR = resolve(out!);
+	// ────────────────────────────────────────────────────
+	//  Pre-flight checks
+	// ────────────────────────────────────────────────────
+	try {
+		await stat(ROOT_DIR);
+	} catch {
+		throw new Error(`ROOT_DIR not found: ${ROOT_DIR}`);
+	}
 
-// ────────────────────────────────────────────────────
-//  Pre-flight checks
-// ────────────────────────────────────────────────────
-try {
-	await stat(ROOT_DIR);
-} catch {
-	throw new Error(`ROOT_DIR not found: ${ROOT_DIR}`);
+	console.log("Exporting Org-roam DB:", db);
+	console.log("Destination:", OUTPUT_DIR);
+
+	// ────────────────────────────────────────────────────
+	//  Copy frontend bundle
+	// ────────────────────────────────────────────────────
+	console.log("Copying frontend bundle…");
+	await rm(OUTPUT_DIR, { recursive: true, force: true });
+	await cp(join(ROOT_DIR, "frontend", "dist"), OUTPUT_DIR, { recursive: true });
+	await chmod(OUTPUT_DIR, 0o777);
+
+	// ────────────────────────────────────────────────────
+	//  Generate JSON API
+	// ────────────────────────────────────────────────────
+	console.log("Generating JSON API…");
+
+	const { dump } = await import(join(ROOT_DIR, "backend", "dist", "dump.js"));
+	await dump(db, join(OUTPUT_DIR, "api"));
 }
-
-console.log("Exporting Org-roam DB:", db);
-console.log("Destination:", OUTPUT_DIR);
-
-// ────────────────────────────────────────────────────
-//  Copy frontend bundle
-// ────────────────────────────────────────────────────
-console.log("Copying frontend bundle…");
-await rm(OUTPUT_DIR, { recursive: true, force: true });
-await cp(join(ROOT_DIR, "frontend", "dist"), OUTPUT_DIR, { recursive: true });
-await chmod(OUTPUT_DIR, 0o777);
-
-// ────────────────────────────────────────────────────
-//  Generate JSON API
-// ────────────────────────────────────────────────────
-console.log("Generating JSON API…");
-
-const { dump } = await import(join(ROOT_DIR, "backend", "dist", "dump.js"));
-await dump(db, join(OUTPUT_DIR, "api"));

@@ -3,8 +3,8 @@
 	"private": true,
 	"type": "module",
 	"scripts": {
-		"dev": "bun --watch src/backend.ts",
-		"build": "bun build ./src/backend.ts --target node --outdir ./dist",
+		"dev": "bun --watch src/serve.ts",
+		"build": "bun build --target node --outdir ./dist ./src/serve.ts ./src/dump.ts",
 		"lint": "biome check src/*.ts *.json",
 		"lint:fix": "biome check --fix src/*.ts *.json",
 		"check": "tsc"

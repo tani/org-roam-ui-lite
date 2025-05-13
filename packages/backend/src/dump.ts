@@ -1,6 +1,8 @@
 // scripts/dump-json.ts
 import * as fs from "node:fs/promises";
 import * as path from "node:path";
+import process from "node:process";
+import { parseArgs } from "node:util";
 import { eq } from "drizzle-orm";
 import { createDatabase } from "./database.ts";
 import { files, links, nodes } from "./schema.ts";
@@ -81,3 +83,21 @@ export async function dump(db_path: string, out_path: string) {
 	await dumpNodeJsons(db_path, out_path);
 	console.log(`✅ All JSON files dumped to ${out_path}`);
 }
+
+export const args = parseArgs({
+	options: {
+		output: {
+			type: "string",
+			short: "o",
+			default: process.env.OUTPUT ?? `${process.cwd()}/dist`,
+		},
+		database: {
+			type: "string",
+			short: "d",
+			default: process.env.DATABASE ?? `${process.cwd()}/database.db`,
+		},
+	},
+	allowPositionals: true,
+});
+
+await dump(args.values.database, args.values.output);

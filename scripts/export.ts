@@ -71,4 +71,4 @@ await chmod(OUTPUT_DIR, 0o777);
 //  Generate JSON API
 // ────────────────────────────────────────────────────
 console.log("Generating JSON API…");
-await $`bun ${ROOT_DIR}/backend/dist/backend.js -m dump -d ${db} -o ${OUTPUT_DIR}/api`;
+await $`bun ${ROOT_DIR}/backend/dist/dump.js -d ${db} -o ${OUTPUT_DIR}/api`;

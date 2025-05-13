@@ -17,7 +17,7 @@
           version = packageJson.version;
           src = ./.;
           nativeBuildInputs = [ pkgs.bun ];
-          npmDepsHash = "sha256-UMwgH1z7WqW6NG+XSJVjFR+4OpS5mXEMu5dtwTte+Fg=";
+          npmDepsHash = "sha256-x4UFhinoTyFRhVJqh1aAwIXk9ejG/0gurNXwPxPhy1I=";
           npmDeps = pkgs.fetchNpmDeps {
             inherit src;
             name = "${pname}-${version}-npm-deps";

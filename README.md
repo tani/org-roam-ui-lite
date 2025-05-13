@@ -55,7 +55,7 @@ nodes!
 $ curl -fsSLO https://github.com/tani/org-roam-ui-lite/releases/latest/download/org-roam-ui-lite.zip
 $ unzip ./org-roam-ui-lite.zip
 $ cd org-roam-ui-lite
-$ node scripts/export.ts -r . -d /path/to/database.db -o /path/to/output
+$ node scripts/export.js -r . -d /path/to/database.db -o /path/to/output
 $ python3 -m http.server -d /path/to/output
 ```
 

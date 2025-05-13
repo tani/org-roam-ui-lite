@@ -1,3 +1,4 @@
+// @ts-check
 import { chmod, cp, rm, stat } from "node:fs/promises";
 import { join, resolve } from "node:path";
 import process from "node:process";

@@ -1,6 +1,7 @@
 import * as fs from "node:fs/promises";
 import * as path from "node:path";
 import process from "node:process";
+import * as url from "node:url";
 import { parseArgs } from "node:util";
 import * as nodeServer from "@hono/node-server";
 import { serveStatic } from "@hono/node-server/serve-static";
@@ -93,20 +94,24 @@ export async function serve(db_path: string, port: number) {
 	nodeServer.serve({ fetch: app.fetch, port });
 }
 
-export const args = parseArgs({
-	options: {
-		database: {
-			type: "string",
-			short: "d",
-			default: process.env.DATABASE ?? `${process.cwd()}/database.db`,
-		},
-		port: {
-			type: "string",
-			short: "p",
-			default: process.env.PORT ?? "5174",
-		},
-	},
-	allowPositionals: true,
-});
+const isMain = process.argv[1] === url.fileURLToPath(import.meta.url);
 
-await serve(args.values.database, Number(args.values.port));
+if (isMain) {
+	const args = parseArgs({
+		options: {
+			database: {
+				type: "string",
+				short: "d",
+				default: process.env.DATABASE ?? `${process.cwd()}/database.db`,
+			},
+			port: {
+				type: "string",
+				short: "p",
+				default: process.env.PORT ?? "5174",
+			},
+		},
+		allowPositionals: true,
+	});
+
+	await serve(args.values.database, Number(args.values.port));
+}

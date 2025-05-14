@@ -16,7 +16,6 @@
           pname = "org-roam-ui-lite-nodepkg";
           version = packageJson.version;
           src = ./.;
-          nativeBuildInputs = [ pkgs.bun ];
           npmDepsHash = "sha256-GXfwObtD58FqmrnIcB+HtmhglzZUwmVJLtYldcm+xHA=";
           npmDeps = pkgs.fetchNpmDeps {
             inherit src;
@@ -32,10 +31,10 @@
           cp -r --no-preserve=ownership ${nodepkg} ./dist
         '';
         serve = pkgs.writeShellScriptBin "org-roam-ui-lite-serve" ''
-          ${pkgs.bun}/bin/bun ${nodepkg}/backend/dist/backend.js -m serve "$@"
+          ${pkgs.nodejs}/bin/node ${nodepkg}/backend/dist/backend.js -m serve "$@"
         '';
         export = pkgs.writeShellScriptBin "org-roam-ui-lite-export" ''
-          ${pkgs.bun}/bin/bun ${./scripts}/export.ts -r "${nodepkg}" "$@"
+          ${pkgs.nodejs}/bin/node ${./scripts}/export.ts -r "${nodepkg}" "$@"
         '';
         elisp = emacsPackages.trivialBuild {
           pname = "org-roam-ui-lite-elisp";
@@ -66,7 +65,6 @@
 
         devShells.default = pkgs.mkShell {
           buildInputs = with pkgs; [
-            bun
             nodejs
             prefetch-npm-deps
             typescript-language-server

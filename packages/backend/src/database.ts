@@ -11,7 +11,9 @@ export async function createDatabase(db_path: string): Promise<Database> {
 	try {
 		// @ts-ignore: esbuild
 		const { default: wasmURL } = await import("sql.js/dist/sql-wasm.wasm");
-		SQL = await initSqlJs({ locateFile: () => import.meta.resolve(wasmURL) });
+		SQL = await initSqlJs({
+			locateFile: () => import.meta.resolve("./" + wasmURL),
+		});
 	} catch {
 		SQL = await initSqlJs();
 	}

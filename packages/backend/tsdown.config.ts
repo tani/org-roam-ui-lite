@@ -7,7 +7,7 @@ export default defineConfig({
 	shims: true,
 	inputOptions: {
 		moduleTypes: {
-			".wasm": "asset",
+			".wasm": "binary",
 		},
 	},
 });

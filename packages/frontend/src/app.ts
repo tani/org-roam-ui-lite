@@ -1,13 +1,8 @@
 import persist from "@alpinejs/persist";
 import Alpine from "alpinejs";
 import * as bootstrap from "bootstrap";
-import cytoscape, { type Core, type ElementDefinition } from "cytoscape";
-import "./app.css";
-import "./themes.css";
-import "./code.css";
-import "bootstrap/dist/css/bootstrap.min.css";
-import "bootstrap-icons/font/bootstrap-icons.css";
 import type { LayoutOptions } from "cytoscape";
+import cytoscape, { type Core, type ElementDefinition } from "cytoscape";
 import createClient from "openapi-fetch";
 import type { RehypeMermaidOptions } from "rehype-mermaid";
 import type { components, paths } from "./api";

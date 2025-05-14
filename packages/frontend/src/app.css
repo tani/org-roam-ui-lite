@@ -1,4 +1,9 @@
 /* グラフを全画面に表示 */
+@import url("./themes.css");
+@import url("./code.css");
+@import url("bootstrap/dist/css/bootstrap.min.css");
+@import url("bootstrap-icons/font/bootstrap-icons.css");
+
 body,
 html {
 	margin: 0;

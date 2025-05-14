@@ -25,5 +25,5 @@
 		"lint:fix": "biome check --fix",
 		"check": "tsc"
 	},
-	"version": "0.0.39"
+	"version": "0.0.40"
 }

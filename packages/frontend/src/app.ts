@@ -5,7 +5,7 @@ import type { LayoutOptions } from "cytoscape";
 import cytoscape, { type Core, type ElementDefinition } from "cytoscape";
 import createClient from "openapi-fetch";
 import type { RehypeMermaidOptions } from "rehype-mermaid";
-import type { components, paths } from "./api";
+import type { components, paths } from "./api.d.ts";
 
 const api = createClient<paths>();
 

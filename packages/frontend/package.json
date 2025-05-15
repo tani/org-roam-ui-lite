@@ -32,6 +32,6 @@
 		"@types/alpinejs__persist": "^3.13.4",
 		"@types/bootstrap": "^5.2.10",
 		"openapi-typescript": "^7.6.1",
-		"vite": "^6.3.5"
+		"vite": "npm:rolldown-vite@^6.3.9"
 	}
 }

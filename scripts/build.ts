@@ -43,7 +43,7 @@ try {
 		.filter(([, v]) => v.licenseFile)
 		.map(
 			([n, v]) =>
-				[v.licenseFile!, `${DIST}/licenses/${slugify(n)}`] as [string, string],
+				[v.licenseFile, `${DIST}/licenses/${slugify(n)}`] as [string, string],
 		);
 
 	const TARGETS: [string, string][] = [...FILES, ...LICENSES];

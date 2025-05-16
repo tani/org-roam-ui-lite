@@ -79,7 +79,7 @@ function resetHighlights(graph: Core | undefined): void {
 
 // --- Processor Factory ---
 /** Create unified processor for Org → HTML */
-async function createOrgHtmlProcessor(theme: Theme) {
+async function createOrgHtmlProcessor(theme: Theme, id: string) {
 	const [
 		{ unified },
 		parse,
@@ -91,6 +91,7 @@ async function createOrgHtmlProcessor(theme: Theme) {
 		stringify,
 		raw,
 		classNames,
+		rehypeImgSrcFix,
 	] = await Promise.all([
 		import("unified"),
 		import("uniorg-parse"),
@@ -102,11 +103,13 @@ async function createOrgHtmlProcessor(theme: Theme) {
 		import("rehype-stringify"),
 		import("rehype-raw"),
 		import("rehype-class-names"),
+		import("./rehype-img-src-fix.ts"),
 	]);
 	return unified()
 		.use(parse.default)
 		.use(rehype.default)
 		.use(raw.default)
+		.use(rehypeImgSrcFix.default, id)
 		.use(mathjax.default)
 		.use(mermaid.default, {
 			strategy: "img-svg",
@@ -295,7 +298,7 @@ Alpine.data("app", () => ({
 			return;
 		}
 
-		const processor = await createOrgHtmlProcessor(this.theme);
+		const processor = await createOrgHtmlProcessor(this.theme, id);
 
 		const html = String(await processor.process(data.raw));
 		this.selected = { ...data, html };

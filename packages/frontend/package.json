@@ -24,13 +24,15 @@
 		"rehype-stringify": "^10.0.1",
 		"unified": "^11.0.5",
 		"uniorg-parse": "^3.2.0",
-		"uniorg-rehype": "^2.2.0"
+		"uniorg-rehype": "^2.2.0",
+		"unist-util-visit": "^5.0.0"
 	},
 	"devDependencies": {
 		"@rollup/plugin-url": "^8.0.2",
 		"@types/alpinejs": "^3.13.11",
 		"@types/alpinejs__persist": "^3.13.4",
 		"@types/bootstrap": "^5.2.10",
+		"@types/hast": "^3.0.4",
 		"openapi-typescript": "^7.6.1",
 		"vite": "npm:rolldown-vite@^6.3.9"
 	}

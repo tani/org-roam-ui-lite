@@ -15,7 +15,7 @@
 	"scripts": {
 		"version": "nix run .#update-npm-deps-hash && git add flake.nix",
 		"build": "npm run build --workspaces && tsx ./scripts/build.ts",
-		"export": "npm run build && bun ./scripts/export.js -r ./dist",
+		"export": "npm run build && node ./scripts/export.js -r ./dist",
 		"dev": "npm-run-all -p dev:frontend 'dev:backend -- {@}' --",
 		"dev:frontend": "npm --workspace=packages/frontend run dev --",
 		"dev:backend": "npm --workspace=packages/backend run dev --",

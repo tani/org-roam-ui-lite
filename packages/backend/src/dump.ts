@@ -5,6 +5,13 @@ import process from "node:process";
 import * as url from "node:url";
 import { parseArgs } from "node:util";
 import { eq } from "drizzle-orm";
+import type { Element, Root } from "hast";
+import raw from "rehype-raw";
+import { unified } from "unified";
+import parseOrg from "uniorg-parse";
+import rehypeOrg from "uniorg-rehype";
+import { visit } from "unist-util-visit";
+import { encodeBase64url } from "./base64url.ts";
 import { createDatabase } from "./database.ts";
 import { files, links, nodes } from "./schema.ts";
 
@@ -42,6 +49,13 @@ async function dumpGraphJson(db_path: string, out_path: string) {
 
 async function dumpNodeJsons(db_path: string, out_path: string) {
 	const db = await createDatabase(db_path);
+
+	// unified パイプラインを一度だけ組んでおく
+	const processor = unified()
+		.use(parseOrg) // org テキスト → MDAST
+		.use(rehypeOrg) // MDAST → HAST
+		.use(raw); // HAST 中の HTML を展開
+
 	const allNodes = await db
 		.select({ id: nodes.id, title: nodes.title, file: files.file })
 		.from(nodes)
@@ -49,8 +63,9 @@ async function dumpNodeJsons(db_path: string, out_path: string) {
 
 	for (const row of allNodes) {
 		const id = row.id;
-		const raw = await fs.readFile(row.file, "utf8");
+		const rawText = await fs.readFile(row.file, "utf8");
 
+		// 1) 通常の node.json ダンプ
 		const backlinks = await db
 			.select({
 				source: links.source,
@@ -64,18 +79,55 @@ async function dumpNodeJsons(db_path: string, out_path: string) {
 			title: b.title,
 			source: b.source,
 		}));
-
 		const nodeJson = {
 			id,
 			title: row.title,
-			raw,
+			raw: rawText,
 			backlinks: cleanBacklinks,
 		};
-		await fs.mkdir(path.join(out_path, "node"), { recursive: true });
+
+		const nodeDir = path.join(out_path, "node");
+		await fs.mkdir(nodeDir, { recursive: true });
 		await fs.writeFile(
-			path.join(out_path, `node/${id}.json`),
+			path.join(nodeDir, `${id}.json`),
 			JSON.stringify(nodeJson, null, 2),
 		);
+
+		const parsed = processor.parse(rawText);
+		// @ts-ignore: unified@10+ の run は Node を返します
+		const tree = (await processor.run(parsed)) as Root;
+
+		const imgSrcs: string[] = [];
+		visit(tree, "element", (node: Element) => {
+			if (node.tagName === "img" && typeof node.properties?.src === "string") {
+				const src: string = node.properties.src;
+				if (
+					src.startsWith("data:") ||
+					src.startsWith("http:") ||
+					src.startsWith("https:") ||
+					src.startsWith("//")
+				)
+					return;
+				imgSrcs.push(src);
+			}
+		});
+
+		// 重複排除
+		const uniqueSrcs = Array.from(new Set(imgSrcs));
+		const basePath = path.dirname(row.file);
+
+		for (const src of uniqueSrcs) {
+			const ext = path.extname(src);
+			const basename = path.basename(src, ext);
+			const encoded = encodeBase64url(basename);
+
+			const srcPath = path.resolve(basePath, src);
+			const destDir = path.join(out_path, "node", id);
+			const destFile = path.join(destDir, `${encoded}${ext}`);
+
+			await fs.mkdir(destDir, { recursive: true });
+			await fs.copyFile(srcPath, destFile);
+		}
 	}
 }
 

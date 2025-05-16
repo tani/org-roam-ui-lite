@@ -7,6 +7,7 @@ import * as nodeServer from "@hono/node-server";
 import { serveStatic } from "@hono/node-server/serve-static";
 import { eq } from "drizzle-orm";
 import { Hono } from "hono";
+import { lookup } from "mime-types";
 import { createDatabase } from "./database.ts";
 import { files, links, nodes } from "./schema.ts";
 
@@ -87,6 +88,31 @@ export async function serve(db_path: string, port: number) {
 			title: row.title,
 			raw,
 			backlinks: cleanBacklinks,
+		});
+	});
+
+	app.get("/api/node/:id/:path", async (c) => {
+		const id = c.req.param("id");
+		const row = db
+			.select({ id: nodes.id, title: nodes.title, file: files.file })
+			.from(nodes)
+			.innerJoin(files, eq(nodes.file, files.file))
+			.where(eq(nodes.id, `"${id}"`))
+			.get();
+
+		if (!row) return c.json({ error: "not_found" }, 404);
+
+		const basePath = path.dirname(row.file);
+		const { ext, name } = path.parse(c.req.param("path"));
+		const decodedBasename = Buffer.from(name, "base64").toString("utf8");
+		const filePath = `${decodedBasename}${ext}`;
+		const resolvedPath = path.resolve(basePath, filePath);
+
+		const buffer = await fs.readFile(resolvedPath);
+		return new Response(buffer, {
+			headers: {
+				"Content-Type": lookup(resolvedPath) || "application/octet-stream",
+			},
 		});
 	});
 

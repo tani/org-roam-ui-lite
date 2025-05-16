@@ -212,6 +212,61 @@ export interface paths {
 		patch?: never;
 		trace?: never;
 	};
+	"/api/node/{id}/{path}": {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/**
+		 * Serve node asset (e.g. images)
+		 * @description Serves binary assets (images, etc.) referenced in the note with given `id`. The `path` parameter is the Base64url-encoded basename plus extension.
+		 *
+		 */
+		get: {
+			parameters: {
+				query?: never;
+				header?: never;
+				path: {
+					id: string;
+					path: string;
+				};
+				cookie?: never;
+			};
+			requestBody?: never;
+			responses: {
+				/** @description Binary asset returned */
+				200: {
+					headers: {
+						[name: string]: unknown;
+					};
+					content: {
+						"image/*": string;
+					};
+				};
+				/** @description Asset not found */
+				404: {
+					headers: {
+						[name: string]: unknown;
+					};
+					content: {
+						"application/json": {
+							/** @example not_found */
+							error: string;
+						};
+					};
+				};
+			};
+		};
+		put?: never;
+		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
 }
 export type webhooks = Record<string, never>;
 export interface components {

@@ -139,25 +139,96 @@
                                 `((source . ,src) (dest . ,dst)))
                               (org-roam-ui-lite--links)))))))
 
-;;;; API: /api/node/:id.json --------------------------------------------------
-(defservlet* api/node/:id text/plain ()
-  (let* ((id (file-name-sans-extension id))
-         (row (org-roam-ui-lite--node-row id)))
+
+
+(defun org-roam-ui-lite--decode-base64url (b64url)
+  "Convert URL-safe Base64 B64URL to standard Base64 and add padding."
+  (let* ((s (replace-regexp-in-string "-" "+" 
+             (replace-regexp-in-string "_" "/" b64url)))
+         ;; パディング長を計算して“=”を足す
+         (pad   (% (- 4 (mod (length s) 4)) 4))
+         (s-padded (concat s (make-string pad ?=))))
+    s-padded))
+
+(defun org-roam-ui-lite--serve-node-asset (proc id path)
+  "Serve a file attached to node ID, where PATH is BASE64URL_FILENAME.ext."
+  (let* ((row       (org-roam-ui-lite--node-row id)))
     (if (null row)
         (org-roam-ui-lite--json proc '((error . "not_found")) 404)
-      (pcase-let ((`(,nid ,ntitle ,nfile ,_) row))
-        (let* ((id     (org-roam-ui-lite--dequote nid))
-               (title  (org-roam-ui-lite--dequote ntitle))
-               (file   (org-roam-ui-lite--dequote nfile))
-               (raw    (with-temp-buffer
-                         (insert-file-contents file)
-                         (buffer-string)))
-               (backs  (apply #'vector (org-roam-ui-lite--backlinks id))))
-          (org-roam-ui-lite--json
-           proc `((id . ,id)
-                  (title . ,title)
-                  (raw . ,raw)
-                  (backlinks . ,backs))))))))
+      (let* ((file       (nth 2 row))
+             (base-dir   (file-name-directory file))
+             (ext        (file-name-extension path t))
+             (b64url     (file-name-sans-extension path))
+             ;; URL-safe Base64 → 標準 Base64 + padding
+             (b64        (org-roam-ui-lite--decode-base64url b64url))
+             ;; デコード
+             (decoded    (with-temp-buffer
+                           (insert b64)
+                           (base64-decode-region (point-min) (point-max))
+                           (buffer-string)))
+             (rel-path   (concat decoded ext))
+             (full-path  (expand-file-name rel-path base-dir)))
+        (if (file-exists-p full-path)
+            (httpd-send-file proc full-path)
+          (org-roam-ui-lite--json proc '((error . "not_found")) 404))))))
+
+;;;; API: /api/node/... (Unified Handler) ------------------------------------
+;; /api/node/ 以下の様々なパターンをこの単一のサーブレットで処理します。
+;; simple-httpdのディスパッチは最も長い固定プレフィックス(/api/node/)でサーブレットを選択するため、
+;; 異なる可変パターン(例: /:id.json と /:id/:path)は一つのサーブレットで判別する必要があります。
+(defservlet* api/node/:part1/:part2 nil () ;; パスコンポーネントを part1, part2 としてバインド
+  "Handle requests for /api/node/:id.json and /api/node/:id/:path.
+Dispatches based on the number of path components after /api/node/."
+
+  (let* ((split-path (split-string (substring httpd-path 1) "/")) ;; ルートスラッシュを除去し、パス全体を分割
+         (num-components (length split-path)) ;; パス全体のコンポーネント数 (api, node, ...)
+         (api-node-idx 1)                     ;; "node" コンポーネントのインデックス (通常1)
+         (part1-comp (nth (+ api-node-idx 1) split-path)) ;; /api/node/ の直後のコンポーネント
+         (part2-comp (nth (+ api-node-idx 2) split-path)) ;; part1-comp の直後のコンポーネント (または nil)
+         (proc httpd-current-proc))
+
+    (cond
+     ;; パターン: /api/node/:id/:path (コンポーネント数が 4)
+     ;; 例: /api/node/UUID/encoded_filename.png
+     ((and (= num-components (+ api-node-idx 3)) ;; api, node, part1, part2 の計4コンポーネント
+           (stringp part1-comp)
+           (stringp part2-comp))
+      (let ((node-id part1-comp)    ;; ここでは拡張子除去はせず、そのままIDとして扱う
+            (asset-path part2-comp))
+        (httpd-log (list 'api/node/dispatch 'asset :id node-id :path asset-path))
+        ;; ノードIDとアセットパスを渡してアセットサービング関数を呼び出し
+        (org-roam-ui-lite--serve-node-asset proc node-id asset-path)))
+
+     ;; パターン: /api/node/:id.json または /api/node/:id (コンポーネント数が 3)
+     ;; 例: /api/node/UUID.json または /api/node/UUID
+     ((and (= num-components (+ api-node-idx 2)) ;; api, node, part1 の計3コンポーネント
+           (stringp part1-comp))
+      (let ((node-id-with-ext part1-comp)
+            (node-id (file-name-sans-extension part1-comp))) ;; .json など拡張子を除去
+        (httpd-log (list 'api/node/dispatch 'json :id-with-ext node-id-with-ext :id node-id))
+        ;; ノードの詳細JSONを返すロジックを実行
+        (let ((row (org-roam-ui-lite--node-row node-id)))
+          (if (null row)
+              (org-roam-ui-lite--json proc '((error . "not_found")) 404)
+            (pcase-let ((`(,nid ,ntitle ,nfile ,_) row))
+              (let* ((id     (org-roam-ui-lite--dequote nid))
+                     (title  (org-roam-ui-lite--dequote ntitle))
+                     (file   (org-roam-ui-lite--dequote nfile))
+                     (raw    (with-temp-buffer
+                               (insert-file-contents file)
+                               (buffer-string)))
+                     (backs  (apply #'vector (org-roam-ui-lite--backlinks id))))
+                (org-roam-ui-lite--json
+                 proc `((id . ,id)
+                       (title . ,title)
+                       (raw . ,raw)
+                       (backlinks . ,backs)))))))))
+
+     ;; どのパターンにも一致しない場合
+     (t
+      (httpd-log (list 'api/node/dispatch 'nomatch :path httpd-path :components split-path))
+      (httpd-error proc 404 (format "Path '%s' does not match expected /api/node/ patterns." httpd-path))))))
+
 
 ;;;; Entry point --------------------------------------------------------------
 ;;;###autoload

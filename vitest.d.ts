@@ -7,6 +7,8 @@ declare module "vitest" {
 	export const expect: any;
 	// biome-ignore lint/suspicious/noExplicitAny: typed via vitest when installed
 	export const vi: any;
+	// biome-ignore lint/suspicious/noExplicitAny: typed via vitest when installed
+	export const beforeEach: any;
 }
 
 declare module "vitest/config" {

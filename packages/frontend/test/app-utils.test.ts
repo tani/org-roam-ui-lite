@@ -5,7 +5,7 @@ import {
 	pickColor,
 	setElementsStyle,
 	setNodeStyle,
-} from "../src/app.ts";
+} from "../src/util.ts";
 
 const ACCENT_VARS = [
 	"--bs-blue",

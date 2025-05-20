@@ -7,7 +7,6 @@ export type Database = SQLJsDatabase<typeof schema>;
 export async function createDatabase(db_path: string): Promise<Database> {
 	let SQL: SqlJsStatic;
 	try {
-		// @ts-ignore: import wasm as binary
 		const { default: wasmBinary } = await import("sql.js/dist/sql-wasm.wasm");
 		SQL = await initSqlJs({ wasmBinary });
 	} catch {

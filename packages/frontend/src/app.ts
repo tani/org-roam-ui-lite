@@ -2,14 +2,11 @@ import persist from "@alpinejs/persist";
 import Alpine from "alpinejs";
 import * as bootstrap from "bootstrap";
 import type { LayoutOptions } from "cytoscape";
-import cytoscape, { type Core, type ElementDefinition } from "cytoscape";
+import cytoscape, { type Core } from "cytoscape";
 import createClient from "openapi-fetch";
-import type { RehypeMermaidOptions } from "rehype-mermaid";
 import type { components, paths } from "./api.d.ts";
 
 const api = createClient<paths>();
-
-Alpine.plugin(persist);
 
 const Layouts = [
 	"cose",
@@ -34,7 +31,7 @@ type Theme = (typeof Themes)[number]["value"];
 
 // --- Utility Functions ---
 /** Read CSS variable value */
-function getCssVar(name: string): string {
+export function getCssVar(name: string): string {
 	return getComputedStyle(document.documentElement)
 		.getPropertyValue(name)
 		.trim();
@@ -54,14 +51,14 @@ const ACCENT_VARS = [
 ] as const;
 
 /** Deterministic color picker based on id key */
-function pickColor(key: string): string {
+export function pickColor(key: string): string {
 	let sum = 0;
 	for (const ch of key) sum = (sum + ch.charCodeAt(0)) % ACCENT_VARS.length;
 	return getCssVar(ACCENT_VARS[sum]);
 }
 
 /** Dim unrelated nodes/edges */
-function dimOthers(graph: Core | undefined, focusId: string): void {
+export function dimOthers(graph: Core | undefined, focusId: string): void {
 	if (graph) {
 		const focus = graph.$id(focusId);
 		const neighborhood = focus?.closedNeighborhood();
@@ -72,68 +69,30 @@ function dimOthers(graph: Core | undefined, focusId: string): void {
 	}
 }
 
-/** Reset all styles */
-function resetHighlights(graph: Core | undefined): void {
-	graph?.elements().style("opacity", 1);
+export function setElementsStyle(
+	graph: Core | undefined,
+	style: Record<string, unknown>,
+): void {
+	for (const [key, value] of Object.entries(style)) {
+		graph?.elements().style(key, value);
+	}
 }
 
-// --- Processor Factory ---
-/** Create unified processor for Org → HTML */
-async function createOrgHtmlProcessor(theme: Theme, id: string) {
-	const [
-		{ unified },
-		parse,
-		rehype,
-		mathjax,
-		mermaid,
-		prettyCode,
-		{ transformerCopyButton },
-		stringify,
-		raw,
-		classNames,
-		rehypeImgSrcFix,
-	] = await Promise.all([
-		import("unified"),
-		import("uniorg-parse"),
-		import("uniorg-rehype"),
-		import("rehype-mathjax"),
-		import("rehype-mermaid"),
-		import("rehype-pretty-code"),
-		import("@rehype-pretty/transformers"),
-		import("rehype-stringify"),
-		import("rehype-raw"),
-		import("rehype-class-names"),
-		import("./rehype-img-src-fix.ts"),
-	]);
-	return unified()
-		.use(parse.default)
-		.use(rehype.default)
-		.use(raw.default)
-		.use(rehypeImgSrcFix.default, id)
-		.use(mathjax.default)
-		.use(mermaid.default, {
-			strategy: "img-svg",
-			dark: theme.endsWith("dark"),
-		} as RehypeMermaidOptions)
-		.use(prettyCode.default, {
-			theme: theme.endsWith("dark") ? "vitesse-dark" : "vitesse-light",
-			transformers: [
-				transformerCopyButton({
-					visibility: "always",
-					feedbackDuration: 3_000,
-				}),
-			],
-		})
-		.use(classNames.default, {
-			table: "table table-bordered table-hover",
-			blockquote: "blockquote",
-		})
-		.use(stringify.default);
+export function setNodeStyle(
+	graph: Core | undefined,
+	style: Record<string, unknown>,
+): void {
+	graph?.nodes().style(style);
 }
 
-// --- Graph Data & Rendering ---
-
-export async function fetchGraph(): Promise<ElementDefinition[]> {
+/** Initialize or update the Cytoscape graph */
+export async function renderGraph(
+	layoutName: Layout,
+	container: HTMLElement,
+	existingGraph: Core | undefined,
+	nodeSize: number,
+	labelScale: number,
+): Promise<Core> {
 	const { data, error } = await api.GET("/api/graph.json");
 
 	if (error) throw new Error(`API error: ${error}`);
@@ -141,23 +100,12 @@ export async function fetchGraph(): Promise<ElementDefinition[]> {
 	const nodes = data.nodes;
 	const edges = data.edges;
 
-	return [
+	const elements = [
 		...nodes.map((n) => ({
 			data: { id: n.id, label: n.title, color: pickColor(n.id) },
 		})),
 		...edges.map((e) => ({ data: { source: e.source, target: e.dest } })),
 	];
-}
-
-/** Initialize or update the Cytoscape graph */
-async function renderGraph(
-	layoutName: Layout,
-	container: HTMLElement,
-	existingGraph: Core | undefined,
-	nodeSize: number,
-	labelScale: number,
-): Promise<Core> {
-	const elements = await fetchGraph();
 
 	const style = [
 		{ selector: "edge", style: { width: 1 } },
@@ -208,6 +156,23 @@ async function renderGraph(
 	return existingGraph;
 }
 
+export async function openNode(theme: Theme, id: string) {
+	const { data, error } = await api.GET("/api/node/{id}.json", {
+		params: { path: { id } },
+	});
+
+	if (error) {
+		throw error;
+	}
+
+	const { createOrgHtmlProcessor } = await import("./processor.ts");
+	const process = createOrgHtmlProcessor(theme, id);
+	const html = String(await process(data.raw));
+	return { ...data, html };
+}
+
+Alpine.plugin(persist);
+
 // --- Alpine App ---
 Alpine.data("app", () => ({
 	themes: Themes,
@@ -236,8 +201,7 @@ Alpine.data("app", () => ({
 
 		// Event bindings
 		this.graph.on("tap", "node", ({ target }) => {
-			const id = target.id();
-			void this.openNode(id);
+			void this.openNode(target.id());
 		});
 
 		this.$refs.offcanvas.addEventListener("show.bs.offcanvas", () =>
@@ -245,15 +209,8 @@ Alpine.data("app", () => ({
 		);
 
 		this.$refs.offcanvas.addEventListener("hidden.bs.offcanvas", () =>
-			resetHighlights(this.graph),
+			setElementsStyle(this.graph, { opacity: 1 }),
 		);
-
-		this.$refs.rendered.addEventListener("click", (ev) => {
-			const a = (ev.target as HTMLElement).closest("a");
-			if (!a || !a.href.startsWith("id:")) return;
-			ev.preventDefault();
-			this.openNode(a.href.replace("id:", ""));
-		});
 	},
 
 	// Refresh graph with current settings
@@ -280,28 +237,17 @@ Alpine.data("app", () => ({
 
 	// Called when node size slider changes
 	onSizeChange() {
-		this.graph?.nodes().style({ width: this.nodeSize, height: this.nodeSize });
+		setNodeStyle(this.graph, { width: this.nodeSize, height: this.nodeSize });
 	},
 
 	// Called when label scale slider changes
 	onScaleChange() {
-		this.graph?.nodes().style("font-size", `${this.labelScale}em`);
+		setNodeStyle(this.graph, { "font-size": `${this.labelScale}em` });
 	},
 
 	async openNode(id: string) {
-		const { data, error } = await api.GET("/api/node/{id}.json", {
-			params: { path: { id } },
-		});
-
-		if (error) {
-			console.warn("Node not found");
-			return;
-		}
-
-		const processor = await createOrgHtmlProcessor(this.theme, id);
-
-		const html = String(await processor.process(data.raw));
-		this.selected = { ...data, html };
+		const selected = await openNode(this.theme, id);
+		this.selected = selected;
 		this.offcanvas?.show();
 	},
 }));

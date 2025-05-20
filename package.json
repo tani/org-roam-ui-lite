@@ -26,7 +26,8 @@
 		"lint": "biome check",
 		"lint:fix": "biome check --fix",
 		"check": "tsc",
-		"test": "vitest"
+		"test": "vitest",
+		"test:ui": "vitest --ui"
 	},
 	"version": "0.0.45"
 }

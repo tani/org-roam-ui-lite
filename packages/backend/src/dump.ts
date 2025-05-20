@@ -52,40 +52,45 @@ async function dumpNodeJsons(db_path: string, out_path: string) {
 			JSON.stringify(response.content["application/json"], null, 2),
 		);
 
-		// @ts-ignore: a
-		const parsed = processor.parse(nodeResponse.raw);
-		// @ts-ignore: unified@10+ の run は Node を返します
-		const tree = (await processor.run(parsed)) as Root;
+		const json = response.content["application/json"];
+		if ("raw" in json) {
+			const parsed = processor.parse(json.raw);
+			// unified@10+ run returns Node, but our pipeline yields a HAST Root
+			const tree = (await processor.run(parsed)) as unknown as Root;
 
-		const imgSrcs: string[] = [];
-		visit(tree, "element", (node: Element) => {
-			if (node.tagName === "img" && typeof node.properties?.src === "string") {
-				const src: string = node.properties.src;
+			const imgSrcs: string[] = [];
+			visit(tree, "element", (node: Element) => {
 				if (
-					src.startsWith("data:") ||
-					src.startsWith("http:") ||
-					src.startsWith("https:") ||
-					src.startsWith("//")
-				)
-					return;
-				imgSrcs.push(src);
+					node.tagName === "img" &&
+					typeof node.properties?.src === "string"
+				) {
+					const src: string = node.properties.src;
+					if (
+						src.startsWith("data:") ||
+						src.startsWith("http:") ||
+						src.startsWith("https:") ||
+						src.startsWith("//")
+					)
+						return;
+					imgSrcs.push(src);
+				}
+			});
+
+			// 重複排除
+			const uniqueSrcs = Array.from(new Set(imgSrcs));
+			const basePath = path.dirname(row.file);
+
+			for (const src of uniqueSrcs) {
+				const ext = path.extname(src);
+				const basename = path.basename(src, ext);
+				const encoded = encodeBase64url(basename);
+				const srcPath = path.resolve(basePath, src);
+				const destDir = path.join(out_path, "node", id);
+				const destFile = path.join(destDir, `${encoded}${ext}`);
+
+				await fs.mkdir(destDir, { recursive: true });
+				await fs.copyFile(srcPath, destFile);
 			}
-		});
-
-		// 重複排除
-		const uniqueSrcs = Array.from(new Set(imgSrcs));
-		const basePath = path.dirname(row.file);
-
-		for (const src of uniqueSrcs) {
-			const ext = path.extname(src);
-			const basename = path.basename(src, ext);
-			const encoded = encodeBase64url(basename);
-			const srcPath = path.resolve(basePath, src);
-			const destDir = path.join(out_path, "node", id);
-			const destFile = path.join(destDir, `${encoded}${ext}`);
-
-			await fs.mkdir(destDir, { recursive: true });
-			await fs.copyFile(srcPath, destFile);
 		}
 	}
 }

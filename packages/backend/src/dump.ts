@@ -13,37 +13,16 @@ import rehypeOrg from "uniorg-rehype";
 import { visit } from "unist-util-visit";
 import { encodeBase64url } from "./base64url.ts";
 import { createDatabase } from "./database.ts";
-import { files, links, nodes } from "./schema.ts";
-
-function isUuid(str: unknown): str is string {
-	const UUID_REGEX =
-		/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-	return typeof str === "string" && UUID_REGEX.test(str);
-}
+import { graph, node } from "./query.ts";
+import { files, nodes } from "./schema.ts";
 
 async function dumpGraphJson(db_path: string, out_path: string) {
-	const db = await createDatabase(db_path);
-	const [ns, es] = await Promise.all([
-		db.select({ id: nodes.id, title: nodes.title }).from(nodes),
-		db.select({ source: links.source, dest: links.dest }).from(links),
-	]);
-
-	const cleanNodes = ns.map((n) => ({
-		id: n.id,
-		title: n.title,
-	}));
-
-	const cleanEdges = es
-		.filter((e) => isUuid(e.dest))
-		.map(({ source, dest }) => ({
-			source,
-			dest,
-		}));
+	const [_statusCode, response] = await graph(db_path);
 
 	await fs.mkdir(out_path, { recursive: true });
 	await fs.writeFile(
 		path.join(out_path, "graph.json"),
-		JSON.stringify({ nodes: cleanNodes, edges: cleanEdges }, null, 2),
+		JSON.stringify(response.content["application/json"], null, 2),
 	);
 }
 
@@ -63,37 +42,18 @@ async function dumpNodeJsons(db_path: string, out_path: string) {
 
 	for (const row of allNodes) {
 		const id = row.id;
-		const rawText = await fs.readFile(row.file, "utf8");
 
-		// 1) 通常の node.json ダンプ
-		const backlinks = await db
-			.select({
-				source: links.source,
-				title: nodes.title,
-			})
-			.from(links)
-			.innerJoin(nodes, eq(links.source, nodes.id))
-			.where(eq(links.dest, `"${id}"`));
-
-		const cleanBacklinks = backlinks.map((b) => ({
-			title: b.title,
-			source: b.source,
-		}));
-		const nodeJson = {
-			id,
-			title: row.title,
-			raw: rawText,
-			backlinks: cleanBacklinks,
-		};
+		const [_statusCode, response] = await node(db_path, id);
 
 		const nodeDir = path.join(out_path, "node");
 		await fs.mkdir(nodeDir, { recursive: true });
 		await fs.writeFile(
 			path.join(nodeDir, `${id}.json`),
-			JSON.stringify(nodeJson, null, 2),
+			JSON.stringify(response.content["application/json"], null, 2),
 		);
 
-		const parsed = processor.parse(rawText);
+		// @ts-ignore: a
+		const parsed = processor.parse(nodeResponse.raw);
 		// @ts-ignore: unified@10+ の run は Node を返します
 		const tree = (await processor.run(parsed)) as Root;
 
@@ -120,7 +80,6 @@ async function dumpNodeJsons(db_path: string, out_path: string) {
 			const ext = path.extname(src);
 			const basename = path.basename(src, ext);
 			const encoded = encodeBase64url(basename);
-
 			const srcPath = path.resolve(basePath, src);
 			const destDir = path.join(out_path, "node", id);
 			const destFile = path.join(destDir, `${encoded}${ext}`);

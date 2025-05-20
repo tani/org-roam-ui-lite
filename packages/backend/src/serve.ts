@@ -1,24 +1,14 @@
-import * as fs from "node:fs/promises";
 import * as path from "node:path";
 import process from "node:process";
 import * as url from "node:url";
 import { parseArgs } from "node:util";
 import * as nodeServer from "@hono/node-server";
 import { serveStatic } from "@hono/node-server/serve-static";
-import { eq } from "drizzle-orm";
 import { Hono } from "hono";
 import { lookup } from "mime-types";
-import { createDatabase } from "./database.ts";
-import { files, links, nodes } from "./schema.ts";
-
-function isUuid(str: unknown): str is string {
-	const UUID_REGEX =
-		/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-	return typeof str === "string" && UUID_REGEX.test(str);
-}
+import { graph, node, resource } from "./query.ts";
 
 export async function serve(db_path: string, port: number) {
-	const db = await createDatabase(db_path);
 	const frontendDistPath = path.relative(
 		process.cwd(),
 		path.join(import.meta.dirname ?? "", "../../frontend/dist"),
@@ -36,84 +26,30 @@ export async function serve(db_path: string, port: number) {
 
 	/* ノード & エッジ一覧 */
 	app.get("/api/graph.json", async (c) => {
-		const [ns, es] = await Promise.all([
-			db.select({ id: nodes.id, title: nodes.title }).from(nodes),
-			db.select({ source: links.source, dest: links.dest }).from(links),
-		]);
-
-		const cleanNodes = ns.map((n) => ({
-			id: n.id,
-			title: n.title,
-		}));
-
-		// dest が UUID のみ許可
-		const cleanEdges = es
-			.filter((e) => isUuid(e.dest))
-			.map(({ source, dest }) => ({ source: source, dest: dest }));
-
-		return c.json({
-			nodes: cleanNodes,
-			edges: cleanEdges,
-		});
+		const [statusCode, response] = await graph(db_path);
+		return c.json(response.content["application/json"], statusCode);
 	});
 
 	/* ノード詳細 + Org ソース */
 	app.get("/api/node/:id", async (c) => {
 		const id = c.req.param("id").replace(/\.json$/, "");
-		const row = db
-			.select({ id: nodes.id, title: nodes.title, file: files.file })
-			.from(nodes)
-			.innerJoin(files, eq(nodes.file, files.file))
-			.where(eq(nodes.id, `"${id}"`))
-			.get();
-
-		if (!row) return c.json({ error: "not_found" }, 404);
-
-		const raw = await fs.readFile(row.file, "utf8");
-		const backlinks = await db
-			.select({
-				source: links.source,
-				title: nodes.title,
-			})
-			.from(links)
-			.innerJoin(nodes, eq(links.source, nodes.id))
-			.where(eq(links.dest, `"${id}"`));
-		const cleanBacklinks = backlinks.map((node) => ({
-			title: node.title,
-			source: node.source,
-		}));
-
-		return c.json({
-			id: row.id,
-			title: row.title,
-			raw,
-			backlinks: cleanBacklinks,
-		});
+		const [statusCode, response] = await node(db_path, id);
+		return c.json(response.content["application/json"], statusCode);
 	});
 
-	app.get("/api/node/:id/:path", async (c) => {
+	app.get("/api/node/:id/:encoded_path", async (c) => {
 		const id = c.req.param("id");
-		const row = db
-			.select({ id: nodes.id, title: nodes.title, file: files.file })
-			.from(nodes)
-			.innerJoin(files, eq(nodes.file, files.file))
-			.where(eq(nodes.id, `"${id}"`))
-			.get();
-
-		if (!row) return c.json({ error: "not_found" }, 404);
-
-		const basePath = path.dirname(row.file);
-		const { ext, name } = path.parse(c.req.param("path"));
-		const decodedBasename = Buffer.from(name, "base64").toString("utf8");
-		const filePath = `${decodedBasename}${ext}`;
-		const resolvedPath = path.resolve(basePath, filePath);
-
-		const buffer = await fs.readFile(resolvedPath);
-		return new Response(buffer, {
-			headers: {
-				"Content-Type": lookup(resolvedPath) || "application/octet-stream",
-			},
-		});
+		const encoded_path = c.req.param("encoded_path");
+		const result = await resource(db_path, id, encoded_path);
+		if (result[0] === 200) {
+			return new Response(result[1].content["image/*"], {
+				headers: {
+					"Content-Type": lookup(encoded_path) || "application/octet-stream",
+				},
+			});
+		} else {
+			return c.json(result[1].content["application/json"], result[0]);
+		}
 	});
 
 	console.log(`Launch at http://localhost:${port}/index.html`);

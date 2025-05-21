@@ -3,13 +3,14 @@
 
   inputs = {
     nixpkgs.url     = "github:NixOS/nixpkgs/nixos-unstable";
-    flake-utils.url = "github:numtide/flake-utils";
+    flake-parts.url = "github:hercules-ci/flake-parts";
   };
 
-  outputs = { self, nixpkgs, flake-utils, ... }:
-    flake-utils.lib.eachDefaultSystem (system:
-      let
-        pkgs = import nixpkgs { inherit system; };
+  outputs = inputs@{ self, systems, flake-parts, nixpkgs, flake-utils, ... }:
+    flake-parts.lib.mkFlake { inherit inputs; } {
+      imports = [ flake-parts.flakeModules.easyOverlay ];
+      systems = nixpkgs.lib.platforms.all;
+      perSystem = { config, pkgs, ... }: let
         emacsPackages = pkgs.emacsPackagesFor pkgs.emacs;
         packageJson = builtins.fromJSON (builtins.readFile ./package.json);
         nodepkg = pkgs.buildNpmPackage rec {
@@ -56,25 +57,29 @@
           echo "New npm-deps hash: $hash" >&2
           ${pkgs.gnused}/bin/sed -i "s|npmDepsHash = \".*\";|npmDepsHash = \"$hash\";|" flake.nix
         '';
-      in {
-        packages.emacs = emacs;
-        packages.elisp = elisp;
-        packages.export = export;
-        packages.serve = serve;
-        packages.build = build;
-        packages.update-npm-deps-hash = update-npm-deps-hash;
-
-        devShells.default = pkgs.mkShell {
-          buildInputs = with pkgs; [
-            nodejs
-            prefetch-npm-deps
-            typescript-language-server
-          ];
-          shellHook = ''
-            export NODEPKG_ENV=development
-            echo "🟢  Nodepkg $(node -v) / npm $(npm -v) ready!"
-          '';
+      in
+        {
+          overlayAttrs = {
+            emacsPackages = {
+              org-roam-ui-lite = elisp;
+            };
+            org-roam-ui-lite-serve = serve;
+            org-roam-ui-lite-export = export;
+          };
+          packages = {
+            inherit emacs elisp export serve build update-npm-deps-hash;
+          };
+          devShells.default = pkgs.mkShell {
+            buildInputs = with pkgs; [
+              nodejs
+              prefetch-npm-deps
+              typescript-language-server
+            ];
+            shellHook = ''
+              export NODEPKG_ENV=development
+              echo "🟢  Nodepkg $(node -v) / npm $(npm -v) ready!"
+            '';
+          };
         };
-      }
-    );
+    };
 }

@@ -1,5 +1,3 @@
-// openapi.ts
-import fs from "node:fs/promises";
 import openapiTS, {
 	astToString,
 	type SchemaObject,
@@ -18,18 +16,14 @@ const customTransform = (
 };
 
 async function generate() {
-	const schemaUrl = new URL("../../openapi.yaml", import.meta.url);
-	const outputFile = new URL("./src/api.d.ts", import.meta.url);
-
+	const schemaUrl = new URL("./openapi.yaml", import.meta.url);
 	const ast = await openapiTS(schemaUrl, {
 		transform: customTransform,
 	});
 
-	// ASTを文字列に変換
 	const generated = astToString(ast);
 
-	await fs.writeFile(outputFile, generated);
-	console.log(`Types generated to ${outputFile}`);
+	console.log(generated);
 }
 
 generate().catch(console.error);

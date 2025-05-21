@@ -1,19 +1,19 @@
 import { describe, expect, it, vi } from "vitest";
 
-const mockMermaid = vi.fn(() => () => {});
+const mockMermaid = vi.fn((..._args: unknown[]) => () => {});
 vi.mock("rehype-mermaid", () => ({
 	default: (...args: unknown[]) => mockMermaid(...args),
 }));
-const mockPrettyCode = vi.fn(() => () => {});
+const mockPrettyCode = vi.fn((..._args: unknown[]) => () => {});
 vi.mock("rehype-pretty-code", () => ({
 	default: (...args: unknown[]) => mockPrettyCode(...args),
 }));
-const mockMathJax = vi.fn(() => () => {});
+const mockMathJax = vi.fn((..._args: unknown[]) => () => {});
 vi.mock("rehype-mathjax", () => ({
 	default: (...args: unknown[]) => mockMathJax(...args),
 }));
 const mockLoadLanguage = vi.fn(() => Promise.resolve());
-const mockGetHighlighter = vi.fn(async () => ({
+const mockGetHighlighter = vi.fn(async (..._args: unknown[]) => ({
 	loadLanguage: mockLoadLanguage,
 	codeToHtml: () => "",
 	getTheme: () => ({ settings: [] }),

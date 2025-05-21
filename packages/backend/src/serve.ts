@@ -64,7 +64,8 @@ if (isMain) {
 			database: {
 				type: "string",
 				short: "d",
-				default: process.env.DATABASE ?? `${process.cwd()}/database.db`,
+				default:
+					process.env.DATABASE ?? `${process.env.HOME}/.emacs.d/org-roam.db`,
 			},
 			port: {
 				type: "string",

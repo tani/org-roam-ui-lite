@@ -12,8 +12,8 @@ function usage(exitCode = 0) {
 		`Usage: export.ts -d DB -o OUTPUT -r DIR\n\n` +
 			`Options (short only):\n` +
 			`  -r   Resource folder (required)\n` +
-			`  -d   SQLite DB file (required)\n` +
-			`  -o   Destination folder (required)\n` +
+			`  -d   SQLite DB file (default: $HOME/.emacs.d/org-roam.db)\n` +
+			`  -o   Destination folder (default: out)\n` +
 			`  -h   Show this help\n`,
 	);
 	process.exit(exitCode);
@@ -32,8 +32,8 @@ const { values } = parseArgs({
 if (values.h) usage(0);
 
 const res = values.r;
-const db = values.d;
-const out = values.o;
+const db = values.d ?? `${process.env.HOME}/.emacs.d/org-roam.db`;
+const out = values.o ?? "out";
 
 if (!res || !db || !out) usage(1);
 

@@ -87,8 +87,10 @@ $ python3 -m http.server -d /path/to/output
 
 ## Quick start (Nix)
 
+Replace v0.0.48 with the version you want to use.
+
 ``` bash
-$ nix run github:tani/org-roam-ui-lite#serve -- -d /path/to/database.db
+$ nix run 'github:tani/org-roam-ui-lite?tag=v0.0.48#serve' -- -d /path/to/database.db
 $ # nix run .#serve -- -d /path/to/database.db
 ```
 
@@ -97,8 +99,10 @@ nodes!
 
 ## Building a static-site (Nix)
 
+Replace v0.0.48 with the version you want to use.
+
 ``` bash
-$ nix run github:tani/org-roam-ui-lite#export -- -d /path/to/database.db -o /path/to/output
+$ nix run 'github:tani/org-roam-ui-lite?tag=v0.0.48#export' -- -d /path/to/database.db -o /path/to/output
 $ # nix run .#export -- -d /path/to/database.db -o /path/to/output
 $ python3 -m http.server -d /path/to/output
 ```

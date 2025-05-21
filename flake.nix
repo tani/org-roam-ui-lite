@@ -31,10 +31,10 @@
           cp -r --no-preserve=ownership ${nodepkg} ./dist
         '';
         serve = pkgs.writeShellScriptBin "org-roam-ui-lite-serve" ''
-          ${pkgs.nodejs}/bin/node ${nodepkg}/backend/dist/backend.js -m serve "$@"
+          ${pkgs.nodejs}/bin/node ${nodepkg}/backend/dist/serve.js "$@"
         '';
         export = pkgs.writeShellScriptBin "org-roam-ui-lite-export" ''
-          ${pkgs.nodejs}/bin/node ${./scripts}/export.ts -r "${nodepkg}" "$@"
+          ${pkgs.nodejs}/bin/node ${./scripts}/export.js -r "${nodepkg}" "$@"
         '';
         elisp = emacsPackages.trivialBuild {
           pname = "org-roam-ui-lite-elisp";

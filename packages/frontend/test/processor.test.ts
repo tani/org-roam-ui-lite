@@ -12,6 +12,15 @@ const mockMathJax = vi.fn(() => () => {});
 vi.mock("rehype-mathjax", () => ({
 	default: (...args: unknown[]) => mockMathJax(...args),
 }));
+const mockLoadLanguage = vi.fn(() => Promise.resolve());
+const mockGetHighlighter = vi.fn(async () => ({
+	loadLanguage: mockLoadLanguage,
+	codeToHtml: () => "",
+	getTheme: () => ({ settings: [] }),
+}));
+vi.mock("shiki", () => ({
+	getSingletonHighlighter: (...args: unknown[]) => mockGetHighlighter(...args),
+}));
 
 import { createOrgHtmlProcessor } from "../src/processor.ts";
 
@@ -52,31 +61,44 @@ describe("createOrgHtmlProcessor", () => {
 			'<blockquote class="blockquote"><p>foo</p></blockquote>',
 		);
 	});
+	it("loads optional plugins only when needed", async () => {
+		mockMermaid.mockClear();
+		mockMathJax.mockClear();
+		mockPrettyCode.mockClear();
+		mockLoadLanguage.mockClear();
+		await createProcess()("*");
+		expect(mockMermaid).not.toHaveBeenCalled();
+		expect(mockMathJax).not.toHaveBeenCalled();
+		expect(mockPrettyCode).not.toHaveBeenCalled();
+		expect(mockLoadLanguage).not.toHaveBeenCalled();
+	});
+
 	it("uses mermaid plugin based on theme", async () => {
 		mockMermaid.mockClear();
-		await createProcess()("*");
+		const mermaidOrg = "#+begin_src mermaid\nflowchart\n#+end_src";
+		await createProcess()(mermaidOrg);
 		expect(mockMermaid).toHaveBeenCalledWith(
 			expect.objectContaining({ dark: false }),
 		);
 		mockMermaid.mockClear();
-		await createProcess("my-dark")("*");
+		await createProcess("my-dark")(mermaidOrg);
 		expect(mockMermaid).toHaveBeenCalledWith(
 			expect.objectContaining({ dark: true }),
 		);
 	});
 
-	it("uses mathjax plugin", async () => {
+	it("uses mathjax plugin when math present", async () => {
 		mockMathJax.mockClear();
-		await createProcess()("*");
+		await createProcess()("$x$");
 		expect(mockMathJax).toHaveBeenCalled();
 	});
 
-	it("uses pretty code plugin", async () => {
+	it("loads languages for code blocks", async () => {
 		mockPrettyCode.mockClear();
-		await createProcess()("*");
+		mockLoadLanguage.mockClear();
+		const org = "#+begin_src js\nconsole.log(1)\n#+end_src";
+		await createProcess()(org);
 		expect(mockPrettyCode).toHaveBeenCalled();
-		const opts = mockPrettyCode.mock.calls[0][0];
-		expect(opts.theme).toBe("vitesse-light");
-		expect(Array.isArray(opts.transformers)).toBe(true);
+		expect(mockLoadLanguage).toHaveBeenCalledWith("js");
 	});
 });

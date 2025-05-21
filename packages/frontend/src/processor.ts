@@ -71,9 +71,13 @@ export function createOrgHtmlProcessor<Theme extends string>(
 				themes: [theme.endsWith("dark") ? "vitesse-dark" : "vitesse-light"],
 			});
 			await Promise.all(
-				info.languages.map((l) =>
-					highlighter.loadLanguage(l as never).catch(() => {}),
-				),
+				info.languages.map(async (l) => {
+					try {
+						await highlighter.loadLanguage(l as never);
+					} catch {
+						/* ignore unknown languages */
+					}
+				}),
 			);
 			processor.use(rehypePrettyCode, {
 				theme: theme.endsWith("dark") ? "vitesse-dark" : "vitesse-light",

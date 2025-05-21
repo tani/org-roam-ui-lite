@@ -101,4 +101,14 @@ describe("createOrgHtmlProcessor", () => {
 		expect(mockPrettyCode).toHaveBeenCalled();
 		expect(mockLoadLanguage).toHaveBeenCalledWith("js");
 	});
+
+	it("ignores unknown languages", async () => {
+		mockLoadLanguage.mockClear();
+		mockLoadLanguage.mockImplementationOnce(() => {
+			throw new Error("bad lang");
+		});
+		const org = "#+begin_src unknown\nfoo\n#+end_src";
+		await expect(createProcess()(org)).resolves.not.toThrow();
+		expect(mockLoadLanguage).toHaveBeenCalledWith("unknown");
+	});
 });

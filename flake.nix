@@ -49,7 +49,7 @@
             ln -s ${nodepkg}/frontend $out/share/emacs/site-lisp/org-roam-ui-lite/frontend
             runHook postInstall
           '';
-          packageRequires = with pkgs.emacsPackages; [ org-roam simple-httpd ];
+          packageRequires = with emacsPackages; [ org-roam simple-httpd ];
         };
         emacs = pkgs.emacs.pkgs.withPackages (epkgs: [ elisp ]);
         update-npm-deps-hash = pkgs.writeShellScriptBin "org-roam-ui-lite-update-npm-deps-hash" ''
@@ -60,9 +60,7 @@
       in
         {
           overlayAttrs = {
-            emacsPackages = {
-              org-roam-ui-lite = elisp;
-            };
+            org-roam-ui-lite-elisp = elisp;
             org-roam-ui-lite-serve = serve;
             org-roam-ui-lite-export = export;
           };

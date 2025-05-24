@@ -36,6 +36,8 @@
 		"@types/alpinejs__persist": "^3.13.4",
 		"@types/bootstrap": "^5.2.10",
 		"@types/hast": "^3.0.4",
+		"@types/react": "^19.1.5",
+		"@types/react-dom": "^19.1.5",
 		"vite": "npm:rolldown-vite@^6.3.9"
 	}
 }

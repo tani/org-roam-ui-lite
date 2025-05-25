@@ -16,7 +16,13 @@ import { createDatabase } from "./database.ts";
 import { graph, node } from "./query.ts";
 import { files, nodes } from "./schema.ts";
 
-async function dumpGraphJson(db_path: string, out_path: string) {
+/**
+ * Write graph.json representing all nodes and edges.
+ *
+ * @param db_path - Path to the database
+ * @param out_path - Directory for the output file
+ */
+async function dumpGraphJson(db_path: string, out_path: string): Promise<void> {
 	const [_statusCode, response] = await graph(db_path);
 
 	await fs.mkdir(out_path, { recursive: true });
@@ -26,14 +32,20 @@ async function dumpGraphJson(db_path: string, out_path: string) {
 	);
 }
 
-async function dumpNodeJsons(db_path: string, out_path: string) {
+/**
+ * Dump each node as an individual JSON file and copy referenced images.
+ *
+ * @param db_path - Path to the database
+ * @param out_path - Directory where the files will be written
+ */
+async function dumpNodeJsons(db_path: string, out_path: string): Promise<void> {
 	const db = await createDatabase(db_path);
 
-	// unified パイプラインを一度だけ組んでおく
+	// Build the unified pipeline once
 	const processor = unified()
-		.use(parseOrg) // org テキスト → MDAST
-		.use(rehypeOrg) // MDAST → HAST
-		.use(raw); // HAST 中の HTML を展開
+		.use(parseOrg) // org text -> MDAST
+		.use(rehypeOrg) // MDAST -> HAST
+		.use(raw); // Expand HTML within HAST
 
 	const allNodes = await db
 		.select({ id: nodes.id, title: nodes.title, file: files.file })
@@ -76,7 +88,7 @@ async function dumpNodeJsons(db_path: string, out_path: string) {
 				}
 			});
 
-			// 重複排除
+			// Remove duplicates
 			const uniqueSrcs = Array.from(new Set(imgSrcs));
 			const basePath = path.dirname(row.file);
 
@@ -95,7 +107,13 @@ async function dumpNodeJsons(db_path: string, out_path: string) {
 	}
 }
 
-export async function dump(db_path: string, out_path: string) {
+/**
+ * Dump graph and node data to JSON files under the given directory.
+ *
+ * @param db_path - Path to the database
+ * @param out_path - Directory where files are written
+ */
+export async function dump(db_path: string, out_path: string): Promise<void> {
 	await dumpGraphJson(db_path, out_path);
 	await dumpNodeJsons(db_path, out_path);
 	console.log(`✅ All JSON files dumped to ${out_path}`);

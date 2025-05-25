@@ -11,6 +11,12 @@ type Detect = {
 	languages: string[];
 };
 
+/**
+ * Inspect the Org string and determine which processors are needed.
+ *
+ * @param org - Org source text
+ * @returns Flags indicating required plugins
+ */
 function detect(org: string): Detect {
 	const langRe = /^#\+begin_src\s+(\S+)/gm;
 	const langs = new Set<string>();
@@ -29,6 +35,13 @@ function detect(org: string): Detect {
 
 type Process = (str: string) => Promise<string>;
 
+/**
+ * Create a processor that converts Org markup to HTML.
+ *
+ * @param theme - Color theme
+ * @param id - Node identifier used for resource links
+ * @returns Function that processes an Org string to HTML
+ */
 export function createOrgHtmlProcessor<Theme extends string>(
 	theme: Theme,
 	id: string,

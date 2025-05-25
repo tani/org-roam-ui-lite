@@ -5,6 +5,12 @@ import type { paths } from "./api.d.ts";
 import { createDatabase } from "./database.ts";
 import { files, links, nodes } from "./schema.ts";
 
+/**
+ * Check whether the given value is a UUID string.
+ *
+ * @param str - Value to test
+ * @returns True if the value matches UUID format
+ */
 function isUuid(str: unknown): str is string {
 	const UUID_REGEX =
 		/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
@@ -14,6 +20,12 @@ function isUuid(str: unknown): str is string {
 type KVPair<T> = { [K in keyof T]: [K, T[K]] }[keyof T];
 
 type GraphResponse = KVPair<paths["/api/graph.json"]["get"]["responses"]>;
+
+/**
+ * Return the entire graph as nodes and edges.
+ *
+ * @param db_path - Path to the database
+ */
 export async function graph(db_path: string): Promise<GraphResponse> {
 	const db = await createDatabase(db_path);
 	const [ns, es] = await Promise.all([
@@ -26,7 +38,7 @@ export async function graph(db_path: string): Promise<GraphResponse> {
 		title: n.title,
 	}));
 
-	// dest が UUID のみ許可
+	// Only allow edges whose dest is a valid UUID
 	const cleanEdges = es
 		.filter((e) => isUuid(e.dest))
 		.map(({ source, dest }) => ({ source: source, dest: dest }));
@@ -46,6 +58,13 @@ export async function graph(db_path: string): Promise<GraphResponse> {
 }
 
 type NodeResponse = KVPair<paths["/api/node/{id}.json"]["get"]["responses"]>;
+
+/**
+ * Fetch a single node and its backlinks.
+ *
+ * @param db_path - Path to the database
+ * @param id - Node identifier
+ */
 export async function node(db_path: string, id: string): Promise<NodeResponse> {
 	const db = await createDatabase(db_path);
 	const row = db
@@ -101,6 +120,13 @@ export async function node(db_path: string, id: string): Promise<NodeResponse> {
 type ResourceResponse = KVPair<
 	paths["/api/node/{id}/{path}"]["get"]["responses"]
 >;
+/**
+ * Serve a binary resource attached to a node.
+ *
+ * @param db_path - Path to the database
+ * @param id - Node identifier
+ * @param encoded_path - Base64url encoded file name
+ */
 export async function resource(
 	db_path: string,
 	id: string,

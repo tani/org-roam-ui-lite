@@ -4,6 +4,13 @@ import initSqlJs, { type SqlJsStatic } from "sql.js";
 import * as schema from "./schema.ts";
 
 export type Database = SQLJsDatabase<typeof schema>;
+
+/**
+ * Open the SQLite database and wrap it with Drizzle.
+ *
+ * @param db_path - Path to the database file
+ * @returns Drizzle connection bound to the schema
+ */
 export async function createDatabase(db_path: string): Promise<Database> {
 	let SQL: SqlJsStatic;
 	try {

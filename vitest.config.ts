@@ -3,7 +3,7 @@ import { defineConfig } from "vitest/config";
 
 export default defineConfig({
 	test: {
-		// root のデフォルト環境は node のまま
+		// default environment for the root project
 		environment: "node",
 		coverage: {
 			enabled: true,
@@ -11,15 +11,15 @@ export default defineConfig({
 			include: ["packages/*/src/**"],
 		},
 
-		// 2つの inline プロジェクトを定義
+		// define two inline projects
 		projects: [
 			{
-				// root の設定（plugins など）を継承
+				// inherit root settings such as plugins
 				extends: true,
 				test: {
 					name: "frontend",
 					include: ["packages/frontend/test/**/*.test.ts"],
-					environment: "jsdom", // フロントエンドは jsdom
+					environment: "jsdom", // frontend uses jsdom
 				},
 			},
 			{
@@ -27,7 +27,7 @@ export default defineConfig({
 				test: {
 					name: "backend",
 					include: ["packages/backend/test/**/*.test.ts"],
-					environment: "node", // バックエンドは node
+					environment: "node", // backend uses node
 				},
 			},
 		],

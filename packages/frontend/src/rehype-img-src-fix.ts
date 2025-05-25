@@ -2,6 +2,12 @@ import type { Element, Root } from "hast";
 import { visit } from "unist-util-visit";
 import { encodeBase64url } from "./base64url.ts";
 
+/**
+ * Rewrite image src attributes to point to the resource API.
+ *
+ * @param id - Node identifier used in the URL
+ * @returns Transformer for the rehype pipeline
+ */
 export default function rehypeImgSrcFix(id: string) {
 	return (tree: Root) => {
 		visit(tree, "element", (node: Element) => {

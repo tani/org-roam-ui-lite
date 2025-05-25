@@ -6,13 +6,13 @@ import {
 	dimOthers,
 	type Layout,
 	Layouts,
-	openNode,
 	renderGraph,
 	setElementsStyle,
 	setNodeStyle,
 	type Theme,
 	Themes,
-} from "./util.ts";
+} from "./graph.ts";
+import { openNode } from "./node.ts";
 
 Alpine.plugin(persist);
 

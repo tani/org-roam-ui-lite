@@ -1,7 +1,7 @@
-import type { LayoutOptions } from "cytoscape";
-import cytoscape, { type Core } from "cytoscape";
+import cytoscape, { type Core, type LayoutOptions } from "cytoscape";
 import createClient from "openapi-fetch";
-import type { components, paths } from "./api.d.ts";
+import type { paths } from "./api.d.ts";
+import { getCssVariable, pickColor } from "./style.ts";
 
 const api = createClient<paths>();
 
@@ -26,45 +26,6 @@ export const Themes = [
 
 export type Theme = (typeof Themes)[number]["value"];
 
-// --- Utility Functions ---
-/**
- * Read a CSS variable value.
- *
- * @param name - CSS custom property name
- * @returns Resolved value
- */
-export function getCssVariable(name: string): string {
-	return getComputedStyle(document.documentElement)
-		.getPropertyValue(name)
-		.trim();
-}
-
-const ACCENT_VARIABLES = [
-	"--bs-blue",
-	"--bs-indigo",
-	"--bs-purple",
-	"--bs-pink",
-	"--bs-red",
-	"--bs-orange",
-	"--bs-yellow",
-	"--bs-green",
-	"--bs-teal",
-	"--bs-cyan",
-] as const;
-
-/**
- * Deterministically pick a color based on a string key.
- *
- * @param key - String used for color selection
- * @returns CSS variable value
- */
-export function pickColor(key: string): string {
-	let sum = 0;
-	for (const ch of key)
-		sum = (sum + ch.charCodeAt(0)) % ACCENT_VARIABLES.length;
-	return getCssVariable(ACCENT_VARIABLES[sum]);
-}
-
 /**
  * Dim unrelated nodes and edges leaving the focused node opaque.
  *
@@ -72,14 +33,13 @@ export function pickColor(key: string): string {
  * @param focusId - Node id to highlight
  */
 export function dimOthers(graph: Core | undefined, focusId: string): void {
-	if (graph) {
-		const focus = graph.$id(focusId);
-		const neighborhood = focus?.closedNeighborhood();
-		graph.elements().forEach((el) => {
-			const isNeighbor = neighborhood.has(el);
-			el.style("opacity", isNeighbor ? 1 : el.isNode() ? 0.15 : 0.05);
-		});
-	}
+	if (!graph) return;
+	const focus = graph.$id(focusId);
+	const neighborhood = focus?.closedNeighborhood();
+	graph.elements().forEach((el) => {
+		const isNeighbor = neighborhood.has(el);
+		el.style("opacity", isNeighbor ? 1 : el.isNode() ? 0.15 : 0.05);
+	});
 }
 
 /**
@@ -156,11 +116,6 @@ export async function renderGraph(
 		},
 	];
 
-	/*
-  Since we removed fcose, we now automatically fall back to cose.
-  However, starting with Cytoscape v4, cose may be dropped;
-  if that happens, we might bring fcose back.
-   */
 	layoutName = layoutName === "fcose" ? "cose" : layoutName;
 
 	const layout = {
@@ -188,29 +143,4 @@ export async function renderGraph(
 		existingGraph.layout(layout).run();
 	});
 	return existingGraph;
-}
-
-/**
- * Fetch a single node and convert its Org content to HTML.
- *
- * @param theme - Color theme
- * @param nodeId - Node identifier
- * @returns Node information with rendered HTML
- */
-export async function openNode(
-	theme: Theme,
-	nodeId: string,
-): Promise<components["schemas"]["Node"] & { html: string }> {
-	const { data, error } = await api.GET("/api/node/{id}.json", {
-		params: { path: { id: nodeId } },
-	});
-
-	if (error) {
-		throw error;
-	}
-
-	const { createOrgHtmlProcessor } = await import("./processor.ts");
-	const process = createOrgHtmlProcessor(theme, nodeId);
-	const html = String(await process(data.raw));
-	return { ...data, html };
 }

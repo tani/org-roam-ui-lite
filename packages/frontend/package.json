@@ -7,15 +7,13 @@
 		"build": "vite build"
 	},
 	"dependencies": {
+		"@alpinejs/persist": "^3.14.9",
 		"@rehype-pretty/transformers": "^0.13.2",
+		"alpinejs": "^3.14.9",
 		"bootstrap": "^5.3.5",
 		"bootstrap-icons": "^1.11.3",
 		"cytoscape": "^3.31.4",
 		"openapi-fetch": "^0.13.5",
-		"react": "^19.1.0",
-		"react-bootstrap": "^2.10.10",
-		"react-dom": "^19.1.0",
-		"react-router": "^7.6.0",
 		"rehype-class-names": "^2.0.0",
 		"rehype-mathjax": "^7.1.0",
 		"rehype-mermaid": "^3.0.0",
@@ -30,10 +28,10 @@
 	},
 	"devDependencies": {
 		"@rollup/plugin-url": "^8.0.2",
+		"@types/alpinejs": "^3.13.11",
+		"@types/alpinejs__persist": "^3.13.4",
 		"@types/bootstrap": "^5.2.10",
 		"@types/hast": "^3.0.4",
-		"@types/react": "^19.1.5",
-		"@types/react-dom": "^19.1.5",
 		"vite": "npm:rolldown-vite@^6.3.9"
 	}
 }

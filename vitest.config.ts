@@ -18,7 +18,7 @@ export default defineConfig({
 				extends: true,
 				test: {
 					name: "frontend",
-					include: ["packages/frontend/test/**/*.test.{ts,tsx}"],
+					include: ["packages/frontend/test/**/*.test.ts"],
 					environment: "jsdom", // フロントエンドは jsdom
 				},
 			},

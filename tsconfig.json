@@ -6,7 +6,6 @@
 		"module": "es2022",
 		"moduleResolution": "bundler",
 		"strict": true,
-		"jsx": "react-jsx",
 		"allowImportingTsExtensions": true,
 		"skipLibCheck": true
 	}

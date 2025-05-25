@@ -296,8 +296,11 @@ export function App() {
 	return (
 		<BrowserRouter>
 			<Routes>
-				<Route path="/" element={<Main />} />
-				<Route path="/node/:id" element={<Main />} />
+				{/* keep Main mounted while switching between / and /node/:id */}
+				<Route path="/" element={<Main />}>
+					{/* child route matches /node/:id without re-mounting Main */}
+					<Route path="node/:id" />
+				</Route>
 			</Routes>
 		</BrowserRouter>
 	);

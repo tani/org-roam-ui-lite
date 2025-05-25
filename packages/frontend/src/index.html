@@ -25,6 +25,7 @@
 			tabindex="-1"
 			id="offcanvasSettings"
 			aria-labelledby="offcanvasSettingsLabel"
+			:class="{ show: settingsOpen }"
 		>
 			<div class="offcanvas-header">
 				<h4 class="offcanvas-title" id="offcanvasSettingsLabel">
@@ -33,7 +34,7 @@
 				<button
 					type="button"
 					class="btn-close"
-					data-bs-dismiss="offcanvas"
+					@click="settingsOpen = false"
 					aria-label="Close"
 				></button>
 			</div>
@@ -100,9 +101,7 @@
 			type="button"
 			class="btn btn-outline-secondary position-fixed"
 			style="top: 1rem; left: 1rem; z-index: 1;"
-			data-bs-toggle="offcanvas"
-			data-bs-target="#offcanvasSettings"
-			aria-controls="offcanvasSettings"
+			@click="toggleSettings()"
 		>
 			<i class="bi bi-gear"></i>
 		</button>
@@ -112,8 +111,8 @@
 			class="offcanvas offcanvas-end responsive-wide"
 			tabindex="-1"
 			id="offcanvasDetails"
-			x-ref="offcanvas"
 			aria-labelledby="offcanvasDetailsLabel"
+			:class="{ show: detailsOpen }"
 		>
 			<div class="offcanvas-header">
 				<h4 class="offcanvas-title" id="offcanvasDetailsLabel">
@@ -125,7 +124,7 @@
 				<button
 					type="button"
 					class="btn-close"
-					data-bs-dismiss="offcanvas"
+					@click="closeDetails()"
 					aria-label="Close"
 				></button>
 			</div>
@@ -158,9 +157,7 @@
 			type="button"
 			class="btn btn-outline-secondary position-fixed"
 			style="top: 1rem; right: 1rem; z-index: 1;"
-			data-bs-toggle="offcanvas"
-			data-bs-target="#offcanvasDetails"
-			aria-controls="offcanvasDetails"
+			@click="toggleDetails()"
 		>
 			<i class="bi bi-chevron-left"></i>
 		</button>

@@ -1,6 +1,5 @@
 import persist from "@alpinejs/persist";
 import Alpine from "alpinejs";
-import * as bootstrap from "bootstrap";
 import type { Core } from "cytoscape";
 import type { components } from "./api.d.ts";
 import {
@@ -29,11 +28,10 @@ Alpine.data("app", () => ({
 	layouts: Layouts,
 	graph: undefined as Core | undefined,
 	selected: {} as components["schemas"]["Node"] & { html?: string },
-	offcanvas: undefined as bootstrap.Offcanvas | undefined,
+	settingsOpen: false,
+	detailsOpen: false,
 
 	async init() {
-		this.offcanvas = new bootstrap.Offcanvas(this.$refs.offcanvas);
-
 		// Initial graph render
 		this.graph = await renderGraph(
 			this.layout,
@@ -47,14 +45,6 @@ Alpine.data("app", () => ({
 		this.graph.on("tap", "node", ({ target }) => {
 			void this.openNode(target.id());
 		});
-
-		this.$refs.offcanvas.addEventListener("show.bs.offcanvas", () =>
-			dimOthers(this.graph, this.selected.id),
-		);
-
-		this.$refs.offcanvas.addEventListener("hidden.bs.offcanvas", () =>
-			setElementsStyle(this.graph, { opacity: 1 }),
-		);
 	},
 
 	// Refresh graph with current settings
@@ -92,7 +82,25 @@ Alpine.data("app", () => ({
 	async openNode(id: string) {
 		const selected = await openNode(this.theme, id);
 		this.selected = selected;
-		this.offcanvas?.show();
+		this.openDetails();
+	},
+
+	openDetails() {
+		this.detailsOpen = true;
+		dimOthers(this.graph, this.selected.id);
+	},
+
+	closeDetails() {
+		this.detailsOpen = false;
+		setElementsStyle(this.graph, { opacity: 1 });
+	},
+
+	toggleDetails() {
+		this.detailsOpen ? this.closeDetails() : this.openDetails();
+	},
+
+	toggleSettings() {
+		this.settingsOpen = !this.settingsOpen;
 	},
 }));
 

@@ -20,7 +20,7 @@
 	},
 	"scripts": {
 		"version": "nix run .#update-npm-deps-hash && git add flake.nix",
-		"prebuild": "tsx openapi.ts | tee packages/frontend/src/api.d.ts packages/backend/src/api.d.ts > /dev/null",
+		"prebuild": "tsx openapi.ts | tee packages/frontend/src/api.d.ts packages/backend/src/api.d.ts > /dev/null && biome format --write packages/frontend/src/api.d.ts packages/backend/src/api.d.ts",
 		"build": "npm run build --workspaces && tsx ./scripts/build.ts",
 		"export": "npm run build && node ./scripts/export.js -r ./dist",
 		"dev": "npm-run-all -p dev:frontend 'dev:backend -- {@}' --",

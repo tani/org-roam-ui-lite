@@ -16,7 +16,8 @@ vi.mock("../src/processor.ts", () => ({
 	),
 }));
 
-import { dimOthers, openNode, renderGraph } from "../src/util.ts";
+import { dimOthers, renderGraph } from "../src/graph.ts";
+import { openNode } from "../src/node.ts";
 
 const NODE_ID = "11111111-1111-4111-8111-111111111111";
 

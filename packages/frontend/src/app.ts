@@ -46,6 +46,13 @@ Alpine.data("app", () => ({
 		this.graph.on("tap", "node", ({ target }) => {
 			void this.openNode(target.id());
 		});
+
+		this.$refs.rendered.addEventListener("click", (ev) => {
+			const a = (ev.target as HTMLElement).closest("a");
+			if (!a || !a.href.startsWith("id:")) return;
+			ev.preventDefault();
+			this.openNode(a.href.replace("id:", ""));
+		});
 	},
 
 	/** Re-render the graph with current settings */

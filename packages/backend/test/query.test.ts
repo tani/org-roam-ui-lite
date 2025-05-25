@@ -73,15 +73,15 @@ vi.mock("../src/database.ts", () => ({
 	createDatabase: (...args: unknown[]) => mockCreateDatabase(...args),
 }));
 
-import { graph, node, resource } from "../src/query.ts";
+import { fetchGraph, fetchNode, fetchResource } from "../src/query.ts";
 
 mockReadFile = vi.fn();
 mockCreateDatabase = vi.fn();
 
-describe("graph", () => {
+describe("fetchGraph", () => {
 	it("filters invalid edges", async () => {
 		mockCreateDatabase.mockResolvedValue(makeGraphDb());
-		const result = await graph("x");
+		const result = await fetchGraph("x");
 		const body = result[1].content["application/json"];
 		expect(body.nodes).toHaveLength(1);
 		expect(body.edges).toEqual([
@@ -93,14 +93,14 @@ describe("graph", () => {
 	});
 });
 
-describe("node", () => {
+describe("fetchNode", () => {
 	it("returns node with backlinks and raw", async () => {
 		mockReadFile.mockResolvedValue("ORG");
 		makeNodeDb.called = false;
 		mockCreateDatabase.mockResolvedValue(
 			makeNodeDb({ id: NODE_ID, title: "t", file: "/tmp/a" }),
 		);
-		const result = await node("db", NODE_ID);
+		const result = await fetchNode("db", NODE_ID);
 		type NodeBody = {
 			id: string;
 			title: string;
@@ -114,7 +114,7 @@ describe("node", () => {
 	});
 });
 
-describe("resource", () => {
+describe("fetchResource", () => {
 	it("reads resolved file", async () => {
 		const row = { id: NODE_ID, title: "t", file: "/base/file.org" };
 		mockCreateDatabase.mockResolvedValue(makeResourceDb(row));
@@ -122,7 +122,7 @@ describe("resource", () => {
 		const full = `${encoded}.png`;
 		const buf = new Uint8Array([1, 2]);
 		mockReadFile.mockResolvedValue(buf);
-		const result = await resource("db", NODE_ID, full);
+		const result = await fetchResource("db", NODE_ID, full);
 		const body = (result[1].content as { [key: string]: Uint8Array })[
 			"image/*"
 		];

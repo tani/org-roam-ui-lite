@@ -8,10 +8,10 @@ export type Database = SQLJsDatabase<typeof schema>;
 /**
  * Open the SQLite database and wrap it with Drizzle.
  *
- * @param db_path - Path to the database file
+ * @param databasePath - Path to the database file
  * @returns Drizzle connection bound to the schema
  */
-export async function createDatabase(db_path: string): Promise<Database> {
+export async function createDatabase(databasePath: string): Promise<Database> {
 	let SQL: SqlJsStatic;
 	try {
 		const { default: wasmBinary } = await import("sql.js/dist/sql-wasm.wasm");
@@ -19,7 +19,7 @@ export async function createDatabase(db_path: string): Promise<Database> {
 	} catch {
 		SQL = await initSqlJs();
 	}
-	const blob = new Uint8Array(await fs.readFile(db_path));
+	const blob = new Uint8Array(await fs.readFile(databasePath));
 	const database = new SQL.Database(blob);
 	return drizzle(database, { schema });
 }

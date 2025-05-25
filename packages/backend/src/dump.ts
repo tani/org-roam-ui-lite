@@ -13,21 +13,24 @@ import rehypeOrg from "uniorg-rehype";
 import { visit } from "unist-util-visit";
 import { encodeBase64url } from "./base64url.ts";
 import { createDatabase } from "./database.ts";
-import { graph, node } from "./query.ts";
+import { fetchGraph, fetchNode } from "./query.ts";
 import { files, nodes } from "./schema.ts";
 
 /**
  * Write graph.json representing all nodes and edges.
  *
- * @param db_path - Path to the database
- * @param out_path - Directory for the output file
+ * @param databasePath - Path to the database
+ * @param outputPath - Directory for the output file
  */
-async function dumpGraphJson(db_path: string, out_path: string): Promise<void> {
-	const [_statusCode, response] = await graph(db_path);
+async function dumpGraphJson(
+	databasePath: string,
+	outputPath: string,
+): Promise<void> {
+	const [_statusCode, response] = await fetchGraph(databasePath);
 
-	await fs.mkdir(out_path, { recursive: true });
+	await fs.mkdir(outputPath, { recursive: true });
 	await fs.writeFile(
-		path.join(out_path, "graph.json"),
+		path.join(outputPath, "graph.json"),
 		JSON.stringify(response.content["application/json"], null, 2),
 	);
 }
@@ -35,11 +38,14 @@ async function dumpGraphJson(db_path: string, out_path: string): Promise<void> {
 /**
  * Dump each node as an individual JSON file and copy referenced images.
  *
- * @param db_path - Path to the database
- * @param out_path - Directory where the files will be written
+ * @param databasePath - Path to the database
+ * @param outputPath - Directory where the files will be written
  */
-async function dumpNodeJsons(db_path: string, out_path: string): Promise<void> {
-	const db = await createDatabase(db_path);
+async function dumpNodeJsons(
+	databasePath: string,
+	outputPath: string,
+): Promise<void> {
+	const database = await createDatabase(databasePath);
 
 	// Build the unified pipeline once
 	const processor = unified()
@@ -47,7 +53,7 @@ async function dumpNodeJsons(db_path: string, out_path: string): Promise<void> {
 		.use(rehypeOrg) // MDAST -> HAST
 		.use(raw); // Expand HTML within HAST
 
-	const allNodes = await db
+	const allNodes = await database
 		.select({ id: nodes.id, title: nodes.title, file: files.file })
 		.from(nodes)
 		.innerJoin(files, eq(nodes.file, files.file));
@@ -55,9 +61,9 @@ async function dumpNodeJsons(db_path: string, out_path: string): Promise<void> {
 	for (const row of allNodes) {
 		const id = row.id;
 
-		const [_statusCode, response] = await node(db_path, id);
+		const [_statusCode, response] = await fetchNode(databasePath, id);
 
-		const nodeDir = path.join(out_path, "node");
+		const nodeDir = path.join(outputPath, "node");
 		await fs.mkdir(nodeDir, { recursive: true });
 		await fs.writeFile(
 			path.join(nodeDir, `${id}.json`),
@@ -70,38 +76,38 @@ async function dumpNodeJsons(db_path: string, out_path: string): Promise<void> {
 			// unified@10+ run returns Node, but our pipeline yields a HAST Root
 			const tree = (await processor.run(parsed)) as unknown as Root;
 
-			const imgSrcs: string[] = [];
+			const imageSources: string[] = [];
 			visit(tree, "element", (node: Element) => {
 				if (
 					node.tagName === "img" &&
 					typeof node.properties?.src === "string"
 				) {
-					const src: string = node.properties.src;
+					const sourcePath: string = node.properties.src;
 					if (
-						src.startsWith("data:") ||
-						src.startsWith("http:") ||
-						src.startsWith("https:") ||
-						src.startsWith("//")
+						sourcePath.startsWith("data:") ||
+						sourcePath.startsWith("http:") ||
+						sourcePath.startsWith("https:") ||
+						sourcePath.startsWith("//")
 					)
 						return;
-					imgSrcs.push(src);
+					imageSources.push(sourcePath);
 				}
 			});
 
 			// Remove duplicates
-			const uniqueSrcs = Array.from(new Set(imgSrcs));
+			const uniqueSources = Array.from(new Set(imageSources));
 			const basePath = path.dirname(row.file);
 
-			for (const src of uniqueSrcs) {
-				const ext = path.extname(src);
-				const basename = path.basename(src, ext);
-				const encoded = encodeBase64url(basename);
-				const srcPath = path.resolve(basePath, src);
-				const destDir = path.join(out_path, "node", id);
+			for (const sourcePath of uniqueSources) {
+				const ext = path.extname(sourcePath);
+				const baseName = path.basename(sourcePath, ext);
+				const encoded = encodeBase64url(baseName);
+				const sourceFilePath = path.resolve(basePath, sourcePath);
+				const destDir = path.join(outputPath, "node", id);
 				const destFile = path.join(destDir, `${encoded}${ext}`);
 
 				await fs.mkdir(destDir, { recursive: true });
-				await fs.copyFile(srcPath, destFile);
+				await fs.copyFile(sourceFilePath, destFile);
 			}
 		}
 	}
@@ -110,13 +116,16 @@ async function dumpNodeJsons(db_path: string, out_path: string): Promise<void> {
 /**
  * Dump graph and node data to JSON files under the given directory.
  *
- * @param db_path - Path to the database
- * @param out_path - Directory where files are written
+ * @param databasePath - Path to the database
+ * @param outputPath - Directory where files are written
  */
-export async function dump(db_path: string, out_path: string): Promise<void> {
-	await dumpGraphJson(db_path, out_path);
-	await dumpNodeJsons(db_path, out_path);
-	console.log(`✅ All JSON files dumped to ${out_path}`);
+export async function dump(
+	databasePath: string,
+	outputPath: string,
+): Promise<void> {
+	await dumpGraphJson(databasePath, outputPath);
+	await dumpNodeJsons(databasePath, outputPath);
+	console.log(`✅ All JSON files dumped to ${outputPath}`);
 }
 
 const isMain = process.argv[1] === url.fileURLToPath(import.meta.url);

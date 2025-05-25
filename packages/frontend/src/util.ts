@@ -33,13 +33,13 @@ export type Theme = (typeof Themes)[number]["value"];
  * @param name - CSS custom property name
  * @returns Resolved value
  */
-export function getCssVar(name: string): string {
+export function getCssVariable(name: string): string {
 	return getComputedStyle(document.documentElement)
 		.getPropertyValue(name)
 		.trim();
 }
 
-const ACCENT_VARS = [
+const ACCENT_VARIABLES = [
 	"--bs-blue",
 	"--bs-indigo",
 	"--bs-purple",
@@ -60,8 +60,9 @@ const ACCENT_VARS = [
  */
 export function pickColor(key: string): string {
 	let sum = 0;
-	for (const ch of key) sum = (sum + ch.charCodeAt(0)) % ACCENT_VARS.length;
-	return getCssVar(ACCENT_VARS[sum]);
+	for (const ch of key)
+		sum = (sum + ch.charCodeAt(0)) % ACCENT_VARIABLES.length;
+	return getCssVariable(ACCENT_VARIABLES[sum]);
 }
 
 /**
@@ -149,7 +150,7 @@ export async function renderGraph(
 				height: nodeSize,
 				"font-size": `${labelScale}em`,
 				label: "data(label)",
-				color: getCssVar("--bs-body-color"),
+				color: getCssVariable("--bs-body-color"),
 				"background-color": "data(color)",
 			},
 		},
@@ -193,15 +194,15 @@ export async function renderGraph(
  * Fetch a single node and convert its Org content to HTML.
  *
  * @param theme - Color theme
- * @param id - Node identifier
+ * @param nodeId - Node identifier
  * @returns Node information with rendered HTML
  */
 export async function openNode(
 	theme: Theme,
-	id: string,
+	nodeId: string,
 ): Promise<components["schemas"]["Node"] & { html: string }> {
 	const { data, error } = await api.GET("/api/node/{id}.json", {
-		params: { path: { id } },
+		params: { path: { id: nodeId } },
 	});
 
 	if (error) {
@@ -209,7 +210,7 @@ export async function openNode(
 	}
 
 	const { createOrgHtmlProcessor } = await import("./processor.ts");
-	const process = createOrgHtmlProcessor(theme, id);
+	const process = createOrgHtmlProcessor(theme, nodeId);
 	const html = String(await process(data.raw));
 	return { ...data, html };
 }

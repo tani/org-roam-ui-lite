@@ -6,15 +6,15 @@ import * as nodeServer from "@hono/node-server";
 import { serveStatic } from "@hono/node-server/serve-static";
 import { Hono } from "hono";
 import { lookup } from "mime-types";
-import { graph, node, resource } from "./query.ts";
+import { fetchGraph, fetchNode, fetchResource } from "./query.ts";
 
 /**
  * Start the HTTP server serving the front-end and API.
  *
- * @param db_path - Path to the database
+ * @param databasePath - Path to the database
  * @param port - TCP port to listen on
  */
-export async function serve(db_path: string, port: number): Promise<void> {
+export async function serve(databasePath: string, port: number): Promise<void> {
 	const frontendDistPath = path.relative(
 		process.cwd(),
 		path.join(import.meta.dirname ?? "", "../../frontend/dist"),
@@ -31,30 +31,30 @@ export async function serve(db_path: string, port: number): Promise<void> {
 	);
 
 	/* Node and edge list */
-	app.get("/api/graph.json", async (c) => {
-		const [statusCode, response] = await graph(db_path);
-		return c.json(response.content["application/json"], statusCode);
+	app.get("/api/graph.json", async (context) => {
+		const [statusCode, response] = await fetchGraph(databasePath);
+		return context.json(response.content["application/json"], statusCode);
 	});
 
 	/* Node details including Org source */
-	app.get("/api/node/:id", async (c) => {
-		const id = c.req.param("id").replace(/\.json$/, "");
-		const [statusCode, response] = await node(db_path, id);
-		return c.json(response.content["application/json"], statusCode);
+	app.get("/api/node/:id", async (context) => {
+		const nodeId = context.req.param("id").replace(/\.json$/, "");
+		const [statusCode, response] = await fetchNode(databasePath, nodeId);
+		return context.json(response.content["application/json"], statusCode);
 	});
 
-	app.get("/api/node/:id/:encoded_path", async (c) => {
-		const id = c.req.param("id");
-		const encoded_path = c.req.param("encoded_path");
-		const result = await resource(db_path, id, encoded_path);
+	app.get("/api/node/:id/:encoded_path", async (context) => {
+		const nodeId = context.req.param("id");
+		const encodedPath = context.req.param("encoded_path");
+		const result = await fetchResource(databasePath, nodeId, encodedPath);
 		if (result[0] === 200) {
 			return new Response(result[1].content["image/*"], {
 				headers: {
-					"Content-Type": lookup(encoded_path) || "application/octet-stream",
+					"Content-Type": lookup(encodedPath) || "application/octet-stream",
 				},
 			});
 		} else {
-			return c.json(result[1].content["application/json"], result[0]);
+			return context.json(result[1].content["application/json"], result[0]);
 		}
 	});
 

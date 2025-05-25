@@ -24,23 +24,23 @@ type GraphResponse = KVPair<paths["/api/graph.json"]["get"]["responses"]>;
 /**
  * Return the entire graph as nodes and edges.
  *
- * @param db_path - Path to the database
+ * @param databasePath - Path to the database
  */
-export async function graph(db_path: string): Promise<GraphResponse> {
-	const db = await createDatabase(db_path);
-	const [ns, es] = await Promise.all([
-		db.select({ id: nodes.id, title: nodes.title }).from(nodes),
-		db.select({ source: links.source, dest: links.dest }).from(links),
+export async function fetchGraph(databasePath: string): Promise<GraphResponse> {
+	const database = await createDatabase(databasePath);
+	const [nodeRows, edgeRows] = await Promise.all([
+		database.select({ id: nodes.id, title: nodes.title }).from(nodes),
+		database.select({ source: links.source, dest: links.dest }).from(links),
 	]);
 
-	const cleanNodes = ns.map((n) => ({
-		id: n.id,
-		title: n.title,
+	const cleanNodes = nodeRows.map((nodeRow) => ({
+		id: nodeRow.id,
+		title: nodeRow.title,
 	}));
 
 	// Only allow edges whose dest is a valid UUID
-	const cleanEdges = es
-		.filter((e) => isUuid(e.dest))
+	const cleanEdges = edgeRows
+		.filter((edge) => isUuid(edge.dest))
 		.map(({ source, dest }) => ({ source: source, dest: dest }));
 
 	return [
@@ -62,16 +62,19 @@ type NodeResponse = KVPair<paths["/api/node/{id}.json"]["get"]["responses"]>;
 /**
  * Fetch a single node and its backlinks.
  *
- * @param db_path - Path to the database
- * @param id - Node identifier
+ * @param databasePath - Path to the database
+ * @param nodeId - Node identifier
  */
-export async function node(db_path: string, id: string): Promise<NodeResponse> {
-	const db = await createDatabase(db_path);
-	const row = db
+export async function fetchNode(
+	databasePath: string,
+	nodeId: string,
+): Promise<NodeResponse> {
+	const database = await createDatabase(databasePath);
+	const row = database
 		.select({ id: nodes.id, title: nodes.title, file: files.file })
 		.from(nodes)
 		.innerJoin(files, eq(nodes.file, files.file))
-		.where(eq(nodes.id, `"${id}"`))
+		.where(eq(nodes.id, `"${nodeId}"`))
 		.get();
 
 	if (!row)
@@ -88,17 +91,17 @@ export async function node(db_path: string, id: string): Promise<NodeResponse> {
 		];
 
 	const raw = await fs.readFile(row.file, "utf8");
-	const backlinks = await db
+	const backlinks = await database
 		.select({
 			source: links.source,
 			title: nodes.title,
 		})
 		.from(links)
 		.innerJoin(nodes, eq(links.source, nodes.id))
-		.where(eq(links.dest, `"${id}"`));
-	const cleanBacklinks = backlinks.map((node) => ({
-		title: node.title,
-		source: node.source,
+		.where(eq(links.dest, `"${nodeId}"`));
+	const cleanBacklinks = backlinks.map((backlink) => ({
+		title: backlink.title,
+		source: backlink.source,
 	}));
 
 	return [
@@ -123,21 +126,21 @@ type ResourceResponse = KVPair<
 /**
  * Serve a binary resource attached to a node.
  *
- * @param db_path - Path to the database
- * @param id - Node identifier
- * @param encoded_path - Base64url encoded file name
+ * @param databasePath - Path to the database
+ * @param nodeId - Node identifier
+ * @param encodedPath - Base64url encoded file name
  */
-export async function resource(
-	db_path: string,
-	id: string,
-	encoded_path: string,
+export async function fetchResource(
+	databasePath: string,
+	nodeId: string,
+	encodedPath: string,
 ): Promise<ResourceResponse> {
-	const db = await createDatabase(db_path);
-	const row = db
+	const database = await createDatabase(databasePath);
+	const row = database
 		.select({ id: nodes.id, title: nodes.title, file: files.file })
 		.from(nodes)
 		.innerJoin(files, eq(nodes.file, files.file))
-		.where(eq(nodes.id, `"${id}"`))
+		.where(eq(nodes.id, `"${nodeId}"`))
 		.get();
 
 	if (!row)
@@ -154,7 +157,7 @@ export async function resource(
 		];
 
 	const basePath = path.dirname(row.file);
-	const { ext, name } = path.parse(encoded_path);
+	const { ext, name } = path.parse(encodedPath);
 	const decodedBasename = Buffer.from(name, "base64").toString("utf8");
 	const filePath = `${decodedBasename}${ext}`;
 	const resolvedPath = path.resolve(basePath, filePath);

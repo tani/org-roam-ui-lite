@@ -53,6 +53,22 @@
 					</select>
 				</div>
 				<div class="mb-4">
+					<h5>Renderer</h5>
+					<select
+						class="form-select"
+						x-model="renderer"
+						@change="setRenderer(renderer)"
+					>
+						<template x-for="r in renderers" :key="r.value">
+							<option
+								:value="r.value"
+								x-text="r.label"
+								:selected="r.value === renderer"
+							></option>
+						</template>
+					</select>
+				</div>
+				<div class="mb-4">
 					<h5>Layout</h5>
 					<select
 						class="form-select"

@@ -9,7 +9,7 @@ https://github.com/user-attachments/assets/20ba9c71-6de0-452d-988b-cea4b0ebcc45
 A **self-contained, zero-config graph viewer** for your
 [Org-roam](https://www.orgroam.com) notes. Run it either as a tiny Node
 server or straight from Emacs, then open a browser and explore your
-knowledge graph with a snappy Cytoscape-powered UI.
+knowledge graph with a snappy UI powered by Cytoscape or Force Graph.
 
 # Features
 
@@ -20,6 +20,7 @@ knowledge graph with a snappy Cytoscape-powered UI.
   light/dark.
 - **Deterministic node colours** based on UUID for easy visual grouping.
 - **Interactive layout switching** (fcose, concentric, grid, …).
+- **Selectable renderers** – Cytoscape, Force Graph (2D) and 3D Force Graph.
 - **Backlink panel** with Org-styled rendering (MathJax, Mermaid, syntax
   highlighting with copy button).
 - **Offline export** – dump the JSON once, host on any static server.
@@ -157,8 +158,9 @@ rejected automatically.
 
 - [Org-roam](https://github.com/org-roam/org-roam) for the database &
   inspiration.
-- [Hono](https://hono.dev), [Cytoscape.js](https://js.cytoscape.org),
-  [Alpine.js](https://alpinejs.dev).
+ - [Hono](https://hono.dev), [Cytoscape.js](https://js.cytoscape.org),
+   [Force Graph](https://github.com/vasturiano/force-graph),
+   [Alpine.js](https://alpinejs.dev).
 - Colour palettes from **Nord**, **Gruvbox** and **Dracula** themes.
 
 Happy note-exploring! 🎈

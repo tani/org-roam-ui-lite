@@ -4,8 +4,11 @@ import type { Core } from "cytoscape";
 import type { components } from "./api.d.ts";
 import {
 	dimOthers,
+	type GraphInstance,
 	type Layout,
 	Layouts,
+	type Renderer,
+	Renderers,
 	renderGraph,
 	setElementsStyle,
 	setNodeStyle,
@@ -26,7 +29,9 @@ Alpine.data("app", () => ({
 	labelScale: 0.5,
 	layout: Alpine.$persist<Layout>("cose"),
 	layouts: Layouts,
-	graph: undefined as Core | undefined,
+	renderers: Renderers,
+	renderer: Alpine.$persist<Renderer>("cytoscape"),
+	graph: undefined as GraphInstance | undefined,
 	selected: {} as components["schemas"]["Node"] & { html?: string },
 	settingsOpen: false,
 	detailsOpen: false,
@@ -35,6 +40,7 @@ Alpine.data("app", () => ({
 	async init() {
 		// Initial graph render
 		this.graph = await renderGraph(
+			this.renderer,
 			this.layout,
 			this.$refs.graph,
 			this.graph,
@@ -43,9 +49,19 @@ Alpine.data("app", () => ({
 		);
 
 		// Event bindings
-		this.graph.on("tap", "node", ({ target }) => {
-			void this.openNode(target.id());
-		});
+		if (this.renderer === "cytoscape") {
+			(this.graph as Core).on("tap", "node", ({ target }) => {
+				void this.openNode(target.id());
+			});
+		} else {
+			(
+				this.graph as unknown as {
+					onNodeClick: (cb: (node: { id: string }) => void) => void;
+				}
+			).onNodeClick((node: { id: string }) => {
+				void this.openNode(node.id);
+			});
+		}
 
 		this.$refs.rendered.addEventListener("click", (ev) => {
 			const a = (ev.target as HTMLElement).closest("a");
@@ -58,6 +74,7 @@ Alpine.data("app", () => ({
 	/** Re-render the graph with current settings */
 	async refresh() {
 		this.graph = await renderGraph(
+			this.renderer,
 			this.layout,
 			this.$refs.graph,
 			this.graph,
@@ -72,6 +89,12 @@ Alpine.data("app", () => ({
 		void this.refresh();
 	},
 
+	/** Change renderer and refresh */
+	setRenderer(newRenderer: Renderer) {
+		this.renderer = newRenderer;
+		void this.refresh();
+	},
+
 	/** Switch between themes and refresh */
 	setTheme(newTheme: Theme) {
 		this.theme = newTheme;
@@ -80,12 +103,19 @@ Alpine.data("app", () => ({
 
 	/** Adjust node size in the graph */
 	onSizeChange() {
-		setNodeStyle(this.graph, { width: this.nodeSize, height: this.nodeSize });
+		if (this.renderer === "cytoscape")
+			setNodeStyle(this.graph as Core, {
+				width: this.nodeSize,
+				height: this.nodeSize,
+			});
+		else void this.refresh();
 	},
 
 	/** Adjust label scale in the graph */
 	onScaleChange() {
-		setNodeStyle(this.graph, { "font-size": `${this.labelScale}em` });
+		if (this.renderer === "cytoscape")
+			setNodeStyle(this.graph as Core, { "font-size": `${this.labelScale}em` });
+		else void this.refresh();
 	},
 
 	/** Fetch and display details for NODE ID */
@@ -98,13 +128,15 @@ Alpine.data("app", () => ({
 	/** Show the details pane and dim other nodes */
 	openDetails() {
 		this.detailsOpen = true;
-		dimOthers(this.graph, this.selected.id);
+		if (this.renderer === "cytoscape")
+			dimOthers(this.graph as Core, this.selected.id);
 	},
 
 	/** Hide the details pane and restore styles */
 	closeDetails() {
 		this.detailsOpen = false;
-		setElementsStyle(this.graph, { opacity: 1 });
+		if (this.renderer === "cytoscape")
+			setElementsStyle(this.graph as Core, { opacity: 1 });
 	},
 
 	/** Toggle the details pane */

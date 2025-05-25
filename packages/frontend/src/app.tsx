@@ -25,12 +25,14 @@ type NodeData = components["schemas"]["Node"] & { html?: string };
 
 function GraphView({
 	layout,
+	theme,
 	nodeSize,
 	labelScale,
 	onOpenNode,
 	onGraphReady,
 }: {
 	layout: Layout;
+	theme: Theme;
 	nodeSize: number;
 	labelScale: number;
 	onOpenNode: (id: string) => void;
@@ -45,6 +47,7 @@ function GraphView({
 	}, [onOpenNode]);
 
 	useEffect(() => {
+		const _theme = theme;
 		const container = containerRef.current;
 		if (!container) return;
 		let mounted = true;
@@ -64,7 +67,7 @@ function GraphView({
 		return () => {
 			mounted = false;
 		};
-	}, [layout, nodeSize, labelScale, onGraphReady]);
+	}, [layout, nodeSize, labelScale, onGraphReady, theme]);
 
 	return <div ref={containerRef} id="graph" className="h-100 w-100"></div>;
 }
@@ -234,11 +237,20 @@ function Main() {
 		if (id && !openNodes.current.includes(id)) openNodes.current.push(id);
 	}, [id]);
 
+	useEffect(() => {
+		document.documentElement.setAttribute("data-theme", theme);
+		document.documentElement.setAttribute(
+			"data-bs-theme",
+			theme.replace(/.*-/, ""),
+		);
+	}, [theme]);
+
 	const handleOpenNode = (nodeId: string) => navigate(`/node/${nodeId}`);
 
 	return (
 		<>
 			<GraphView
+				theme={theme}
 				layout={layout}
 				nodeSize={nodeSize}
 				labelScale={labelScale}

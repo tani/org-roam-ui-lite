@@ -32,6 +32,24 @@ Alpine.data("app", () => ({
 	renderers: Renderers,
 	renderer: Alpine.$persist<Renderer>("cytoscape"),
 	graph: undefined as GraphInstance | undefined,
+	/** Attach node click events based on the current renderer */
+	bindGraphEvents() {
+		if (!this.graph) return;
+		if (this.renderer === "cytoscape") {
+			const cy = this.graph as Core;
+			cy.off("tap", "node");
+			cy.on("tap", "node", ({ target }) => {
+				void this.openNode(target.id());
+			});
+		} else {
+			const fg = this.graph as unknown as {
+				onNodeClick: (cb: (node: { id: string }) => void) => void;
+			};
+			fg.onNodeClick((node: { id: string }) => {
+				void this.openNode(node.id);
+			});
+		}
+	},
 	selected: {} as components["schemas"]["Node"] & { html?: string },
 	settingsOpen: false,
 	detailsOpen: false,
@@ -48,24 +66,12 @@ Alpine.data("app", () => ({
 			this.labelScale,
 		);
 
+		this.bindGraphEvents();
+
 		this.$watch("renderer", () => {
+			this.graph = undefined;
 			void this.refresh();
 		});
-
-		// Event bindings
-		if (this.renderer === "cytoscape") {
-			(this.graph as Core).on("tap", "node", ({ target }) => {
-				void this.openNode(target.id());
-			});
-		} else {
-			(
-				this.graph as unknown as {
-					onNodeClick: (cb: (node: { id: string }) => void) => void;
-				}
-			).onNodeClick((node: { id: string }) => {
-				void this.openNode(node.id);
-			});
-		}
 
 		this.$refs.rendered.addEventListener("click", (ev) => {
 			const a = (ev.target as HTMLElement).closest("a");
@@ -85,6 +91,8 @@ Alpine.data("app", () => ({
 			this.nodeSize,
 			this.labelScale,
 		);
+
+		this.bindGraphEvents();
 	},
 
 	/** Change layout and refresh the graph */
@@ -96,6 +104,7 @@ Alpine.data("app", () => ({
 	/** Change renderer and refresh */
 	setRenderer(newRenderer: Renderer) {
 		this.renderer = newRenderer;
+		this.graph = undefined;
 	},
 
 	/** Switch between themes and refresh */

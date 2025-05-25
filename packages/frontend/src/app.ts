@@ -10,7 +10,7 @@ import {
 	type Renderer,
 	Renderers,
 	renderGraph,
-	setElementsStyle,
+	resetDim,
 	setNodeStyle,
 	type Theme,
 	Themes,
@@ -47,6 +47,10 @@ Alpine.data("app", () => ({
 			this.nodeSize,
 			this.labelScale,
 		);
+
+		this.$watch("renderer", () => {
+			void this.refresh();
+		});
 
 		// Event bindings
 		if (this.renderer === "cytoscape") {
@@ -92,7 +96,6 @@ Alpine.data("app", () => ({
 	/** Change renderer and refresh */
 	setRenderer(newRenderer: Renderer) {
 		this.renderer = newRenderer;
-		void this.refresh();
 	},
 
 	/** Switch between themes and refresh */
@@ -128,15 +131,13 @@ Alpine.data("app", () => ({
 	/** Show the details pane and dim other nodes */
 	openDetails() {
 		this.detailsOpen = true;
-		if (this.renderer === "cytoscape")
-			dimOthers(this.graph as Core, this.selected.id);
+		dimOthers(this.graph, this.selected.id);
 	},
 
 	/** Hide the details pane and restore styles */
 	closeDetails() {
 		this.detailsOpen = false;
-		if (this.renderer === "cytoscape")
-			setElementsStyle(this.graph as Core, { opacity: 1 });
+		resetDim(this.graph);
 	},
 
 	/** Toggle the details pane */

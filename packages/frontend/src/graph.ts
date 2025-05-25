@@ -181,11 +181,14 @@ export async function renderGraph(
 
 	if (error) throw new Error(`API error: ${error}`);
 
-	const nodes = data.nodes.map((n) => ({
+	const baseNodes = data.nodes.map((n) => ({
 		id: n.id,
 		label: n.title,
 		color: pickColor(n.id),
 	}));
+	const radius = nodeSize / 2;
+	const area = Math.PI * radius * radius;
+	const volume = (4 / 3) * Math.PI * radius * radius * radius;
 	const edgeColor = getCssVariable("--bs-secondary");
 	const edges = data.edges.map((e) => ({
 		source: e.source,
@@ -195,7 +198,7 @@ export async function renderGraph(
 
 	if (renderer === "cytoscape") {
 		const elements = [
-			...nodes.map((n) => ({ data: n })),
+			...baseNodes.map((n) => ({ data: n })),
 			...edges.map((e) => ({ data: e })),
 		];
 
@@ -246,25 +249,29 @@ export async function renderGraph(
 	}
 
 	if (renderer === "force-graph") {
+		const nodes = baseNodes.map((n) => ({ ...n, val: area }));
 		let fg = existingGraph as InstanceType<typeof ForceGraph> | undefined;
 		if (!fg) fg = new ForceGraph(container);
 		fg.nodeId("id")
 			.nodeLabel("label")
 			.nodeColor("color")
-			.nodeRelSize(nodeSize / 10)
+			.nodeVal("val")
+			.nodeRelSize(1)
 			.linkColor("color")
 			.linkWidth(1)
 			.graphData({ nodes, links: edges });
 		return fg;
 	}
 
+	const nodes = baseNodes.map((n) => ({ ...n, val: volume }));
 	let fg3d = existingGraph as InstanceType<typeof ForceGraph3D> | undefined;
 	if (!fg3d) fg3d = new ForceGraph3D(container);
 	fg3d
 		.nodeId("id")
 		.nodeLabel("label")
 		.nodeColor("color")
-		.nodeRelSize(nodeSize / 10)
+		.nodeVal("val")
+		.nodeRelSize(1)
 		.linkColor("color")
 		.linkWidth(1)
 		.graphData({ nodes, links: edges });

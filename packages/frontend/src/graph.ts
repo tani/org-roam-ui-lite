@@ -3,7 +3,7 @@ import cytoscape, { type Core, type LayoutOptions } from "cytoscape";
 import ForceGraph from "force-graph";
 import createClient from "openapi-fetch";
 import type { paths } from "./api.d.ts";
-import { getCssVariable, pickColor } from "./style.ts";
+import { alphaColor, getCssVariable, pickColor } from "./style.ts";
 
 const api = createClient<paths>();
 
@@ -39,17 +39,59 @@ export type Renderer = (typeof Renderers)[number]["value"];
 /**
  * Dim unrelated nodes and edges leaving the focused node opaque.
  *
- * @param graph - Cytoscape instance
+ * @param graph - Graph instance
  * @param focusId - Node id to highlight
  */
-export function dimOthers(graph: Core | undefined, focusId: string): void {
+export function dimOthers(
+	graph: GraphInstance | undefined,
+	focusId: string,
+): void {
 	if (!graph) return;
-	const focus = graph.$id(focusId);
-	const neighborhood = focus?.closedNeighborhood();
-	graph.elements().forEach((el) => {
-		const isNeighbor = neighborhood.has(el);
-		el.style("opacity", isNeighbor ? 1 : el.isNode() ? 0.15 : 0.05);
+
+	// Cytoscape graph handling
+	if (typeof (graph as Core).elements === "function") {
+		const cy = graph as Core;
+		const focus = cy.$id(focusId);
+		const neighborhood = focus?.closedNeighborhood();
+		cy.elements().forEach((el) => {
+			const isNeighbor = neighborhood.has(el);
+			el.style("opacity", isNeighbor ? 1 : el.isNode() ? 0.15 : 0.05);
+		});
+		return;
+	}
+
+	// Force graph handling
+	const fg = graph as
+		| InstanceType<typeof ForceGraph>
+		| InstanceType<typeof ForceGraph3D>;
+	const data = fg.graphData();
+	const neighbors = new Set<string>([focusId]);
+	// biome-ignore lint/suspicious/noExplicitAny: external library types
+	(data.links as any[]).forEach((l: any) => {
+		const s = typeof l.source === "object" ? l.source.id : l.source;
+		const t = typeof l.target === "object" ? l.target.id : l.target;
+		if (s === focusId) neighbors.add(String(t));
+		if (t === focusId) neighbors.add(String(s));
 	});
+	const edgeColor = getCssVariable("--bs-secondary");
+	// biome-ignore lint/suspicious/noExplicitAny: external library types
+	const fgAny = fg as any;
+	fgAny.nodeColor(
+		// biome-ignore lint/suspicious/noExplicitAny: library callback
+		(node: any) =>
+			neighbors.has(String(node.id))
+				? node.color
+				: alphaColor(node.color, 0.15),
+	);
+	fgAny.linkColor(
+		// biome-ignore lint/suspicious/noExplicitAny: library callback
+		(link: any) => {
+			const s = typeof link.source === "object" ? link.source.id : link.source;
+			const t = typeof link.target === "object" ? link.target.id : link.target;
+			const related = neighbors.has(String(s)) && neighbors.has(String(t));
+			return related ? edgeColor : alphaColor(edgeColor, 0.05);
+		},
+	);
 }
 
 /**
@@ -78,6 +120,27 @@ export function setNodeStyle(
 	style: Record<string, unknown>,
 ): void {
 	graph?.nodes().style(style);
+}
+
+/**
+ * Restore default opacity and colors for all graph elements.
+ *
+ * @param graph - Graph instance
+ */
+export function resetDim(graph: GraphInstance | undefined): void {
+	if (!graph) return;
+	if (typeof (graph as Core).elements === "function") {
+		setElementsStyle(graph as Core, { opacity: 1 });
+		return;
+	}
+	const fg = graph as
+		| InstanceType<typeof ForceGraph>
+		| InstanceType<typeof ForceGraph3D>;
+	const edgeColor = getCssVariable("--bs-secondary");
+	// biome-ignore lint/suspicious/noExplicitAny: external library types
+	const fgAny = fg as any;
+	fgAny.nodeColor("color");
+	fgAny.linkColor(edgeColor);
 }
 
 /**
@@ -123,7 +186,12 @@ export async function renderGraph(
 		label: n.title,
 		color: pickColor(n.id),
 	}));
-	const edges = data.edges.map((e) => ({ source: e.source, target: e.dest }));
+	const edgeColor = getCssVariable("--bs-secondary");
+	const edges = data.edges.map((e) => ({
+		source: e.source,
+		target: e.dest,
+		color: edgeColor,
+	}));
 
 	if (renderer === "cytoscape") {
 		const elements = [
@@ -184,6 +252,7 @@ export async function renderGraph(
 			.nodeLabel("label")
 			.nodeColor("color")
 			.nodeRelSize(nodeSize / 10)
+			.linkColor("color")
 			.linkWidth(1)
 			.graphData({ nodes, links: edges });
 		return fg;
@@ -196,6 +265,7 @@ export async function renderGraph(
 		.nodeLabel("label")
 		.nodeColor("color")
 		.nodeRelSize(nodeSize / 10)
+		.linkColor("color")
 		.linkWidth(1)
 		.graphData({ nodes, links: edges });
 	return fg3d;

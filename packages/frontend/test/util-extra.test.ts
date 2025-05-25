@@ -14,7 +14,7 @@ let mockForceGraph: ReturnType<typeof vi.fn>;
 vi.mock("force-graph", () => ({
 	default: class {
 		constructor(...args: unknown[]) {
-			mockForceGraph(...args);
+			Object.assign(this, mockForceGraph(...args));
 		}
 	},
 }));
@@ -23,7 +23,7 @@ let mockForceGraph3D: ReturnType<typeof vi.fn>;
 vi.mock("3d-force-graph", () => ({
 	default: class {
 		constructor(...args: unknown[]) {
-			mockForceGraph3D(...args);
+			Object.assign(this, mockForceGraph3D(...args));
 		}
 	},
 }));
@@ -128,6 +128,7 @@ describe("renderGraph", () => {
 			nodeLabel: vi.fn(() => fgInstance),
 			nodeColor: vi.fn(() => fgInstance),
 			nodeRelSize: vi.fn(() => fgInstance),
+			linkColor: vi.fn(() => fgInstance),
 			linkWidth: vi.fn(() => fgInstance),
 		};
 		mockForceGraph.mockReturnValue(fgInstance);
@@ -141,7 +142,7 @@ describe("renderGraph", () => {
 			1,
 		);
 		expect(mockForceGraph).toHaveBeenCalledWith(container);
-		expect(result).toBe(fgInstance);
+		expect(result).toEqual(fgInstance);
 	});
 
 	it("creates 3d-force-graph instance", async () => {
@@ -151,6 +152,7 @@ describe("renderGraph", () => {
 			nodeLabel: vi.fn(() => fgInstance),
 			nodeColor: vi.fn(() => fgInstance),
 			nodeRelSize: vi.fn(() => fgInstance),
+			linkColor: vi.fn(() => fgInstance),
 			linkWidth: vi.fn(() => fgInstance),
 		} as unknown as object;
 		mockForceGraph3D.mockReturnValue(fgInstance);
@@ -164,7 +166,7 @@ describe("renderGraph", () => {
 			1,
 		);
 		expect(mockForceGraph3D).toHaveBeenCalledWith(container);
-		expect(result).toBe(fgInstance);
+		expect(result).toEqual(fgInstance);
 	});
 });
 

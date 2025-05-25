@@ -10,6 +10,24 @@ vi.mock("cytoscape", () => ({
 	default: (...args: unknown[]) => mockCytoscape(...args),
 }));
 
+let mockForceGraph: ReturnType<typeof vi.fn>;
+vi.mock("force-graph", () => ({
+	default: class {
+		constructor(...args: unknown[]) {
+			mockForceGraph(...args);
+		}
+	},
+}));
+
+let mockForceGraph3D: ReturnType<typeof vi.fn>;
+vi.mock("3d-force-graph", () => ({
+	default: class {
+		constructor(...args: unknown[]) {
+			mockForceGraph3D(...args);
+		}
+	},
+}));
+
 vi.mock("../src/processor.ts", () => ({
 	createOrgHtmlProcessor: vi.fn(
 		() => (str: string) => Promise.resolve(`html:${str}`),
@@ -23,6 +41,8 @@ const NODE_ID = "11111111-1111-4111-8111-111111111111";
 
 mockGet = vi.fn();
 mockCytoscape = vi.fn();
+mockForceGraph = vi.fn();
+mockForceGraph3D = vi.fn();
 
 describe("dimOthers", () => {
 	it("sets opacity based on neighborhood", () => {
@@ -49,6 +69,8 @@ describe("renderGraph", () => {
 	const container = document.createElement("div");
 	beforeEach(() => {
 		mockCytoscape.mockReset();
+		mockForceGraph.mockReset();
+		mockForceGraph3D.mockReset();
 		mockGet.mockReset();
 	});
 
@@ -61,7 +83,14 @@ describe("renderGraph", () => {
 				edges: [],
 			},
 		});
-		const result = await renderGraph("cose", container, undefined, 10, 1);
+		const result = await renderGraph(
+			"cytoscape",
+			"cose",
+			container,
+			undefined,
+			10,
+			1,
+		);
 		expect(mockCytoscape).toHaveBeenCalled();
 		expect(result).toBe(cyInstance);
 	});
@@ -80,9 +109,62 @@ describe("renderGraph", () => {
 				edges: [],
 			},
 		});
-		const result = await renderGraph("fcose", container, existing, 5, 1);
+		const result = await renderGraph(
+			"cytoscape",
+			"fcose",
+			container,
+			existing,
+			5,
+			1,
+		);
 		expect(existing.batch).toHaveBeenCalled();
 		expect(result).toBe(existing);
+	});
+
+	it("creates force-graph instance", async () => {
+		const fgInstance = {
+			graphData: vi.fn(),
+			nodeId: vi.fn(() => fgInstance),
+			nodeLabel: vi.fn(() => fgInstance),
+			nodeColor: vi.fn(() => fgInstance),
+			nodeRelSize: vi.fn(() => fgInstance),
+			linkWidth: vi.fn(() => fgInstance),
+		};
+		mockForceGraph.mockReturnValue(fgInstance);
+		mockGet.mockResolvedValue({ data: { nodes: [], edges: [] } });
+		const result = await renderGraph(
+			"force-graph",
+			"cose",
+			container,
+			undefined,
+			5,
+			1,
+		);
+		expect(mockForceGraph).toHaveBeenCalledWith(container);
+		expect(result).toBe(fgInstance);
+	});
+
+	it("creates 3d-force-graph instance", async () => {
+		const fgInstance = {
+			graphData: vi.fn(),
+			nodeId: vi.fn(() => fgInstance),
+			nodeLabel: vi.fn(() => fgInstance),
+			nodeColor: vi.fn(() => fgInstance),
+			nodeRelSize: vi.fn(() => fgInstance),
+			linkWidth: vi.fn(() => fgInstance),
+		} as unknown as object;
+		mockForceGraph3D.mockReturnValue(fgInstance);
+		mockGet.mockResolvedValue({ data: { nodes: [], edges: [] } });
+		const result = await renderGraph(
+			"3d-force-graph",
+			"cose",
+			container,
+			undefined,
+			5,
+			1,
+		);
+		expect(mockForceGraph3D).toHaveBeenCalledWith(container);
+		expect(result).toBe(fgInstance);
 	});
 });
 

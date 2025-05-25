@@ -1,4 +1,6 @@
+import ForceGraph3D from "3d-force-graph";
 import cytoscape, { type Core, type LayoutOptions } from "cytoscape";
+import ForceGraph from "force-graph";
 import createClient from "openapi-fetch";
 import type { paths } from "./api.d.ts";
 import { getCssVariable, pickColor } from "./style.ts";
@@ -25,6 +27,14 @@ export const Themes = [
 ] as const;
 
 export type Theme = (typeof Themes)[number]["value"];
+
+export const Renderers = [
+	{ value: "cytoscape", label: "Cytoscape" },
+	{ value: "force-graph", label: "Force Graph" },
+	{ value: "3d-force-graph", label: "3D Force Graph" },
+] as const;
+
+export type Renderer = (typeof Renderers)[number]["value"];
 
 /**
  * Dim unrelated nodes and edges leaving the focused node opaque.
@@ -80,68 +90,113 @@ export function setNodeStyle(
  * @param labelScale - Font scale for node labels
  * @returns The created or updated Cytoscape instance
  */
+export type GraphInstance =
+	| Core
+	| InstanceType<typeof ForceGraph>
+	| InstanceType<typeof ForceGraph3D>;
+
+/**
+ * Initialize or update a graph based on selected renderer.
+ *
+ * @param renderer - Rendering library
+ * @param layoutName - Layout algorithm name (Cytoscape only)
+ * @param container - DOM element hosting the graph
+ * @param existingGraph - Previous graph instance
+ * @param nodeSize - Node diameter in pixels
+ * @param labelScale - Font scale for node labels
+ * @returns The created or updated graph instance
+ */
 export async function renderGraph(
+	renderer: Renderer,
 	layoutName: Layout,
 	container: HTMLElement,
-	existingGraph: Core | undefined,
+	existingGraph: GraphInstance | undefined,
 	nodeSize: number,
 	labelScale: number,
-): Promise<Core> {
+): Promise<GraphInstance> {
 	const { data, error } = await api.GET("/api/graph.json");
 
 	if (error) throw new Error(`API error: ${error}`);
 
-	const nodes = data.nodes;
-	const edges = data.edges;
+	const nodes = data.nodes.map((n) => ({
+		id: n.id,
+		label: n.title,
+		color: pickColor(n.id),
+	}));
+	const edges = data.edges.map((e) => ({ source: e.source, target: e.dest }));
 
-	const elements = [
-		...nodes.map((n) => ({
-			data: { id: n.id, label: n.title, color: pickColor(n.id) },
-		})),
-		...edges.map((e) => ({ data: { source: e.source, target: e.dest } })),
-	];
+	if (renderer === "cytoscape") {
+		const elements = [
+			...nodes.map((n) => ({ data: n })),
+			...edges.map((e) => ({ data: e })),
+		];
 
-	const style = [
-		{ selector: "edge", style: { width: 1 } },
-		{
-			selector: "node",
-			style: {
-				width: nodeSize,
-				height: nodeSize,
-				"font-size": `${labelScale}em`,
-				label: "data(label)",
-				"font-family": getCssVariable("--bs-font-sans-serif"),
-				color: getCssVariable("--bs-body-color"),
-				"background-color": "data(color)",
+		const style = [
+			{ selector: "edge", style: { width: 1 } },
+			{
+				selector: "node",
+				style: {
+					width: nodeSize,
+					height: nodeSize,
+					"font-size": `${labelScale}em`,
+					label: "data(label)",
+					"font-family": getCssVariable("--bs-font-sans-serif"),
+					color: getCssVariable("--bs-body-color"),
+					"background-color": "data(color)",
+				},
 			},
-		},
-	];
+		];
 
-	layoutName = layoutName === "fcose" ? "cose" : layoutName;
+		layoutName = layoutName === "fcose" ? "cose" : layoutName;
 
-	const layout = {
-		name: layoutName,
-		tile: false,
-		animate: "end",
-		animationDuration: 700,
-	} as LayoutOptions;
+		const layout = {
+			name: layoutName,
+			tile: false,
+			animate: "end",
+			animationDuration: 700,
+		} as LayoutOptions;
 
-	if (!existingGraph) {
-		const cy = cytoscape({
-			container,
-			elements,
-			layout,
-			minZoom: 0.5,
-			maxZoom: 4,
-			style,
+		const cy = existingGraph as Core | undefined;
+		if (!cy) {
+			const graph = cytoscape({
+				container,
+				elements,
+				layout,
+				minZoom: 0.5,
+				maxZoom: 4,
+				style,
+			});
+			return graph;
+		}
+		cy.batch(() => {
+			cy.elements().remove();
+			cy.add(elements);
+			cy.style(style);
+			cy.layout(layout).run();
 		});
 		return cy;
 	}
-	existingGraph.batch(() => {
-		existingGraph.elements().remove();
-		existingGraph.add(elements);
-		existingGraph.style(style);
-		existingGraph.layout(layout).run();
-	});
-	return existingGraph;
+
+	if (renderer === "force-graph") {
+		let fg = existingGraph as InstanceType<typeof ForceGraph> | undefined;
+		if (!fg) fg = new ForceGraph(container);
+		fg.nodeId("id")
+			.nodeLabel("label")
+			.nodeColor("color")
+			.nodeRelSize(nodeSize / 10)
+			.linkWidth(1)
+			.graphData({ nodes, links: edges });
+		return fg;
+	}
+
+	let fg3d = existingGraph as InstanceType<typeof ForceGraph3D> | undefined;
+	if (!fg3d) fg3d = new ForceGraph3D(container);
+	fg3d
+		.nodeId("id")
+		.nodeLabel("label")
+		.nodeColor("color")
+		.nodeRelSize(nodeSize / 10)
+		.linkWidth(1)
+		.graphData({ nodes, links: edges });
+	return fg3d;
 }

@@ -5,10 +5,10 @@ import { encodeBase64url } from "./base64url.ts";
 /**
  * Rewrite image src attributes to point to the resource API.
  *
- * @param id - Node identifier used in the URL
+ * @param nodeId - Node identifier used in the URL
  * @returns Transformer for the rehype pipeline
  */
-export default function rehypeImgSrcFix(id: string) {
+export default function rehypeImgSrcFix(nodeId: string): (tree: Root) => void {
 	return (tree: Root) => {
 		visit(tree, "element", (node: Element) => {
 			if (
@@ -16,22 +16,22 @@ export default function rehypeImgSrcFix(id: string) {
 				node.properties &&
 				typeof node.properties.src === "string"
 			) {
-				const src: string = node.properties.src;
+				const source: string = node.properties.src;
 				if (
-					src.startsWith("data:") ||
-					src.startsWith("http:") ||
-					src.startsWith("https:") ||
-					src.startsWith("//") ||
-					src.startsWith("/api/node/") ||
-					src.startsWith("#") ||
-					src.trim() === ""
+					source.startsWith("data:") ||
+					source.startsWith("http:") ||
+					source.startsWith("https:") ||
+					source.startsWith("//") ||
+					source.startsWith("/api/node/") ||
+					source.startsWith("#") ||
+					source.trim() === ""
 				) {
 					return;
 				}
-				const extname = src.replace(/^.*[.]/, ".");
-				const basename = src.replace(/[.][^.]*$/, "");
-				const encodedBasename = encodeBase64url(basename);
-				node.properties.src = `/api/node/${id}/${encodedBasename}${extname}`;
+				const extension = source.replace(/^.*[.]/, ".");
+				const baseName = source.replace(/[.][^.]*$/, "");
+				const encodedBaseName = encodeBase64url(baseName);
+				node.properties.src = `/api/node/${nodeId}/${encodedBaseName}${extension}`;
 			}
 		});
 	};

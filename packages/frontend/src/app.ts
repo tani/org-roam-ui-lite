@@ -82,8 +82,8 @@ Alpine.data("app", () => ({
 	},
 
 	/** Fetch and display details for NODE ID */
-	async openNode(id: string) {
-		const selected = await openNode(this.theme, id);
+	async openNode(nodeId: string) {
+		const selected = await openNode(this.theme, nodeId);
 		this.selected = selected;
 		this.openDetails();
 	},

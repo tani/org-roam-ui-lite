@@ -14,22 +14,22 @@ type Detect = {
 /**
  * Inspect the Org string and determine which processors are needed.
  *
- * @param org - Org source text
+ * @param orgContent - Org source text
  * @returns Flags indicating required plugins
  */
-function detect(org: string): Detect {
-	const langRe = /^#\+begin_src\s+(\S+)/gm;
-	const langs = new Set<string>();
-	let match = langRe.exec(org);
+function detect(orgContent: string): Detect {
+	const languageRegex = /^#\+begin_src\s+(\S+)/gm;
+	const languages = new Set<string>();
+	let match = languageRegex.exec(orgContent);
 	while (match) {
-		langs.add(match[1]);
-		match = langRe.exec(org);
+		languages.add(match[1]);
+		match = languageRegex.exec(orgContent);
 	}
 
 	return {
-		mermaid: /#\+begin_src\s+mermaid/i.test(org),
-		math: /\$[^\n$]+\$|\\\(|\\\[/m.test(org),
-		languages: [...langs],
+		mermaid: /#\+begin_src\s+mermaid/i.test(orgContent),
+		math: /\$[^\n$]+\$|\\\(|\\\[/m.test(orgContent),
+		languages: [...languages],
 	};
 }
 
@@ -39,33 +39,33 @@ type Process = (str: string) => Promise<string>;
  * Create a processor that converts Org markup to HTML.
  *
  * @param theme - Color theme
- * @param id - Node identifier used for resource links
+ * @param nodeId - Node identifier used for resource links
  * @returns Function that processes an Org string to HTML
  */
 export function createOrgHtmlProcessor<Theme extends string>(
 	theme: Theme,
-	id: string,
+	nodeId: string,
 ): Process {
-	return async (org: string) => {
+	return async (orgContent: string) => {
 		const { default: rehypeImgSrcFix } = await import(
 			"./rehype-img-src-fix.ts"
 		);
 		const { default: rehypeClassNames } = await import("rehype-class-names");
 
-		const info = detect(org);
+		const detected = detect(orgContent);
 
 		const processor = unified()
 			.use(uniorgParse)
 			.use(uniorgRehype)
 			.use(rehypeRaw)
-			.use(rehypeImgSrcFix, id);
+			.use(rehypeImgSrcFix, nodeId);
 
-		if (info.math) {
+		if (detected.math) {
 			const { default: rehypeMathJax } = await import("rehype-mathjax");
 			processor.use(rehypeMathJax);
 		}
 
-		if (info.mermaid) {
+		if (detected.mermaid) {
 			const mod = await import("rehype-mermaid");
 			const rehypeMermaid = mod.default;
 			processor.use(rehypeMermaid, {
@@ -74,7 +74,7 @@ export function createOrgHtmlProcessor<Theme extends string>(
 			} as RehypeMermaidOptions);
 		}
 
-		if (info.languages.length > 0) {
+		if (detected.languages.length > 0) {
 			const { transformerCopyButton } = await import(
 				"@rehype-pretty/transformers"
 			);
@@ -84,7 +84,7 @@ export function createOrgHtmlProcessor<Theme extends string>(
 				themes: [theme.endsWith("dark") ? "vitesse-dark" : "vitesse-light"],
 			});
 			await Promise.all(
-				info.languages.map(async (l) => {
+				detected.languages.map(async (l) => {
 					try {
 						await highlighter.loadLanguage(l as never);
 					} catch {
@@ -111,6 +111,6 @@ export function createOrgHtmlProcessor<Theme extends string>(
 			})
 			.use(rehypeStringify);
 
-		return String(await processor.process(org));
+		return String(await processor.process(orgContent));
 	};
 }

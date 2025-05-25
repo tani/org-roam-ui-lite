@@ -1,13 +1,13 @@
 import type { Core } from "cytoscape";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
-	getCssVar,
+	getCssVariable,
 	pickColor,
 	setElementsStyle,
 	setNodeStyle,
 } from "../src/util.ts";
 
-const ACCENT_VARS = [
+const ACCENT_VARIABLES = [
 	"--bs-blue",
 	"--bs-indigo",
 	"--bs-purple",
@@ -23,20 +23,20 @@ const ACCENT_VARS = [
 beforeEach(() => {
 	// reset styles before each test
 	const style = document.documentElement.style;
-	for (const name of ACCENT_VARS) style.removeProperty(name);
+	for (const name of ACCENT_VARIABLES) style.removeProperty(name);
 	style.removeProperty("--foo");
 });
 
-describe("getCssVar", () => {
+describe("getCssVariable", () => {
 	it("returns trimmed css variable", () => {
 		document.documentElement.style.setProperty("--foo", "  bar  ");
-		expect(getCssVar("--foo")).toBe("bar");
+		expect(getCssVariable("--foo")).toBe("bar");
 	});
 });
 
 describe("pickColor", () => {
 	beforeEach(() => {
-		ACCENT_VARS.forEach((name) => {
+		ACCENT_VARIABLES.forEach((name) => {
 			document.documentElement.style.setProperty(
 				name,
 				name.replace("--bs-", ""),

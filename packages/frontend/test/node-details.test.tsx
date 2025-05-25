@@ -62,5 +62,6 @@ describe("NodeDetails interaction", () => {
 		expect(util.setElementsStyle).toHaveBeenCalledWith(expect.anything(), {
 			opacity: 1,
 		});
+		expect(util.renderGraph).toHaveBeenCalledTimes(1);
 	});
 });

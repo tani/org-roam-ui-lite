@@ -1,8 +1,48 @@
-/* グラフを全画面に表示 */
 @import url("./themes.css");
 @import url("./code.css");
 @import url("bootstrap/dist/css/bootstrap.min.css");
 @import url("bootstrap-icons/font/bootstrap-icons.css");
+@import url("@fontsource/noto-color-emoji");
+@import url("@fontsource-variable/noto-sans");
+@import url("@fontsource-variable/noto-sans-jp");
+@import url("@fontsource-variable/noto-sans-kr");
+@import url("@fontsource-variable/noto-sans-sc");
+@import url("@fontsource-variable/noto-sans-tc");
+@import url("@fontsource-variable/noto-sans-mono");
+
+:root {
+	--bs-font-monospace: "Noto Sans Mono Variable", /* Japanese */
+		"Noto Sans JP Variable", /* Korean */ "Noto Sans KR Variable", /* Traditional Chinese (繁体字) */
+		"Noto Sans TC Variable", /* Simplified Chinese (簡体字) */
+		"Noto Sans SC Variable", /* fallback */ monospace, /* Emoji */
+		"Noto Color Emoji";
+	--bs-font-sans-serif: "Noto Sans Variable", /* Japanese */
+		"Noto Sans JP Variable", /* Korean */ "Noto Sans KR Variable", /* Traditional Chinese (繁体字) */
+		"Noto Sans TC Variable", /* Simplified Chinese (簡体字) */
+		"Noto Sans SC Variable", /* fallback */ sans-serif, /* Emoji */
+		"Noto Color Emoji";
+	--h-scale-ratio: 1.08;
+	--h-base-size: 1rem;
+}
+
+h1 {
+	font-size: calc(var(--h-base-size) * pow(var(--h-scale-ratio), 5));
+}
+h2 {
+	font-size: calc(var(--h-base-size) * pow(var(--h-scale-ratio), 4));
+}
+h3 {
+	font-size: calc(var(--h-base-size) * pow(var(--h-scale-ratio), 3));
+}
+h4 {
+	font-size: calc(var(--h-base-size) * pow(var(--h-scale-ratio), 2));
+}
+h5 {
+	font-size: calc(var(--h-base-size) * pow(var(--h-scale-ratio), 1));
+}
+h6 {
+	font-size: calc(var(--h-base-size) * pow(var(--h-scale-ratio), 0));
+}
 
 body,
 html {

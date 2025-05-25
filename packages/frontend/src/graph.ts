@@ -110,6 +110,7 @@ export async function renderGraph(
 				height: nodeSize,
 				"font-size": `${labelScale}em`,
 				label: "data(label)",
+				"font-family": getCssVariable("--bs-font-sans-serif"),
 				color: getCssVariable("--bs-body-color"),
 				"background-color": "data(color)",
 			},

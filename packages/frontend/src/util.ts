@@ -1,7 +1,7 @@
 import type { LayoutOptions } from "cytoscape";
 import cytoscape, { type Core } from "cytoscape";
 import createClient from "openapi-fetch";
-import type { paths } from "./api.d.ts";
+import type { components, paths } from "./api.d.ts";
 
 const api = createClient<paths>();
 
@@ -27,7 +27,12 @@ export const Themes = [
 export type Theme = (typeof Themes)[number]["value"];
 
 // --- Utility Functions ---
-/** Read CSS variable value */
+/**
+ * Read a CSS variable value.
+ *
+ * @param name - CSS custom property name
+ * @returns Resolved value
+ */
 export function getCssVar(name: string): string {
 	return getComputedStyle(document.documentElement)
 		.getPropertyValue(name)
@@ -47,14 +52,24 @@ const ACCENT_VARS = [
 	"--bs-cyan",
 ] as const;
 
-/** Deterministic color picker based on id key */
+/**
+ * Deterministically pick a color based on a string key.
+ *
+ * @param key - String used for color selection
+ * @returns CSS variable value
+ */
 export function pickColor(key: string): string {
 	let sum = 0;
 	for (const ch of key) sum = (sum + ch.charCodeAt(0)) % ACCENT_VARS.length;
 	return getCssVar(ACCENT_VARS[sum]);
 }
 
-/** Dim unrelated nodes/edges */
+/**
+ * Dim unrelated nodes and edges leaving the focused node opaque.
+ *
+ * @param graph - Cytoscape instance
+ * @param focusId - Node id to highlight
+ */
 export function dimOthers(graph: Core | undefined, focusId: string): void {
 	if (graph) {
 		const focus = graph.$id(focusId);
@@ -66,6 +81,12 @@ export function dimOthers(graph: Core | undefined, focusId: string): void {
 	}
 }
 
+/**
+ * Apply style properties to all elements in the graph.
+ *
+ * @param graph - Cytoscape instance
+ * @param style - CSS properties to apply
+ */
 export function setElementsStyle(
 	graph: Core | undefined,
 	style: Record<string, unknown>,
@@ -75,6 +96,12 @@ export function setElementsStyle(
 	}
 }
 
+/**
+ * Apply style properties to all nodes in the graph.
+ *
+ * @param graph - Cytoscape instance
+ * @param style - CSS properties to apply
+ */
 export function setNodeStyle(
 	graph: Core | undefined,
 	style: Record<string, unknown>,
@@ -82,7 +109,16 @@ export function setNodeStyle(
 	graph?.nodes().style(style);
 }
 
-/** Initialize or update the Cytoscape graph */
+/**
+ * Initialize or update the Cytoscape graph.
+ *
+ * @param layoutName - Layout algorithm name
+ * @param container - DOM element hosting the graph
+ * @param existingGraph - Previous Cytoscape instance
+ * @param nodeSize - Node diameter in pixels
+ * @param labelScale - Font scale for node labels
+ * @returns The created or updated Cytoscape instance
+ */
 export async function renderGraph(
 	layoutName: Layout,
 	container: HTMLElement,
@@ -153,7 +189,17 @@ export async function renderGraph(
 	return existingGraph;
 }
 
-export async function openNode(theme: Theme, id: string) {
+/**
+ * Fetch a single node and convert its Org content to HTML.
+ *
+ * @param theme - Color theme
+ * @param id - Node identifier
+ * @returns Node information with rendered HTML
+ */
+export async function openNode(
+	theme: Theme,
+	id: string,
+): Promise<components["schemas"]["Node"] & { html: string }> {
 	const { data, error } = await api.GET("/api/node/{id}.json", {
 		params: { path: { id } },
 	});

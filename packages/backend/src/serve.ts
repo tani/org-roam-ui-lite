@@ -8,7 +8,13 @@ import { Hono } from "hono";
 import { lookup } from "mime-types";
 import { graph, node, resource } from "./query.ts";
 
-export async function serve(db_path: string, port: number) {
+/**
+ * Start the HTTP server serving the front-end and API.
+ *
+ * @param db_path - Path to the database
+ * @param port - TCP port to listen on
+ */
+export async function serve(db_path: string, port: number): Promise<void> {
 	const frontendDistPath = path.relative(
 		process.cwd(),
 		path.join(import.meta.dirname ?? "", "../../frontend/dist"),
@@ -16,7 +22,7 @@ export async function serve(db_path: string, port: number) {
 
 	const app = new Hono();
 
-	/* 静的ファイル (static/) */
+	/* Static files (frontend) */
 	app.use(
 		"/*",
 		serveStatic({
@@ -24,13 +30,13 @@ export async function serve(db_path: string, port: number) {
 		}),
 	);
 
-	/* ノード & エッジ一覧 */
+	/* Node and edge list */
 	app.get("/api/graph.json", async (c) => {
 		const [statusCode, response] = await graph(db_path);
 		return c.json(response.content["application/json"], statusCode);
 	});
 
-	/* ノード詳細 + Org ソース */
+	/* Node details including Org source */
 	app.get("/api/node/:id", async (c) => {
 		const id = c.req.param("id").replace(/\.json$/, "");
 		const [statusCode, response] = await node(db_path, id);

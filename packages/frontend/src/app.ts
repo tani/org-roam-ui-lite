@@ -31,6 +31,7 @@ Alpine.data("app", () => ({
 	settingsOpen: false,
 	detailsOpen: false,
 
+	/** Initialize the application and render the graph */
 	async init() {
 		// Initial graph render
 		this.graph = await renderGraph(
@@ -47,7 +48,7 @@ Alpine.data("app", () => ({
 		});
 	},
 
-	// Refresh graph with current settings
+	/** Re-render the graph with current settings */
 	async refresh() {
 		this.graph = await renderGraph(
 			this.layout,
@@ -58,47 +59,53 @@ Alpine.data("app", () => ({
 		);
 	},
 
+	/** Change layout and refresh the graph */
 	setLayout(newLayout: Layout) {
 		this.layout = newLayout;
 		void this.refresh();
 	},
 
-	// Toggle between dark/light theme
+	/** Switch between themes and refresh */
 	setTheme(newTheme: Theme) {
 		this.theme = newTheme;
 		void this.refresh();
 	},
 
-	// Called when node size slider changes
+	/** Adjust node size in the graph */
 	onSizeChange() {
 		setNodeStyle(this.graph, { width: this.nodeSize, height: this.nodeSize });
 	},
 
-	// Called when label scale slider changes
+	/** Adjust label scale in the graph */
 	onScaleChange() {
 		setNodeStyle(this.graph, { "font-size": `${this.labelScale}em` });
 	},
 
+	/** Fetch and display details for NODE ID */
 	async openNode(id: string) {
 		const selected = await openNode(this.theme, id);
 		this.selected = selected;
 		this.openDetails();
 	},
 
+	/** Show the details pane and dim other nodes */
 	openDetails() {
 		this.detailsOpen = true;
 		dimOthers(this.graph, this.selected.id);
 	},
 
+	/** Hide the details pane and restore styles */
 	closeDetails() {
 		this.detailsOpen = false;
 		setElementsStyle(this.graph, { opacity: 1 });
 	},
 
+	/** Toggle the details pane */
 	toggleDetails() {
 		this.detailsOpen ? this.closeDetails() : this.openDetails();
 	},
 
+	/** Toggle the settings pane */
 	toggleSettings() {
 		this.settingsOpen = !this.settingsOpen;
 	},

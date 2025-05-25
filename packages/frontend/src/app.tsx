@@ -38,6 +38,11 @@ function GraphView({
 }) {
 	const containerRef = useRef<HTMLDivElement>(null);
 	const graphRef = useRef<Core | undefined>(undefined);
+	const onOpenNodeRef = useRef(onOpenNode);
+
+	useEffect(() => {
+		onOpenNodeRef.current = onOpenNode;
+	}, [onOpenNode]);
 
 	useEffect(() => {
 		const container = containerRef.current;
@@ -53,13 +58,13 @@ function GraphView({
 			if (!mounted) return;
 			graphRef.current = g;
 			g.off("tap");
-			g.on("tap", "node", ({ target }) => onOpenNode(target.id()));
+			g.on("tap", "node", ({ target }) => onOpenNodeRef.current(target.id()));
 			onGraphReady(g);
 		});
 		return () => {
 			mounted = false;
 		};
-	}, [layout, nodeSize, labelScale, onOpenNode, onGraphReady]);
+	}, [layout, nodeSize, labelScale, onGraphReady]);
 
 	return <div ref={containerRef} id="graph" className="h-100 w-100"></div>;
 }

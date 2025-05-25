@@ -1,10 +1,11 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom/vitest";
-import { beforeAll, describe, expect, it, vi } from "vitest";
-import { App } from "../src/app.tsx";
+import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import * as util from "../src/util.ts";
 
-beforeAll(() => {
+let App: typeof import("../src/app.tsx").App;
+
+beforeAll(async () => {
 	Object.defineProperty(globalThis, "matchMedia", {
 		writable: true,
 		value: vi.fn().mockReturnValue({
@@ -15,9 +16,11 @@ beforeAll(() => {
 			removeEventListener: vi.fn(),
 		}),
 	});
+	({ App } = await import("../src/app.tsx"));
 });
 
-vi.spyOn(util, "renderGraph").mockResolvedValue({
+const renderGraphSpy = vi.spyOn(util, "renderGraph");
+renderGraphSpy.mockResolvedValue({
 	on: vi.fn(),
 	off: vi.fn(),
 } as unknown as import("cytoscape").Core);
@@ -28,6 +31,10 @@ vi.spyOn(util, "setElementsStyle").mockImplementation(() => {});
 const openNodeSpy = vi.spyOn(util, "openNode");
 
 describe("NodeDetails interaction", () => {
+	beforeEach(() => {
+		renderGraphSpy.mockClear();
+	});
+
 	it("follows backlink and resets styles", async () => {
 		openNodeSpy
 			.mockResolvedValueOnce({
@@ -62,6 +69,6 @@ describe("NodeDetails interaction", () => {
 		expect(util.setElementsStyle).toHaveBeenCalledWith(expect.anything(), {
 			opacity: 1,
 		});
-		expect(util.renderGraph).toHaveBeenCalledTimes(1);
+		expect(renderGraphSpy).toHaveBeenCalledTimes(2);
 	});
 });

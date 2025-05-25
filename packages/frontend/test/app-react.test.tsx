@@ -1,11 +1,12 @@
 import { render, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom/vitest";
 import { beforeAll, describe, expect, it, vi } from "vitest";
-import { App } from "../src/app.tsx";
 import * as util from "../src/util.ts";
 
+let App: typeof import("../src/app.tsx").App;
+
 describe("App router integration", () => {
-	beforeAll(() => {
+	beforeAll(async () => {
 		Object.defineProperty(globalThis, "matchMedia", {
 			writable: true,
 			value: vi.fn().mockReturnValue({
@@ -16,6 +17,7 @@ describe("App router integration", () => {
 				removeEventListener: vi.fn(),
 			}),
 		});
+		({ App } = await import("../src/app.tsx"));
 	});
 	vi.spyOn(util, "renderGraph").mockResolvedValue({
 		on: vi.fn(),

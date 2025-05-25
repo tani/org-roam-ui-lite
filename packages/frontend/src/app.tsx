@@ -1,5 +1,5 @@
 import type { Core } from "cytoscape";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Button, Form, Offcanvas } from "react-bootstrap";
 import { createRoot } from "react-dom/client";
 import {
@@ -21,18 +21,28 @@ import {
 	Themes,
 } from "./util.ts";
 
+const defaultTheme: Theme = matchMedia("(prefers-color-scheme: dark)").matches
+	? "dark"
+	: "light";
+
+if (typeof document !== "undefined") {
+	document.documentElement.setAttribute("data-theme", defaultTheme);
+	document.documentElement.setAttribute(
+		"data-bs-theme",
+		defaultTheme.replace(/.*-/, ""),
+	);
+}
+
 type NodeData = components["schemas"]["Node"] & { html?: string };
 
 function GraphView({
 	layout,
-	theme,
 	nodeSize,
 	labelScale,
 	onOpenNode,
 	onGraphReady,
 }: {
 	layout: Layout;
-	theme: Theme;
 	nodeSize: number;
 	labelScale: number;
 	onOpenNode: (id: string) => void;
@@ -40,14 +50,8 @@ function GraphView({
 }) {
 	const containerRef = useRef<HTMLDivElement>(null);
 	const graphRef = useRef<Core | undefined>(undefined);
-	const onOpenNodeRef = useRef(onOpenNode);
 
 	useEffect(() => {
-		onOpenNodeRef.current = onOpenNode;
-	}, [onOpenNode]);
-
-	useEffect(() => {
-		const _theme = theme;
 		const container = containerRef.current;
 		if (!container) return;
 		let mounted = true;
@@ -61,47 +65,31 @@ function GraphView({
 			if (!mounted) return;
 			graphRef.current = g;
 			g.off("tap");
-			g.on("tap", "node", ({ target }) => onOpenNodeRef.current(target.id()));
+			g.on("tap", "node", ({ target }) => onOpenNode(target.id()));
 			onGraphReady(g);
 		});
 		return () => {
 			mounted = false;
 		};
-	}, [layout, nodeSize, labelScale, onGraphReady, theme]);
+	}, [layout, nodeSize, labelScale, onGraphReady, onOpenNode]);
 
 	return <div ref={containerRef} id="graph" className="h-100 w-100"></div>;
 }
 
 function NodeDetails({
-	id,
-	theme,
+	node,
+	show,
 	onClose,
 	onOpenNode,
-	graph,
 }: {
-	id?: string;
-	theme: Theme;
+	node: NodeData | null;
+	show: boolean;
 	onClose: () => void;
 	onOpenNode: (id: string) => void;
-	graph: Core | undefined;
 }) {
-	const [node, setNode] = useState<NodeData | null>(null);
-	useEffect(() => {
-		if (!id) return;
-		void openNode(theme, id).then((n) => setNode(n));
-	}, [id, theme]);
-
-	useEffect(() => {
-		if (!id) return;
-		dimOthers(graph, id);
-		return () => {
-			setElementsStyle(graph, { opacity: 1 });
-		};
-	}, [id, graph]);
-
 	return (
 		<Offcanvas
-			show={Boolean(id)}
+			show={show}
 			onHide={onClose}
 			placement="end"
 			className="responsive-wide"
@@ -221,9 +209,7 @@ function Settings({
 }
 
 function Main() {
-	const [theme, setTheme] = useState<Theme>(
-		matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light",
-	);
+	const [theme, setThemeState] = useState<Theme>(defaultTheme);
 	const [layout, setLayout] = useState<Layout>("cose");
 	const [nodeSize, setNodeSize] = useState(10);
 	const [labelScale, setLabelScale] = useState(0.5);
@@ -232,25 +218,45 @@ function Main() {
 	const navigate = useNavigate();
 	const { id } = useParams<{ id?: string }>();
 	const openNodes = useRef<string[]>([]);
+	const [node, setNode] = useState<NodeData | null>(null);
 
-	useEffect(() => {
-		if (id && !openNodes.current.includes(id)) openNodes.current.push(id);
-	}, [id]);
-
-	useEffect(() => {
-		document.documentElement.setAttribute("data-theme", theme);
+	const setTheme = useCallback((t: Theme) => {
+		setThemeState(t);
+		document.documentElement.setAttribute("data-theme", t);
 		document.documentElement.setAttribute(
 			"data-bs-theme",
-			theme.replace(/.*-/, ""),
+			t.replace(/.*-/, ""),
 		);
-	}, [theme]);
+	}, []);
 
-	const handleOpenNode = (nodeId: string) => navigate(`/node/${nodeId}`);
+	const handleOpenNode = useCallback(
+		(nodeId: string) => {
+			if (!openNodes.current.includes(nodeId)) openNodes.current.push(nodeId);
+			navigate(`/node/${nodeId}`);
+		},
+		[navigate],
+	);
+
+	useEffect(() => {
+		if (!id || !graph) {
+			setNode(null);
+			return;
+		}
+		if (!openNodes.current.includes(id)) openNodes.current.push(id);
+		dimOthers(graph, id);
+		let active = true;
+		void openNode(theme, id).then((n) => {
+			if (active) setNode(n);
+		});
+		return () => {
+			active = false;
+			setElementsStyle(graph, { opacity: 1 });
+		};
+	}, [id, theme, graph]);
 
 	return (
 		<>
 			<GraphView
-				theme={theme}
 				layout={layout}
 				nodeSize={nodeSize}
 				labelScale={labelScale}
@@ -277,9 +283,8 @@ function Main() {
 				setLabelScale={setLabelScale}
 			/>
 			<NodeDetails
-				id={id}
-				theme={theme}
-				graph={graph}
+				node={node}
+				show={Boolean(id)}
 				onClose={() => navigate("/")}
 				onOpenNode={handleOpenNode}
 			/>

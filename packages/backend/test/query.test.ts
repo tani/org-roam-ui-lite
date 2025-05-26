@@ -10,6 +10,8 @@ vi.mock("node:fs/promises", () => ({
 const NODE_ID = "11111111-1111-4111-8111-111111111111";
 const NODE_ID_2 = "22222222-2222-4222-8222-222222222222";
 
+let makeNodeDbCalled = false;
+
 function makeGraphDb() {
 	let call = 0;
 	return {
@@ -42,8 +44,8 @@ function makeNodeDb(row: { id: string; title: string; file: string }) {
 					innerJoin: vi.fn(() => second),
 					where: vi.fn(() => [{ source: "2", title: "back" }]),
 				};
-				if (!makeNodeDb.called) {
-					makeNodeDb.called = true;
+				if (!makeNodeDbCalled) {
+					makeNodeDbCalled = true;
 					return first;
 				}
 				return second;
@@ -51,7 +53,6 @@ function makeNodeDb(row: { id: string; title: string; file: string }) {
 		})),
 	};
 }
-makeNodeDb.called = false as unknown as boolean;
 
 function makeResourceDb(row: { id: string; title: string; file: string }) {
 	return {
@@ -96,7 +97,7 @@ describe("fetchGraph", () => {
 describe("fetchNode", () => {
 	it("returns node with backlinks and raw", async () => {
 		mockReadFile.mockResolvedValue("ORG");
-		makeNodeDb.called = false;
+		makeNodeDbCalled = false;
 		mockCreateDatabase.mockResolvedValue(
 			makeNodeDb({ id: NODE_ID, title: "t", file: "/tmp/a" }),
 		);

@@ -108,9 +108,10 @@ function bindGraphEvents(): void {
 			void openNodeAction(target.id());
 		});
 	} else {
-		const fg = graph.value as unknown as {
-			onNodeClick: (cb: (node: { id: string }) => void) => void;
-		};
+		interface ClickableGraph {
+			onNodeClick(cb: (node: { id: string }) => void): void;
+		}
+		const fg = graph.value as ClickableGraph;
 		fg.onNodeClick((node: { id: string }) => {
 			void openNodeAction(node.id);
 		});

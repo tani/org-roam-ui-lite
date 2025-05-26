@@ -8,13 +8,7 @@
 	},
 	"dependencies": {
 		"@alpinejs/persist": "^3.14.9",
-		"@fontsource-variable/noto-sans": "^5.2.7",
-		"@fontsource-variable/noto-sans-jp": "^5.2.5",
-		"@fontsource-variable/noto-sans-kr": "^5.2.5",
-		"@fontsource-variable/noto-sans-mono": "^5.2.7",
-		"@fontsource-variable/noto-sans-sc": "^5.2.5",
-		"@fontsource-variable/noto-sans-tc": "^5.2.5",
-		"@fontsource/noto-color-emoji": "^5.2.7",
+
 		"@rehype-pretty/transformers": "^0.13.2",
 		"3d-force-graph": "^1.77.0",
 		"alpinejs": "^3.14.9",

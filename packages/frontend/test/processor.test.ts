@@ -1,24 +1,36 @@
 import { describe, expect, it, vi } from "vitest";
 import { renderToString } from "vue/server-renderer";
 
-const mockMermaid = vi.fn((..._args: unknown[]) => () => {});
+const mockMermaid = vi.fn((...args: unknown[]) => {
+  void args;
+  return () => {};
+});
 vi.mock("rehype-mermaid", () => ({
   default: (...args: unknown[]) => mockMermaid(...args),
 }));
-const mockPrettyCode = vi.fn((..._args: unknown[]) => () => {});
+const mockPrettyCode = vi.fn((...args: unknown[]) => {
+  void args;
+  return () => {};
+});
 vi.mock("rehype-pretty-code", () => ({
   default: (...args: unknown[]) => mockPrettyCode(...args),
 }));
-const mockMathJax = vi.fn((..._args: unknown[]) => () => {});
+const mockMathJax = vi.fn((...args: unknown[]) => {
+  void args;
+  return () => {};
+});
 vi.mock("rehype-mathjax", () => ({
   default: (...args: unknown[]) => mockMathJax(...args),
 }));
 const mockLoadLanguage = vi.fn(() => Promise.resolve());
-const mockGetHighlighter = vi.fn(async (..._args: unknown[]) => ({
-  loadLanguage: mockLoadLanguage,
-  codeToHtml: () => "",
-  getTheme: () => ({ settings: [] }),
-}));
+const mockGetHighlighter = vi.fn(async (...args: unknown[]) => {
+  void args;
+  return {
+    loadLanguage: mockLoadLanguage,
+    codeToHtml: () => "",
+    getTheme: () => ({ settings: [] }),
+  };
+});
 vi.mock("shiki", () => ({
   getSingletonHighlighter: (...args: unknown[]) => mockGetHighlighter(...args),
 }));

@@ -209,7 +209,11 @@ function closeDetails(): void {
 
 /** Toggle the details pane. */
 function toggleDetails(): void {
-  detailsOpen.value ? closeDetails() : openDetails();
+  if (detailsOpen.value) {
+    closeDetails();
+  } else {
+    openDetails();
+  }
 }
 
 /** Toggle the settings pane. */

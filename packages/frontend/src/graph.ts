@@ -1,6 +1,6 @@
-import ForceGraph3D from "3d-force-graph";
+import ForceGraph3D, { type ForceGraph3DInstance } from "3d-force-graph";
 import cytoscape, { type Core, type LayoutOptions } from "cytoscape";
-import ForceGraph from "force-graph";
+import ForceGraph, { type LinkObject, type NodeObject } from "force-graph";
 import createClient from "openapi-fetch";
 import type { paths } from "./api.d.ts";
 import { alphaColor, getCssVariable, pickColor } from "./style.ts";
@@ -36,6 +36,16 @@ export const Renderers = [
 
 export type Renderer = (typeof Renderers)[number]["value"];
 
+export interface GraphNode extends NodeObject {
+	id: string;
+	label: string;
+	color: string;
+}
+
+export interface GraphLink extends LinkObject<GraphNode> {
+	color: string;
+}
+
 /**
  * Dim unrelated nodes and edges leaving the focused node opaque.
  *
@@ -62,36 +72,25 @@ export function dimOthers(
 
 	// Force graph handling
 	const fg = graph as
-		| InstanceType<typeof ForceGraph>
-		| InstanceType<typeof ForceGraph3D>;
+		| ForceGraph<GraphNode, GraphLink>
+		| ForceGraph3DInstance<GraphNode, GraphLink>;
 	const data = fg.graphData();
 	const neighbors = new Set<string>([focusId]);
-	// biome-ignore lint/suspicious/noExplicitAny: external library types
-	(data.links as any[]).forEach((l: any) => {
+	data.links.forEach((l) => {
 		const s = typeof l.source === "object" ? l.source.id : l.source;
 		const t = typeof l.target === "object" ? l.target.id : l.target;
-		if (s === focusId) neighbors.add(String(t));
-		if (t === focusId) neighbors.add(String(s));
+		if (String(s) === focusId) neighbors.add(String(t));
+		if (String(t) === focusId) neighbors.add(String(s));
 	});
-	const edgeColor = getCssVariable("--bs-secondary");
-	// biome-ignore lint/suspicious/noExplicitAny: external library types
-	const fgAny = fg as any;
-	fgAny.nodeColor(
-		// biome-ignore lint/suspicious/noExplicitAny: library callback
-		(node: any) =>
-			neighbors.has(String(node.id))
-				? node.color
-				: alphaColor(node.color, 0.15),
+	fg.nodeColor((node: GraphNode) =>
+		neighbors.has(String(node.id)) ? node.color : alphaColor(node.color, 0.15),
 	);
-	fgAny.linkColor(
-		// biome-ignore lint/suspicious/noExplicitAny: library callback
-		(link: any) => {
-			const s = typeof link.source === "object" ? link.source.id : link.source;
-			const t = typeof link.target === "object" ? link.target.id : link.target;
-			const related = neighbors.has(String(s)) && neighbors.has(String(t));
-			return related ? edgeColor : alphaColor(edgeColor, 0.1);
-		},
-	);
+	fg.linkColor((link: GraphLink) => {
+		const s = typeof link.source === "object" ? link.source.id : link.source;
+		const t = typeof link.target === "object" ? link.target.id : link.target;
+		const related = neighbors.has(String(s)) && neighbors.has(String(t));
+		return related ? link.color : alphaColor(link.color, 0.05);
+	});
 }
 
 /**
@@ -134,13 +133,10 @@ export function resetDim(graph: GraphInstance | undefined): void {
 		return;
 	}
 	const fg = graph as
-		| InstanceType<typeof ForceGraph>
-		| InstanceType<typeof ForceGraph3D>;
-	const edgeColor = getCssVariable("--bs-secondary");
-	// biome-ignore lint/suspicious/noExplicitAny: external library types
-	const fgAny = fg as any;
-	fgAny.nodeColor("color");
-	fgAny.linkColor(edgeColor);
+		| ForceGraph<GraphNode, GraphLink>
+		| ForceGraph3DInstance<GraphNode, GraphLink>;
+	fg.nodeColor("color");
+	fg.linkColor("color");
 }
 
 /**
@@ -155,8 +151,8 @@ export function resetDim(graph: GraphInstance | undefined): void {
  */
 export type GraphInstance =
 	| Core
-	| InstanceType<typeof ForceGraph>
-	| InstanceType<typeof ForceGraph3D>;
+	| ForceGraph<GraphNode, GraphLink>
+	| ForceGraph3DInstance<GraphNode, GraphLink>;
 
 /**
  * Initialize or update a graph based on selected renderer.
@@ -181,7 +177,7 @@ export async function renderGraph(
 
 	if (error) throw new Error(`API error: ${error}`);
 
-	const baseNodes = data.nodes.map((n) => ({
+	const baseNodes: GraphNode[] = data.nodes.map((n) => ({
 		id: n.id,
 		label: n.title,
 		color: pickColor(n.id),
@@ -190,7 +186,7 @@ export async function renderGraph(
 	const area = Math.PI * radius * radius;
 	const volume = (4 / 3) * Math.PI * radius * radius * radius;
 	const edgeColor = getCssVariable("--bs-secondary");
-	const edges = data.edges.map((e) => ({
+	const edges: GraphLink[] = data.edges.map((e) => ({
 		source: e.source,
 		target: e.dest,
 		color: edgeColor,
@@ -250,8 +246,8 @@ export async function renderGraph(
 
 	if (renderer === "force-graph") {
 		const nodes = baseNodes.map((n) => ({ ...n, val: area }));
-		let fg = existingGraph as InstanceType<typeof ForceGraph> | undefined;
-		if (!fg) fg = new ForceGraph(container);
+		let fg = existingGraph as ForceGraph<GraphNode, GraphLink> | undefined;
+		if (!fg) fg = new ForceGraph<GraphNode, GraphLink>(container);
 		fg.nodeId("id")
 			.nodeLabel("label")
 			.nodeColor("color")
@@ -264,8 +260,14 @@ export async function renderGraph(
 	}
 
 	const nodes = baseNodes.map((n) => ({ ...n, val: volume }));
-	let fg3d = existingGraph as InstanceType<typeof ForceGraph3D> | undefined;
-	if (!fg3d) fg3d = new ForceGraph3D(container);
+	let fg3d = existingGraph as
+		| ForceGraph3DInstance<GraphNode, GraphLink>
+		| undefined;
+	if (!fg3d)
+		fg3d = new ForceGraph3D(container) as unknown as ForceGraph3DInstance<
+			GraphNode,
+			GraphLink
+		>;
 	fg3d
 		.nodeId("id")
 		.nodeLabel("label")

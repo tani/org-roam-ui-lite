@@ -43,6 +43,7 @@ import {
 } from "../src/graph.ts";
 import type { Layout } from "../src/graph-types.ts";
 import { openNode } from "../src/node.ts";
+import { alphaColor } from "../src/style.ts";
 
 const NODE_ID = "11111111-1111-4111-8111-111111111111";
 
@@ -60,6 +61,31 @@ describe("highlightNeighborhood", () => {
 		expect(node1.style).toHaveBeenCalledWith("opacity", 1);
 		expect(edge.style).toHaveBeenCalledWith("opacity", 1);
 		expect(node2.style).toHaveBeenCalledWith("opacity", 0.15);
+	});
+
+	it("sets colors for force-graph", () => {
+		const nodeColor = vi.fn();
+		const linkColor = vi.fn();
+		const graph = {
+			graphData: vi.fn(() => ({
+				links: [
+					{ source: "id", target: "b", color: "#1" },
+					{ source: "b", target: "c", color: "#2" },
+				],
+			})),
+			nodeColor,
+			linkColor,
+		} as unknown as GraphInstance;
+		highlightNeighborhood(graph, "id");
+		const nodeFn = nodeColor.mock.calls[0][0];
+		expect(nodeFn({ id: "id", color: "#a" })).toBe("#a");
+		expect(nodeFn({ id: "b", color: "#b" })).toBe("#b");
+		expect(nodeFn({ id: "c", color: "#c" })).toBe(alphaColor("#c", 0.15));
+		const linkFn = linkColor.mock.calls[0][0];
+		expect(linkFn({ source: "id", target: "b", color: "#1" })).toBe("#1");
+		expect(linkFn({ source: "b", target: "c", color: "#2" })).toBe(
+			alphaColor("#2", 0.05),
+		);
 	});
 
 	it("handles undefined graph", () => {

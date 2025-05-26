@@ -1,5 +1,4 @@
 // vitest.config.ts
-// @ts-nocheck
 
 import vue from "@vitejs/plugin-vue";
 import type { PluginOption } from "vite";

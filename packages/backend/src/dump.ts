@@ -26,7 +26,7 @@ async function dumpGraphJson(
   databasePath: string,
   outputPath: string,
 ): Promise<void> {
-  const [_statusCode, response] = await fetchGraph(databasePath);
+  const [, response] = await fetchGraph(databasePath);
 
   await fs.mkdir(outputPath, { recursive: true });
   await fs.writeFile(
@@ -61,7 +61,7 @@ async function dumpNodeJsons(
   for (const row of allNodes) {
     const id = row.id;
 
-    const [_statusCode, response] = await fetchNode(databasePath, id);
+    const [, response] = await fetchNode(databasePath, id);
 
     const nodeDir = path.join(outputPath, "node");
     await fs.mkdir(nodeDir, { recursive: true });

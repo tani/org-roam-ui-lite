@@ -26,10 +26,12 @@ const renderForceGraph3D: RendererFunction = async (
   container: HTMLElement,
   existing: GraphInstance | undefined,
   nodeSize: number,
-  _labelScale: number,
-  _showLabels: boolean,
+  labelScale: number,
+  showLabels: boolean,
 ): Promise<GraphInstance> => {
   const { default: ForceGraph3D } = await import("3d-force-graph");
+  void labelScale;
+  void showLabels;
   const radius = nodeSize / 2;
   const volume = (4 / 3) * Math.PI * radius * radius * radius;
   const fgNodes = nodes.map((n) => ({ ...n, val: volume }));

@@ -29,9 +29,12 @@ vi.mock("3d-force-graph", () => ({
 }));
 
 vi.mock("../src/processor.ts", () => ({
-  createOrgHtmlProcessor: vi.fn(
-    () => (_str: string) => Promise.resolve(h("div")),
-  ),
+  createOrgHtmlProcessor: vi.fn(() => {
+    return (_str: string) => {
+      void _str;
+      return Promise.resolve(h("div"));
+    };
+  }),
 }));
 
 import { h } from "vue";

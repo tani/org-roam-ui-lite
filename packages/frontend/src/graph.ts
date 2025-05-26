@@ -183,6 +183,7 @@ async function renderWithCytoscape(
 	existing: Core | undefined,
 	nodeSize: number,
 	labelScale: number,
+	showLabels: boolean,
 ): Promise<Core> {
 	const { default: cytoscape } = await import("cytoscape");
 	const elements = [
@@ -198,7 +199,7 @@ async function renderWithCytoscape(
 				width: nodeSize,
 				height: nodeSize,
 				"font-size": `${labelScale}em`,
-				label: "data(label)",
+				label: showLabels ? "data(label)" : "",
 				"font-family": getCssVariable("--bs-font-sans-serif"),
 				color: getCssVariable("--bs-body-color"),
 				"background-color": "data(color)",
@@ -242,12 +243,15 @@ async function renderWithForceGraph(
 	container: HTMLElement,
 	existing: ForceGraph<GraphNode, GraphLink> | undefined,
 	nodeSize: number,
+	labelScale: number,
+	showLabels: boolean,
 ): Promise<ForceGraph<GraphNode, GraphLink>> {
 	const { default: ForceGraphCtor } = await import("force-graph");
 	const radius = nodeSize / 2;
 	const area = Math.PI * radius * radius;
 	const fgNodes = nodes.map((n) => ({ ...n, val: area }));
 	if (!existing) existing = new ForceGraphCtor<GraphNode, GraphLink>(container);
+	const fontSize = 12 * labelScale;
 	existing
 		.nodeId("id")
 		.nodeLabel("label")
@@ -257,6 +261,22 @@ async function renderWithForceGraph(
 		.linkColor("color")
 		.linkWidth(2)
 		.graphData({ nodes: fgNodes, links: edges });
+
+	if (showLabels)
+		existing
+			.nodeCanvasObject((node: GraphNode, ctx, scale) => {
+				const label = String(node.label);
+				const size = fontSize / scale;
+				ctx.font = `${size}px ${getCssVariable("--bs-font-sans-serif")}`;
+				ctx.textAlign = "center";
+				ctx.textBaseline = "top";
+				ctx.fillStyle = getCssVariable("--bs-body-color");
+				if (typeof node.x === "number" && typeof node.y === "number")
+					ctx.fillText(label, node.x, node.y + radius + 2);
+			})
+			.nodeCanvasObjectMode(() => "after");
+	else existing.nodeCanvasObject(() => undefined);
+
 	return existing;
 }
 
@@ -267,7 +287,10 @@ async function renderWith3DForceGraph(
 	container: HTMLElement,
 	existing: ForceGraph3DInstance<GraphNode, GraphLink> | undefined,
 	nodeSize: number,
+	labelScale: number,
+	showLabels: boolean,
 ): Promise<ForceGraph3DInstance<GraphNode, GraphLink>> {
+	void labelScale;
 	const { default: ForceGraph3D } = await import("3d-force-graph");
 	const radius = nodeSize / 2;
 	const volume = (4 / 3) * Math.PI * radius * radius * radius;
@@ -277,15 +300,18 @@ async function renderWith3DForceGraph(
 			GraphNode,
 			GraphLink
 		>;
+	existing.backgroundColor(getCssVariable("--bs-body-bg"));
 	existing
 		.nodeId("id")
-		.nodeLabel("label")
 		.nodeColor("color")
 		.nodeVal("val")
 		.nodeRelSize(1)
 		.linkColor("color")
 		.linkWidth(2)
 		.graphData({ nodes: fgNodes, links: edges });
+
+	existing.nodeLabel(showLabels ? "label" : "");
+	if (!showLabels) existing.nodeThreeObject(null).nodeThreeObjectExtend(false);
 	return existing;
 }
 
@@ -299,6 +325,7 @@ export async function drawGraph(
 	existingGraph: GraphInstance | undefined,
 	nodeSize: number,
 	labelScale: number,
+	showLabels: boolean,
 ): Promise<GraphInstance> {
 	const { nodes, edges } = await fetchGraphData();
 
@@ -311,6 +338,7 @@ export async function drawGraph(
 			existingGraph as Core | undefined,
 			nodeSize,
 			labelScale,
+			showLabels,
 		);
 
 	if (renderer === "force-graph")
@@ -320,6 +348,8 @@ export async function drawGraph(
 			container,
 			existingGraph as ForceGraph<GraphNode, GraphLink> | undefined,
 			nodeSize,
+			labelScale,
+			showLabels,
 		);
 
 	return renderWith3DForceGraph(
@@ -328,5 +358,7 @@ export async function drawGraph(
 		container,
 		existingGraph as ForceGraph3DInstance<GraphNode, GraphLink> | undefined,
 		nodeSize,
+		labelScale,
+		showLabels,
 	);
 }

@@ -27,6 +27,7 @@ Alpine.data("app", () => ({
 	),
 	nodeSize: 10,
 	labelScale: 0.5,
+	showLabels: Alpine.$persist<boolean>(true),
 	layout: Alpine.$persist<Layout>("cose"),
 	layouts: Layouts,
 	renderers: Renderers,
@@ -66,6 +67,7 @@ Alpine.data("app", () => ({
 			this.graph,
 			this.nodeSize,
 			this.labelScale,
+			this.showLabels,
 		);
 
 		this.bindGraphEvents();
@@ -94,6 +96,7 @@ Alpine.data("app", () => ({
 			this.graph,
 			this.nodeSize,
 			this.labelScale,
+			this.showLabels,
 		);
 
 		this.bindGraphEvents();
@@ -134,6 +137,11 @@ Alpine.data("app", () => ({
 				"font-size": `${this.labelScale}em`,
 			});
 		else void this.refresh();
+	},
+
+	/** Toggle label visibility */
+	onShowLabelsChange() {
+		void this.refresh();
 	},
 
 	/** Fetch and display details for NODE ID */

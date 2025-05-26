@@ -32,6 +32,8 @@ Alpine.data("app", () => ({
 	renderers: Renderers,
 	renderer: Alpine.$persist<Renderer>("cytoscape"),
 	graph: undefined as GraphInstance | undefined,
+	previewEl: undefined as HTMLElement | undefined,
+	previewAnchor: undefined as HTMLAnchorElement | undefined,
 	/** Attach node click events based on the current renderer */
 	bindGraphEvents() {
 		if (!this.graph) return;
@@ -67,6 +69,8 @@ Alpine.data("app", () => ({
 		);
 
 		this.bindGraphEvents();
+
+		this.attachPreviewEvents();
 
 		this.$watch("renderer", () => {
 			this.graph = undefined;
@@ -141,6 +145,7 @@ Alpine.data("app", () => ({
 
 	/** Show the details pane and dim other nodes */
 	openDetails() {
+		this.hidePreview();
 		this.detailsOpen = true;
 		highlightNeighborhood(this.graph, this.selected.id);
 	},
@@ -148,6 +153,7 @@ Alpine.data("app", () => ({
 	/** Hide the details pane and restore styles */
 	closeDetails() {
 		this.detailsOpen = false;
+		this.hidePreview();
 		resetHighlight(this.graph);
 	},
 
@@ -159,6 +165,51 @@ Alpine.data("app", () => ({
 	/** Toggle the settings pane */
 	toggleSettings() {
 		this.settingsOpen = !this.settingsOpen;
+	},
+
+	/** Attach hover events to display node previews */
+	attachPreviewEvents() {
+		this.$refs.rendered.addEventListener("mouseover", (ev) => {
+			const anchor = (ev.target as HTMLElement).closest("a");
+			if (!anchor || !anchor.href.startsWith("id:")) return;
+			if (this.previewAnchor === anchor) return;
+			void this.showPreview(anchor as HTMLAnchorElement);
+		});
+		this.$refs.rendered.addEventListener("mouseout", (ev) => {
+			if (!this.previewAnchor) return;
+			const related = ev.relatedTarget as Node | null;
+			if (
+				related &&
+				(this.previewAnchor.contains(related) ||
+					this.previewEl?.contains(related))
+			)
+				return;
+			this.hidePreview();
+		});
+	},
+
+	/** Show preview for a linked node */
+	async showPreview(anchor: HTMLAnchorElement): Promise<void> {
+		const node = await openNode(this.theme, anchor.href.replace("id:", ""));
+		const div = document.createElement("div");
+		div.className = "card position-fixed p-2 preview-popover responsive-wide";
+		div.innerHTML = node.html;
+		const rect = anchor.getBoundingClientRect();
+		div.style.top = `${rect.bottom + 8}px`;
+		div.style.left = `${rect.left}px`;
+		document.body.appendChild(div);
+		this.previewEl = div;
+		this.previewAnchor = anchor;
+		div.addEventListener("mouseleave", () => {
+			this.hidePreview();
+		});
+	},
+
+	/** Remove the preview element if present */
+	hidePreview() {
+		this.previewEl?.remove();
+		this.previewEl = undefined;
+		this.previewAnchor = undefined;
 	},
 }));
 

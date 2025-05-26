@@ -32,7 +32,8 @@ style="top: 1rem; left: 1rem; z-index: 1;"
 </button>
 
 <DetailsPanel
-        ref="details"
+
+        :theme="theme"
         :selected="selected"
         :open="detailsOpen"
         @close="closeDetails"
@@ -91,15 +92,12 @@ const layouts = Layouts;
 const renderers = Renderers;
 const renderer = ref<Renderer>("force-graph");
 const graph = ref<GraphInstance>();
-const previewEl = ref<HTMLElement>();
-const previewAnchor = ref<HTMLAnchorElement>();
 const selected = ref<components["schemas"]["Node"] & { html?: string }>(
 	{} as components["schemas"]["Node"] & { html?: string },
 );
 const settingsOpen = ref(false);
 const detailsOpen = ref(false);
 const graphRef = ref<HTMLElement>();
-const details = ref<InstanceType<typeof DetailsPanel>>();
 
 function bindGraphEvents(): void {
 	if (!graph.value) return;
@@ -133,13 +131,6 @@ async function init(): Promise<void> {
 		showLabels.value,
 	);
 	bindGraphEvents();
-	attachPreviewEvents();
-	details.value?.rendered?.addEventListener("click", (ev) => {
-		const a = (ev.target as HTMLElement).closest("a");
-		if (!a || !a.href.startsWith("id:")) return;
-		ev.preventDefault();
-		openNodeAction(a.href.replace("id:", ""));
-	});
 }
 
 /**
@@ -215,7 +206,6 @@ async function openNodeAction(nodeId: string): Promise<void> {
 
 /** Show the details pane and dim other nodes. */
 function openDetails(): void {
-	hidePreview();
 	detailsOpen.value = true;
 	highlightNeighborhood(graph.value, selected.value.id);
 }
@@ -223,7 +213,6 @@ function openDetails(): void {
 /** Hide the details pane and restore styles. */
 function closeDetails(): void {
 	detailsOpen.value = false;
-	hidePreview();
 	resetHighlight(graph.value);
 }
 
@@ -237,62 +226,6 @@ function toggleDetails(): void {
 // biome-ignore lint/correctness/noUnusedVariables: referenced in template
 function toggleSettings(): void {
 	settingsOpen.value = !settingsOpen.value;
-}
-
-/** Attach hover events to display node previews. */
-function attachPreviewEvents(): void {
-	details.value?.rendered?.addEventListener("mouseover", (ev) => {
-		const anchor = (ev.target as HTMLElement).closest("a");
-		if (!anchor || !anchor.href.startsWith("id:")) return;
-		if (previewAnchor.value === anchor) return;
-		void showPreview(anchor as HTMLAnchorElement, ev);
-	});
-	details.value?.rendered?.addEventListener("mouseout", (ev) => {
-		if (!previewAnchor.value) return;
-		const related = ev.relatedTarget as Node | null;
-		if (
-			related &&
-			(previewAnchor.value.contains(related) ||
-				previewEl.value?.contains(related))
-		)
-			return;
-		hidePreview();
-	});
-}
-
-/**
- * Show preview for a linked node near the mouse cursor.
- *
- * @param anchor - Hovered anchor element
- * @param ev - Mouse event
- */
-async function showPreview(
-	anchor: HTMLAnchorElement,
-	ev: MouseEvent,
-): Promise<void> {
-	previewAnchor.value = anchor;
-	const node = await openNode(theme.value, anchor.href.replace("id:", ""));
-	if (previewAnchor.value !== anchor) return;
-	const div = document.createElement("div");
-	div.className = "card position-fixed p-2 preview-popover responsive-wide";
-	div.innerHTML = node.html;
-	div.style.visibility = "hidden";
-	document.body.appendChild(div);
-	const offset = 20;
-	div.style.left = `${ev.clientX - div.offsetWidth - offset}px`;
-	div.style.top = `${ev.clientY + offset}px`;
-	div.style.visibility = "visible";
-	previewEl.value = div;
-	div.addEventListener("mouseleave", () => {
-		hidePreview();
-	});
-}
-
-/** Remove the preview element if present. */
-function hidePreview(): void {
-	previewEl.value?.remove();
-	previewEl.value = undefined;
-	previewAnchor.value = undefined;
 }
 
 watch(renderer, () => {

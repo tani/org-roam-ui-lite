@@ -31,15 +31,103 @@
 </template>
 
 <script setup lang="ts">
+import { onMounted, ref, watch } from "vue";
 import type { components } from "../api.d.ts";
+import type { Theme } from "../graph-types.ts";
+import { openNode } from "../node.ts";
 
-defineProps<{
+const props = defineProps<{
 	open: boolean;
 	selected: components["schemas"]["Node"] & { html?: string };
+	theme: Theme;
 }>();
 
-defineEmits<{
+const emit = defineEmits<{
 	(e: "close"): void;
 	(e: "openNode", id: string): void;
 }>();
+
+const rendered = ref<HTMLElement>();
+const previewEl = ref<HTMLElement>();
+const previewAnchor = ref<HTMLAnchorElement>();
+
+/** Attach click and hover events to the rendered HTML. */
+function attachEvents(): void {
+	rendered.value?.addEventListener("click", (ev) => {
+		const a = (ev.target as HTMLElement).closest("a");
+		if (!a || !a.href.startsWith("id:")) return;
+		ev.preventDefault();
+		emit("openNode", a.href.replace("id:", ""));
+	});
+	rendered.value?.addEventListener("mouseover", (ev) => {
+		const anchor = (ev.target as HTMLElement).closest("a");
+		if (!anchor || !anchor.href.startsWith("id:")) return;
+		if (previewAnchor.value === anchor) return;
+		void showPreview(anchor as HTMLAnchorElement, ev);
+	});
+	rendered.value?.addEventListener("mouseout", (ev) => {
+		if (!previewAnchor.value) return;
+		const related = ev.relatedTarget as Node | null;
+		if (
+			related &&
+			(previewAnchor.value.contains(related) ||
+				previewEl.value?.contains(related))
+		)
+			return;
+		hidePreview();
+	});
+}
+
+/**
+ * Display a preview for the hovered link.
+ *
+ * @param anchor - Anchor element being hovered
+ * @param ev - Mouse event
+ */
+async function showPreview(
+	anchor: HTMLAnchorElement,
+	ev: MouseEvent,
+): Promise<void> {
+	previewAnchor.value = anchor;
+	const node = await openNode(props.theme, anchor.href.replace("id:", ""));
+	if (previewAnchor.value !== anchor) return;
+	const div = document.createElement("div");
+	div.className = "card position-fixed p-2 preview-popover responsive-wide";
+	div.innerHTML = node.html;
+	div.style.visibility = "hidden";
+	document.body.appendChild(div);
+	const offset = 20;
+	div.style.left = `${ev.clientX - div.offsetWidth - offset}px`;
+	div.style.top = `${ev.clientY + offset}px`;
+	div.style.visibility = "visible";
+	previewEl.value = div;
+	div.addEventListener("mouseleave", () => {
+		hidePreview();
+	});
+}
+
+/** Remove the preview element if present. */
+function hidePreview(): void {
+	previewEl.value?.remove();
+	previewEl.value = undefined;
+	previewAnchor.value = undefined;
+}
+
+watch(
+	() => props.open,
+	(value) => {
+		if (!value) hidePreview();
+	},
+);
+
+watch(
+	() => props.selected,
+	() => {
+		hidePreview();
+	},
+);
+
+onMounted(() => {
+	attachEvents();
+});
 </script>

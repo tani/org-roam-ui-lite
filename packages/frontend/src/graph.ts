@@ -254,7 +254,7 @@ export async function renderGraph(
 			.nodeVal("val")
 			.nodeRelSize(1)
 			.linkColor("color")
-			.linkWidth(1)
+			.linkWidth(2)
 			.graphData({ nodes, links: edges });
 		return fg;
 	}
@@ -275,7 +275,7 @@ export async function renderGraph(
 		.nodeVal("val")
 		.nodeRelSize(1)
 		.linkColor("color")
-		.linkWidth(1)
+		.linkWidth(2)
 		.graphData({ nodes, links: edges });
 	return fg3d;
 }

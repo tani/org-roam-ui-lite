@@ -31,7 +31,7 @@
 </template>
 
 <script setup lang="ts">
-import { defineExpose, ref } from "vue";
+import { ref } from "vue";
 import type { components } from "../api.d.ts";
 
 defineProps<{
@@ -43,8 +43,4 @@ defineEmits<{
 	(e: "close"): void;
 	(e: "openNode", id: string): void;
 }>();
-
-const rendered = ref<HTMLElement>();
-
-defineExpose({ rendered });
 </script>

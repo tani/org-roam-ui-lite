@@ -71,7 +71,7 @@ const renderCytoscape: RendererFunction = async (
 			minZoom: 0.5,
 			maxZoom: 4,
 			style,
-		}) as unknown as GraphInstance;
+		});
 	}
 
 	cyExisting.batch(() => {

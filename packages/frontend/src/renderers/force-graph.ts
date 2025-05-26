@@ -60,7 +60,7 @@ const renderForceGraph: RendererFunction = async (
 		}).nodeCanvasObjectMode(() => "after");
 	else fg.nodeCanvasObject(() => undefined).nodeCanvasObjectMode(() => "after");
 
-	return fg as unknown as GraphInstance;
+	return fg;
 };
 
 export default renderForceGraph;

@@ -74,7 +74,7 @@ async function dumpNodeJsons(
 		if ("raw" in json) {
 			const parsed = processor.parse(json.raw);
 			// unified@10+ run returns Node, but our pipeline yields a HAST Root
-			const tree = (await processor.run(parsed)) as unknown as Root;
+			const tree = (await processor.run(parsed)) as Root;
 
 			const imageSources: string[] = [];
 			visit(tree, "element", (node: Element) => {

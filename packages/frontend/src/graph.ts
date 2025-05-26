@@ -212,7 +212,6 @@ async function renderWithCytoscape(
 		name: layoutName,
 		tile: false,
 		animate: "end",
-		animationDuration: 700,
 	} as LayoutOptions;
 
 	if (!existing) {

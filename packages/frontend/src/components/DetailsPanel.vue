@@ -15,7 +15,6 @@
     </div>
     <div class="offcanvas-body">
       <div
-        ref="_rendered"
         @click="_onRenderedClick"
         @mouseover="_onRenderedMouseOver"
         @mouseout="_onRenderedMouseOut"
@@ -65,7 +64,6 @@ const emit = defineEmits<{
 	(e: "openNode", id: string): void;
 }>();
 
-const _rendered = ref<HTMLElement>();
 const preview = ref<{ body: VNode; x: number; y: number }>();
 const previewComponent = ref<{ el: HTMLElement } | null>(null);
 const previewAnchor = ref<HTMLAnchorElement>();

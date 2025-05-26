@@ -3,19 +3,22 @@ import { cleanup, fireEvent, render } from "@testing-library/vue";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { h } from "vue";
 
-var mockOpenNode: ReturnType<typeof vi.fn>;
-vi.mock("../src/node.ts", () => {
-	mockOpenNode = vi.fn();
-	return { openNode: mockOpenNode };
-});
+vi.mock("../src/node.ts", () => ({ openNode: vi.fn() }));
 
 import DetailsPanel from "../src/components/DetailsPanel.vue";
 import { openNode } from "../src/node.ts";
 
+const mockOpenNode = vi.mocked(openNode);
+
 afterEach(() => cleanup());
 
 beforeEach(() => {
-	mockOpenNode.mockResolvedValue({ body: h("p", "preview") });
+	mockOpenNode.mockResolvedValue({
+		id: "1",
+		title: "",
+		raw: "",
+		body: h("p", "preview"),
+	});
 });
 
 const sampleNode = {

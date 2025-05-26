@@ -7,10 +7,8 @@
 		"build": "vite build"
 	},
 	"dependencies": {
-		"@alpinejs/persist": "^3.14.9",
 		"@rehype-pretty/transformers": "^0.13.2",
 		"3d-force-graph": "^1.77.0",
-		"alpinejs": "^3.14.9",
 		"bootstrap": "^5.3.5",
 		"bootstrap-icons": "^1.11.3",
 		"cytoscape": "^3.31.4",
@@ -30,10 +28,6 @@
 		"vue": "^3.5.14"
 	},
 	"devDependencies": {
-		"@rollup/plugin-url": "^8.0.2",
-		"@types/alpinejs": "^3.13.11",
-		"@types/alpinejs__persist": "^3.13.4",
-		"@types/bootstrap": "^5.2.10",
 		"@types/hast": "^3.0.4",
 		"@vitejs/plugin-vue": "^5.2.4",
 		"vite": "npm:rolldown-vite@^6.3.9"

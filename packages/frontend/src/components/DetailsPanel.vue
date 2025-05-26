@@ -14,7 +14,7 @@
       <button type="button" class="btn-close" @click="$emit('close')" aria-label="Close"></button>
     </div>
     <div class="offcanvas-body">
-      <div v-html="selected.html ?? ''" ref="rendered"></div>
+<div ref="rendered"></div>
       <div v-show="selected.backlinks?.length" class="mt-3">
         <h5><i class="bi bi-link-45deg"></i>Backlinks</h5>
         <ul class="list-unstyled">
@@ -31,14 +31,14 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, watch } from "vue";
+import { onMounted, ref, render, type VNode, watch } from "vue";
 import type { components } from "../api.d.ts";
 import type { Theme } from "../graph-types.ts";
 import { openNode } from "../node.ts";
 
 const props = defineProps<{
 	open: boolean;
-	selected: components["schemas"]["Node"] & { html?: string };
+	selected: components["schemas"]["Node"] & { body?: VNode };
 	theme: Theme;
 }>();
 
@@ -50,6 +50,10 @@ const emit = defineEmits<{
 const rendered = ref<HTMLElement>();
 const previewEl = ref<HTMLElement>();
 const previewAnchor = ref<HTMLAnchorElement>();
+
+function renderBody(): void {
+	if (rendered.value) render(props.selected.body ?? null, rendered.value);
+}
 
 /** Attach click and hover events to the rendered HTML. */
 function attachEvents(): void {
@@ -93,7 +97,7 @@ async function showPreview(
 	if (previewAnchor.value !== anchor) return;
 	const div = document.createElement("div");
 	div.className = "card position-fixed p-2 preview-popover responsive-wide";
-	div.innerHTML = node.html;
+	render(node.body, div);
 	div.style.visibility = "hidden";
 	document.body.appendChild(div);
 	const offset = 20;
@@ -108,6 +112,7 @@ async function showPreview(
 
 /** Remove the preview element if present. */
 function hidePreview(): void {
+	if (previewEl.value) render(null, previewEl.value);
 	previewEl.value?.remove();
 	previewEl.value = undefined;
 	previewAnchor.value = undefined;
@@ -124,10 +129,12 @@ watch(
 	() => props.selected,
 	() => {
 		hidePreview();
+		renderBody();
 	},
 );
 
 onMounted(() => {
 	attachEvents();
+	renderBody();
 });
 </script>

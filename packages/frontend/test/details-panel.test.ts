@@ -1,6 +1,7 @@
 import userEvent from "@testing-library/user-event";
 import { cleanup, render } from "@testing-library/vue";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { h } from "vue";
 
 var mockOpenNode: ReturnType<typeof vi.fn>;
 vi.mock("../src/node.ts", () => {
@@ -14,13 +15,13 @@ import { openNode } from "../src/node.ts";
 afterEach(() => cleanup());
 
 beforeEach(() => {
-	mockOpenNode.mockResolvedValue({ html: "<p>preview</p>" });
+	mockOpenNode.mockResolvedValue({ body: h("p", "preview") });
 });
 
 const sampleNode = {
 	id: "1",
 	title: "Node",
-	html: "<p>html</p>",
+	body: h("p", "html"),
 	backlinks: [{ source: "2", title: "Back" }],
 };
 
@@ -78,13 +79,13 @@ describe("DetailsPanel", () => {
 
 	it("shows preview on hover and hides on close", async () => {
 		const user = userEvent.setup();
-		const html = '<p><a href="id:2">link</a></p>';
+		const body = h("p", [h("a", { href: "id:2" }, "link")]);
 		const { container, rerender } = render(
 			DetailsPanel as unknown as Record<string, unknown>,
 			{
 				props: {
 					open: true,
-					selected: { ...sampleNode, html },
+					selected: { ...sampleNode, body },
 					theme: "light",
 				},
 			},
@@ -96,7 +97,7 @@ describe("DetailsPanel", () => {
 		expect(document.body.querySelector(".preview-popover")).toBeTruthy();
 		await rerender({
 			open: false,
-			selected: { ...sampleNode, html },
+			selected: { ...sampleNode, body },
 			theme: "light",
 		});
 		await Promise.resolve();

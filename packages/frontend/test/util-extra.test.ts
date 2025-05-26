@@ -30,10 +30,11 @@ vi.mock("3d-force-graph", () => ({
 
 vi.mock("../src/processor.ts", () => ({
 	createOrgHtmlProcessor: vi.fn(
-		() => (str: string) => Promise.resolve(`html:${str}`),
+		() => (_str: string) => Promise.resolve(h("div")),
 	),
 }));
 
+import { h } from "vue";
 import {
 	drawGraph,
 	type GraphInstance,
@@ -204,7 +205,7 @@ describe("openNode", () => {
 			data: { id: NODE_ID, title: "t", raw: "body" },
 		});
 		const result = await openNode("light", NODE_ID);
-		expect(result.html).toBe("html:body");
+		expect(result.body).toEqual(h("div"));
 		expect(result.id).toBe(NODE_ID);
 	});
 

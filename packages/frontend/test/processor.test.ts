@@ -1,4 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
+import { renderToString } from "vue/server-renderer";
 
 const mockMermaid = vi.fn((..._args: unknown[]) => () => {});
 vi.mock("rehype-mermaid", () => ({
@@ -29,19 +30,21 @@ function createProcess(theme = "light") {
 }
 
 function trim(str: string): string {
-	return str.replace(/\n/g, "");
+	return str.replace(/<!--\[-->|<!--\]-->/g, "").replace(/\n/g, "");
 }
 
 describe("createOrgHtmlProcessor", () => {
 	it("converts headings", async () => {
 		const process = createProcess();
-		const html = await process("* Hello");
+		const vnode = await process("* Hello");
+		const html = await renderToString(vnode);
 		expect(trim(html)).toBe("<h1>Hello</h1>");
 	});
 
 	it("rewrites relative image paths", async () => {
 		const process = createProcess();
-		const html = await process("[[file:images/foo.png]]");
+		const vnode = await process("[[file:images/foo.png]]");
+		const html = await renderToString(vnode);
 		expect(trim(html)).toBe(
 			'<p><img src="/api/node/abc/ZmlsZTppbWFnZXMvZm9v.png"></p>',
 		);
@@ -49,14 +52,16 @@ describe("createOrgHtmlProcessor", () => {
 
 	it("keeps absolute image paths", async () => {
 		const process = createProcess();
-		const html = await process("[[http://example.com/foo.png]]");
+		const vnode = await process("[[http://example.com/foo.png]]");
+		const html = await renderToString(vnode);
 		expect(trim(html)).toBe('<p><img src="http://example.com/foo.png"></p>');
 	});
 
 	it("adds blockquote class", async () => {
 		const process = createProcess();
 		const org = "#+begin_quote\nfoo\n#+end_quote";
-		const html = await process(org);
+		const vnode = await process(org);
+		const html = await renderToString(vnode);
 		expect(trim(html)).toBe(
 			'<blockquote class="blockquote"><p>foo</p></blockquote>',
 		);

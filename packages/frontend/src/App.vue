@@ -53,7 +53,7 @@ style="top: 1rem; right: 1rem; z-index: 1;"
 
 <script setup lang="ts">
 import type { Core } from "cytoscape";
-import { onMounted, ref, watch } from "vue";
+import { onMounted, ref, type VNode, watch } from "vue";
 import type { components } from "./api.d.ts";
 import DetailsPanel from "./components/DetailsPanel.vue";
 import SettingsPanel from "./components/SettingsPanel.vue";
@@ -92,8 +92,8 @@ const layouts = Layouts;
 const renderers = Renderers;
 const renderer = ref<Renderer>("force-graph");
 const graph = ref<GraphInstance>();
-const selected = ref<components["schemas"]["Node"] & { html?: string }>(
-	{} as components["schemas"]["Node"] & { html?: string },
+const selected = ref<components["schemas"]["Node"] & { body?: VNode }>(
+	{} as components["schemas"]["Node"] & { body?: VNode },
 );
 const settingsOpen = ref(false);
 const detailsOpen = ref(false);

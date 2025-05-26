@@ -1,10 +1,10 @@
 import type { ForceGraph3DInstance } from "3d-force-graph";
 import type {
-	GraphInstance,
-	GraphLink,
-	GraphNode,
-	Layout,
-	RendererFunction,
+  GraphInstance,
+  GraphLink,
+  GraphNode,
+  Layout,
+  RendererFunction,
 } from "../graph-types.ts";
 import { getCssVariable } from "../style.ts";
 
@@ -20,36 +20,36 @@ import { getCssVariable } from "../style.ts";
  * @returns The 3d-force-graph instance used for rendering
  */
 const renderForceGraph3D: RendererFunction = async (
-	nodes: GraphNode[],
-	edges: GraphLink[],
-	_layout: Layout,
-	container: HTMLElement,
-	existing: GraphInstance | undefined,
-	nodeSize: number,
-	_labelScale: number,
-	_showLabels: boolean,
+  nodes: GraphNode[],
+  edges: GraphLink[],
+  _layout: Layout,
+  container: HTMLElement,
+  existing: GraphInstance | undefined,
+  nodeSize: number,
+  _labelScale: number,
+  _showLabels: boolean,
 ): Promise<GraphInstance> => {
-	const { default: ForceGraph3D } = await import("3d-force-graph");
-	const radius = nodeSize / 2;
-	const volume = (4 / 3) * Math.PI * radius * radius * radius;
-	const fgNodes = nodes.map((n) => ({ ...n, val: volume }));
-	let fg = existing as ForceGraph3DInstance<GraphNode, GraphLink> | undefined;
-	if (!fg)
-		fg = new ForceGraph3D(container) as unknown as ForceGraph3DInstance<
-			GraphNode,
-			GraphLink
-		>;
-	fg.backgroundColor(getCssVariable("--bs-body-bg"));
-	fg.nodeId("id")
-		.nodeLabel("label")
-		.nodeColor("color")
-		.nodeVal("val")
-		.nodeRelSize(1)
-		.linkColor("color")
-		.linkWidth(2)
-		.graphData({ nodes: fgNodes, links: edges });
+  const { default: ForceGraph3D } = await import("3d-force-graph");
+  const radius = nodeSize / 2;
+  const volume = (4 / 3) * Math.PI * radius * radius * radius;
+  const fgNodes = nodes.map((n) => ({ ...n, val: volume }));
+  let fg = existing as ForceGraph3DInstance<GraphNode, GraphLink> | undefined;
+  if (!fg)
+    fg = new ForceGraph3D(container) as unknown as ForceGraph3DInstance<
+      GraphNode,
+      GraphLink
+    >;
+  fg.backgroundColor(getCssVariable("--bs-body-bg"));
+  fg.nodeId("id")
+    .nodeLabel("label")
+    .nodeColor("color")
+    .nodeVal("val")
+    .nodeRelSize(1)
+    .linkColor("color")
+    .linkWidth(2)
+    .graphData({ nodes: fgNodes, links: edges });
 
-	return fg as unknown as GraphInstance;
+  return fg as unknown as GraphInstance;
 };
 
 export default renderForceGraph3D;

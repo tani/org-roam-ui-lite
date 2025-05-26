@@ -9,9 +9,14 @@
     <div class="offcanvas-header">
       <h4 class="offcanvas-title" id="offcanvasDetailsLabel">
         <i class="bi bi-file-earmark-text"></i>
-        <span>{{ selected.title ?? 'Click a node to view details' }}</span>
+        <span>{{ selected.title ?? "Click a node to view details" }}</span>
       </h4>
-      <button type="button" class="btn-close" @click="$emit('close')" aria-label="Close"></button>
+      <button
+        type="button"
+        class="btn-close"
+        @click="$emit('close')"
+        aria-label="Close"
+      ></button>
     </div>
     <div class="offcanvas-body">
       <div
@@ -33,7 +38,10 @@
         <h5><i class="bi bi-link-45deg"></i>Backlinks</h5>
         <ul class="list-unstyled">
           <li v-for="b in selected.backlinks" :key="b.source">
-            <button class="btn btn-sm btn-link p-0" @click="$emit('openNode', b.source)">
+            <button
+              class="btn btn-sm btn-link p-0"
+              @click="$emit('openNode', b.source)"
+            >
               <i class="bi bi-chevron-right"></i>
               <span>{{ b.title }}</span>
             </button>
@@ -54,14 +62,14 @@ import PreviewPopover from "./PreviewPopover.vue";
 void PreviewPopover;
 
 const props = defineProps<{
-	open: boolean;
-	selected: components["schemas"]["Node"] & { body?: VNode };
-	theme: Theme;
+  open: boolean;
+  selected: components["schemas"]["Node"] & { body?: VNode };
+  theme: Theme;
 }>();
 
 const emit = defineEmits<{
-	(e: "close"): void;
-	(e: "openNode", id: string): void;
+  (e: "close"): void;
+  (e: "openNode", id: string): void;
 }>();
 
 const preview = ref<{ body: VNode; x: number; y: number }>();
@@ -70,29 +78,29 @@ const previewAnchor = ref<HTMLAnchorElement>();
 
 /** Handle user interactions on the rendered HTML. */
 function _onRenderedClick(ev: MouseEvent): void {
-	const a = (ev.target as HTMLElement).closest("a");
-	if (!a || !a.href.startsWith("id:")) return;
-	ev.preventDefault();
-	emit("openNode", a.href.replace("id:", ""));
+  const a = (ev.target as HTMLElement).closest("a");
+  if (!a || !a.href.startsWith("id:")) return;
+  ev.preventDefault();
+  emit("openNode", a.href.replace("id:", ""));
 }
 
 function _onRenderedMouseOver(ev: MouseEvent): void {
-	const anchor = (ev.target as HTMLElement).closest("a");
-	if (!anchor || !anchor.href.startsWith("id:")) return;
-	if (previewAnchor.value === anchor) return;
-	void showPreview(anchor as HTMLAnchorElement, ev);
+  const anchor = (ev.target as HTMLElement).closest("a");
+  if (!anchor || !anchor.href.startsWith("id:")) return;
+  if (previewAnchor.value === anchor) return;
+  void showPreview(anchor as HTMLAnchorElement, ev);
 }
 
 function _onRenderedMouseOut(ev: MouseEvent): void {
-	if (!previewAnchor.value) return;
-	const related = ev.relatedTarget as Node | null;
-	const previewEl = previewComponent.value?.el;
-	if (
-		related &&
-		(previewAnchor.value.contains(related) || previewEl?.contains(related))
-	)
-		return;
-	hidePreview();
+  if (!previewAnchor.value) return;
+  const related = ev.relatedTarget as Node | null;
+  const previewEl = previewComponent.value?.el;
+  if (
+    related &&
+    (previewAnchor.value.contains(related) || previewEl?.contains(related))
+  )
+    return;
+  hidePreview();
 }
 
 /**
@@ -102,32 +110,32 @@ function _onRenderedMouseOut(ev: MouseEvent): void {
  * @param ev - Mouse event
  */
 async function showPreview(
-	anchor: HTMLAnchorElement,
-	ev: MouseEvent,
+  anchor: HTMLAnchorElement,
+  ev: MouseEvent,
 ): Promise<void> {
-	previewAnchor.value = anchor;
-	const node = await openNode(props.theme, anchor.href.replace("id:", ""));
-	if (previewAnchor.value !== anchor) return;
-	preview.value = { body: node.body, x: ev.clientX, y: ev.clientY };
+  previewAnchor.value = anchor;
+  const node = await openNode(props.theme, anchor.href.replace("id:", ""));
+  if (previewAnchor.value !== anchor) return;
+  preview.value = { body: node.body, x: ev.clientX, y: ev.clientY };
 }
 
 /** Remove the preview element if present. */
 function hidePreview(): void {
-	preview.value = undefined;
-	previewAnchor.value = undefined;
+  preview.value = undefined;
+  previewAnchor.value = undefined;
 }
 
 watch(
-	() => props.open,
-	(value) => {
-		if (!value) hidePreview();
-	},
+  () => props.open,
+  (value) => {
+    if (!value) hidePreview();
+  },
 );
 
 watch(
-	() => props.selected,
-	() => {
-		hidePreview();
-	},
+  () => props.selected,
+  () => {
+    hidePreview();
+  },
 );
 </script>

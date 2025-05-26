@@ -21,13 +21,21 @@
       <div class="mb-4">
         <h5>Theme</h5>
         <select class="form-select" :value="theme" @change="onThemeChange">
-          <option v-for="t in themes" :key="t.value" :value="t.value">{{ t.label }}</option>
+          <option v-for="t in themes" :key="t.value" :value="t.value">
+            {{ t.label }}
+          </option>
         </select>
       </div>
       <div class="mb-4">
         <h5>Renderer</h5>
-        <select class="form-select" :value="renderer" @change="onRendererChange">
-          <option v-for="r in renderers" :key="r.value" :value="r.value">{{ r.label }}</option>
+        <select
+          class="form-select"
+          :value="renderer"
+          @change="onRendererChange"
+        >
+          <option v-for="r in renderers" :key="r.value" :value="r.value">
+            {{ r.label }}
+          </option>
         </select>
       </div>
       <div class="mb-4" v-show="renderer === 'cytoscape'">
@@ -38,16 +46,31 @@
       </div>
       <div class="mb-4">
         <h5>Node size</h5>
-        <input type="range" min="5" max="30" :value="nodeSize" @input="onNodeSize" />
+        <input
+          type="range"
+          min="5"
+          max="30"
+          :value="nodeSize"
+          @input="onNodeSize"
+        />
         <div>
-          Current: <span>{{ nodeSize }}</span>px
+          Current: <span>{{ nodeSize }}</span
+          >px
         </div>
       </div>
       <div class="mb-4" v-show="renderer !== '3d-force-graph'">
         <h5>Font size</h5>
-        <input type="range" min="0.3" max="1.5" step="0.1" :value="labelScale" @input="onLabelScale" />
+        <input
+          type="range"
+          min="0.3"
+          max="1.5"
+          step="0.1"
+          :value="labelScale"
+          @input="onLabelScale"
+        />
         <div>
-          Current: <span>{{ labelScale.toFixed(1) }}</span>em
+          Current: <span>{{ labelScale.toFixed(1) }}</span
+          >em
         </div>
       </div>
       <div class="mb-4" v-show="renderer !== '3d-force-graph'">
@@ -60,7 +83,9 @@
             :checked="showLabels"
             @change="onShowLabels"
           />
-          <label class="form-check-label" for="toggleLabels">Display labels</label>
+          <label class="form-check-label" for="toggleLabels"
+            >Display labels</label
+          >
         </div>
       </div>
     </div>
@@ -71,55 +96,55 @@
 import type { Layout, Renderer, Theme } from "../graph-types.ts";
 
 defineProps<{
-	open: boolean;
-	themes: { value: Theme; label: string }[];
-	renderers: { value: Renderer; label: string }[];
-	layouts: Layout[];
-	theme: Theme;
-	renderer: Renderer;
-	layout: Layout;
-	nodeSize: number;
-	labelScale: number;
-	showLabels: boolean;
+  open: boolean;
+  themes: { value: Theme; label: string }[];
+  renderers: { value: Renderer; label: string }[];
+  layouts: Layout[];
+  theme: Theme;
+  renderer: Renderer;
+  layout: Layout;
+  nodeSize: number;
+  labelScale: number;
+  showLabels: boolean;
 }>();
 
 const emit = defineEmits<{
-	(e: "close"): void;
-	(e: "update:theme", value: Theme): void;
-	(e: "update:renderer", value: Renderer): void;
-	(e: "update:layout", value: Layout): void;
-	(e: "update:nodeSize", value: number): void;
-	(e: "update:labelScale", value: number): void;
-	(e: "update:showLabels", value: boolean): void;
+  (e: "close"): void;
+  (e: "update:theme", value: Theme): void;
+  (e: "update:renderer", value: Renderer): void;
+  (e: "update:layout", value: Layout): void;
+  (e: "update:nodeSize", value: number): void;
+  (e: "update:labelScale", value: number): void;
+  (e: "update:showLabels", value: boolean): void;
 }>();
 
 /** Emit theme update event. */
 function onThemeChange(ev: Event): void {
-	emit("update:theme", (ev.target as HTMLSelectElement).value as Theme);
+  emit("update:theme", (ev.target as HTMLSelectElement).value as Theme);
 }
 
 /** Emit renderer update event. */
 function onRendererChange(ev: Event): void {
-	emit("update:renderer", (ev.target as HTMLSelectElement).value as Renderer);
+  emit("update:renderer", (ev.target as HTMLSelectElement).value as Renderer);
 }
 
 /** Emit layout update event. */
 function onLayoutChange(ev: Event): void {
-	emit("update:layout", (ev.target as HTMLSelectElement).value as Layout);
+  emit("update:layout", (ev.target as HTMLSelectElement).value as Layout);
 }
 
 /** Emit node size update event. */
 function onNodeSize(ev: Event): void {
-	emit("update:nodeSize", Number((ev.target as HTMLInputElement).value));
+  emit("update:nodeSize", Number((ev.target as HTMLInputElement).value));
 }
 
 /** Emit label scale update event. */
 function onLabelScale(ev: Event): void {
-	emit("update:labelScale", Number((ev.target as HTMLInputElement).value));
+  emit("update:labelScale", Number((ev.target as HTMLInputElement).value));
 }
 
 /** Emit show labels update event. */
 function onShowLabels(ev: Event): void {
-	emit("update:showLabels", (ev.target as HTMLInputElement).checked);
+  emit("update:showLabels", (ev.target as HTMLInputElement).checked);
 }
 </script>

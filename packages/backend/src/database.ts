@@ -12,14 +12,14 @@ export type Database = SQLJsDatabase<typeof schema>;
  * @returns Drizzle connection bound to the schema
  */
 export async function createDatabase(databasePath: string): Promise<Database> {
-	let SQL: SqlJsStatic;
-	try {
-		const { default: wasmBinary } = await import("sql.js/dist/sql-wasm.wasm");
-		SQL = await initSqlJs({ wasmBinary });
-	} catch {
-		SQL = await initSqlJs();
-	}
-	const blob = new Uint8Array(await fs.readFile(databasePath));
-	const database = new SQL.Database(blob);
-	return drizzle(database, { schema });
+  let SQL: SqlJsStatic;
+  try {
+    const { default: wasmBinary } = await import("sql.js/dist/sql-wasm.wasm");
+    SQL = await initSqlJs({ wasmBinary });
+  } catch {
+    SQL = await initSqlJs();
+  }
+  const blob = new Uint8Array(await fs.readFile(databasePath));
+  const database = new SQL.Database(blob);
+  return drizzle(database, { schema });
 }

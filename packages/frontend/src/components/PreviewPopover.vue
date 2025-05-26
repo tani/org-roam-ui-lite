@@ -22,12 +22,12 @@ defineEmits<Emits>();
 const el = ref<HTMLElement>();
 
 onMounted(() => {
-	nextTick(() => {
-		const offset = 20;
-		const div = el.value as HTMLElement;
-		div.style.left = `${props.x - div.offsetWidth - offset}px`;
-		div.style.top = `${props.y + offset}px`;
-		div.style.visibility = "visible";
-	});
+  nextTick(() => {
+    const offset = 20;
+    const div = el.value as HTMLElement;
+    div.style.left = `${props.x - div.offsetWidth - offset}px`;
+    div.style.top = `${props.y + offset}px`;
+    div.style.visibility = "visible";
+  });
 });
 </script>

@@ -89,7 +89,7 @@ export function dimOthers(
 			const s = typeof link.source === "object" ? link.source.id : link.source;
 			const t = typeof link.target === "object" ? link.target.id : link.target;
 			const related = neighbors.has(String(s)) && neighbors.has(String(t));
-			return related ? edgeColor : alphaColor(edgeColor, 0.05);
+			return related ? edgeColor : alphaColor(edgeColor, 0.1);
 		},
 	);
 }
@@ -258,7 +258,7 @@ export async function renderGraph(
 			.nodeVal("val")
 			.nodeRelSize(1)
 			.linkColor("color")
-			.linkWidth(1)
+			.linkWidth(2)
 			.graphData({ nodes, links: edges });
 		return fg;
 	}
@@ -273,7 +273,7 @@ export async function renderGraph(
 		.nodeVal("val")
 		.nodeRelSize(1)
 		.linkColor("color")
-		.linkWidth(1)
+		.linkWidth(2)
 		.graphData({ nodes, links: edges });
 	return fg3d;
 }

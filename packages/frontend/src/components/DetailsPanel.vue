@@ -31,7 +31,6 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
 import type { components } from "../api.d.ts";
 
 defineProps<{

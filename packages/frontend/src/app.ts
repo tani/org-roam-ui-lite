@@ -5,16 +5,18 @@ import type { components } from "./api.d.ts";
 import {
 	applyNodeStyle,
 	drawGraph,
-	type GraphInstance,
 	highlightNeighborhood,
+	resetHighlight,
+} from "./graph.ts";
+import {
+	type GraphInstance,
 	type Layout,
 	Layouts,
 	type Renderer,
 	Renderers,
-	resetHighlight,
 	type Theme,
 	Themes,
-} from "./graph.ts";
+} from "./graph-types.ts";
 import { openNode } from "./node.ts";
 
 Alpine.plugin(persist);

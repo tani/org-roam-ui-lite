@@ -35,6 +35,7 @@ vi.mock("../src/processor.ts", () => ({
 }));
 
 import { drawGraph, highlightNeighborhood } from "../src/graph.ts";
+import type { Layout } from "../src/graph-types.ts";
 import { openNode } from "../src/node.ts";
 
 const NODE_ID = "11111111-1111-4111-8111-111111111111";
@@ -112,7 +113,7 @@ describe("drawGraph", () => {
 		});
 		const result = await drawGraph(
 			"cytoscape",
-			"fcose",
+			"fcose" as Layout,
 			container,
 			existing,
 			5,
@@ -163,6 +164,7 @@ describe("drawGraph", () => {
 			linkWidth: vi.fn(() => fgInstance),
 			nodeThreeObject: vi.fn(() => fgInstance),
 			nodeThreeObjectExtend: vi.fn(() => fgInstance),
+			backgroundColor: vi.fn(() => fgInstance),
 		} as unknown as object;
 		mockForceGraph3D.mockReturnValue(fgInstance);
 		mockGet.mockResolvedValue({ data: { nodes: [], edges: [] } });

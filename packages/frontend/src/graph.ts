@@ -1,51 +1,27 @@
 import type { ForceGraph3DInstance } from "3d-force-graph";
-import type { Core, LayoutOptions } from "cytoscape";
+import type { Core } from "cytoscape";
 import type ForceGraph from "force-graph";
-import type { LinkObject, NodeObject } from "force-graph";
 import createClient from "openapi-fetch";
 import type { paths } from "./api.d.ts";
+import type {
+	GraphInstance,
+	GraphLink,
+	GraphNode,
+	Layout,
+	Renderer,
+	RendererFunction,
+	Theme,
+} from "./graph-types.ts";
+import { Layouts, Renderers, Themes } from "./graph-types.ts";
+import renderCytoscape from "./renderers/cytoscape.ts";
+import renderForceGraph from "./renderers/force-graph.ts";
+import renderForceGraph3D from "./renderers/force-graph-3d.ts";
 import { alphaColor, getCssVariable, pickColor } from "./style.ts";
 
 const api = createClient<paths>();
 
-export const Layouts = [
-	"cose",
-	"grid",
-	"circle",
-	"concentric",
-	"random",
-	"breadthfirst",
-];
-
-export type Layout = (typeof Layouts)[number];
-
-export const Themes = [
-	{ value: "light", label: "Light" },
-	{ value: "dark", label: "Dark" },
-	{ value: "nord-dark", label: "Nord Dark" },
-	{ value: "gruvbox-dark", label: "Gruvbox Dark" },
-	{ value: "dracula-dark", label: "Dracula Dark" },
-] as const;
-
-export type Theme = (typeof Themes)[number]["value"];
-
-export const Renderers = [
-	{ value: "cytoscape", label: "Cytoscape" },
-	{ value: "force-graph", label: "Force Graph" },
-	{ value: "3d-force-graph", label: "3D Force Graph" },
-] as const;
-
-export type Renderer = (typeof Renderers)[number]["value"];
-
-export interface GraphNode extends NodeObject {
-	id: string;
-	label: string;
-	color: string;
-}
-
-export interface GraphLink extends LinkObject<GraphNode> {
-	color: string;
-}
+export { Layouts, Renderers, Themes };
+export type { Layout, Renderer, Theme, GraphInstance, GraphNode, GraphLink };
 
 /**
  * Highlight the neighborhood of the given node while dimming others.
@@ -59,7 +35,6 @@ export function highlightNeighborhood(
 ): void {
 	if (!graph) return;
 
-	// Cytoscape graph handling
 	if (typeof (graph as Core).elements === "function") {
 		const cy = graph as Core;
 		const focus = cy.$id(focusId);
@@ -71,7 +46,6 @@ export function highlightNeighborhood(
 		return;
 	}
 
-	// Force graph handling
 	const fg = graph as
 		| ForceGraph<GraphNode, GraphLink>
 		| ForceGraph3DInstance<GraphNode, GraphLink>;
@@ -140,14 +114,6 @@ export function resetHighlight(graph: GraphInstance | undefined): void {
 	fg.linkColor("color");
 }
 
-/**
- * Graph instance for any renderer.
- */
-export type GraphInstance =
-	| Core
-	| ForceGraph<GraphNode, GraphLink>
-	| ForceGraph3DInstance<GraphNode, GraphLink>;
-
 interface GraphData {
 	nodes: GraphNode[];
 	edges: GraphLink[];
@@ -174,145 +140,11 @@ async function fetchGraphData(): Promise<GraphData> {
 	return { nodes, edges };
 }
 
-/** Render or update the graph using Cytoscape. */
-async function renderWithCytoscape(
-	nodes: GraphNode[],
-	edges: GraphLink[],
-	layoutName: Layout,
-	container: HTMLElement,
-	existing: Core | undefined,
-	nodeSize: number,
-	labelScale: number,
-	showLabels: boolean,
-): Promise<Core> {
-	const { default: cytoscape } = await import("cytoscape");
-	const elements = [
-		...nodes.map((n) => ({ data: n })),
-		...edges.map((e) => ({ data: e })),
-	];
-
-	const style = [
-		{ selector: "edge", style: { width: 1 } },
-		{
-			selector: "node",
-			style: {
-				width: nodeSize,
-				height: nodeSize,
-				"font-size": `${labelScale}em`,
-				label: showLabels ? "data(label)" : "",
-				"font-family": getCssVariable("--bs-font-sans-serif"),
-				color: getCssVariable("--bs-body-color"),
-				"background-color": "data(color)",
-			},
-		},
-	];
-
-	layoutName = layoutName === "fcose" ? "cose" : layoutName;
-
-	const layout = {
-		name: layoutName,
-		tile: false,
-		animate: "end",
-	} as LayoutOptions;
-
-	if (!existing) {
-		return cytoscape({
-			container,
-			elements,
-			layout,
-			minZoom: 0.5,
-			maxZoom: 4,
-			style,
-		});
-	}
-
-	existing.batch(() => {
-		existing.elements().remove();
-		existing.add(elements);
-		existing.style(style);
-		existing.layout(layout).run();
-	});
-
-	return existing;
-}
-
-/** Render or update the graph using force-graph. */
-async function renderWithForceGraph(
-	nodes: GraphNode[],
-	edges: GraphLink[],
-	container: HTMLElement,
-	existing: ForceGraph<GraphNode, GraphLink> | undefined,
-	nodeSize: number,
-	labelScale: number,
-	showLabels: boolean,
-): Promise<ForceGraph<GraphNode, GraphLink>> {
-	const { default: ForceGraphCtor } = await import("force-graph");
-	const radius = nodeSize / 2;
-	const area = Math.PI * radius * radius;
-	const fgNodes = nodes.map((n) => ({ ...n, val: area }));
-	if (!existing) existing = new ForceGraphCtor<GraphNode, GraphLink>(container);
-	const fontSize = 36 * labelScale;
-	existing
-		.nodeId("id")
-		.nodeLabel("label")
-		.nodeColor("color")
-		.nodeVal("val")
-		.nodeRelSize(1)
-		.linkColor("color")
-		.linkWidth(2)
-		.graphData({ nodes: fgNodes, links: edges });
-
-	if (showLabels)
-		existing
-			.nodeCanvasObject((node: GraphNode, ctx, scale) => {
-				const label = String(node.label);
-				const size = fontSize / scale;
-				ctx.font = `${size}px ${getCssVariable("--bs-font-sans-serif")}`;
-				ctx.textAlign = "center";
-				ctx.textBaseline = "top";
-				ctx.fillStyle = getCssVariable("--bs-body-color");
-				if (typeof node.x === "number" && typeof node.y === "number")
-					ctx.fillText(label, node.x, node.y + radius + 2);
-			})
-			.nodeCanvasObjectMode(() => "after");
-	else
-		existing
-			.nodeCanvasObject(() => undefined)
-			.nodeCanvasObjectMode(() => "after");
-
-	return existing;
-}
-
-/** Render or update the graph using 3d-force-graph. */
-async function renderWith3DForceGraph(
-	nodes: GraphNode[],
-	edges: GraphLink[],
-	container: HTMLElement,
-	existing: ForceGraph3DInstance<GraphNode, GraphLink> | undefined,
-	nodeSize: number,
-): Promise<ForceGraph3DInstance<GraphNode, GraphLink>> {
-	const { default: ForceGraph3D } = await import("3d-force-graph");
-	const radius = nodeSize / 2;
-	const volume = (4 / 3) * Math.PI * radius * radius * radius;
-	const fgNodes = nodes.map((n) => ({ ...n, val: volume }));
-	if (!existing)
-		existing = new ForceGraph3D(container) as unknown as ForceGraph3DInstance<
-			GraphNode,
-			GraphLink
-		>;
-	existing.backgroundColor(getCssVariable("--bs-body-bg"));
-	existing
-		.nodeId("id")
-		.nodeLabel("label")
-		.nodeColor("color")
-		.nodeVal("val")
-		.nodeRelSize(1)
-		.linkColor("color")
-		.linkWidth(2)
-		.graphData({ nodes: fgNodes, links: edges });
-
-	return existing;
-}
+const rendererMap: Record<Renderer, RendererFunction> = {
+	cytoscape: renderCytoscape,
+	"force-graph": renderForceGraph,
+	"3d-force-graph": renderForceGraph3D,
+};
 
 /**
  * Initialize or update a graph based on the selected renderer.
@@ -328,34 +160,14 @@ export async function drawGraph(
 ): Promise<GraphInstance> {
 	const { nodes, edges } = await fetchGraphData();
 
-	if (renderer === "cytoscape")
-		return renderWithCytoscape(
-			nodes,
-			edges,
-			layoutName,
-			container,
-			existingGraph as Core | undefined,
-			nodeSize,
-			labelScale,
-			showLabels,
-		);
-
-	if (renderer === "force-graph")
-		return renderWithForceGraph(
-			nodes,
-			edges,
-			container,
-			existingGraph as ForceGraph<GraphNode, GraphLink> | undefined,
-			nodeSize,
-			labelScale,
-			showLabels,
-		);
-
-	return renderWith3DForceGraph(
+	return rendererMap[renderer](
 		nodes,
 		edges,
+		layoutName,
 		container,
-		existingGraph as ForceGraph3DInstance<GraphNode, GraphLink> | undefined,
+		existingGraph,
 		nodeSize,
+		labelScale,
+		showLabels,
 	);
 }

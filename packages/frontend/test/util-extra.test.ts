@@ -90,6 +90,7 @@ describe("drawGraph", () => {
 			undefined,
 			10,
 			1,
+			true,
 		);
 		expect(mockCytoscape).toHaveBeenCalled();
 		expect(result).toBe(cyInstance);
@@ -116,6 +117,7 @@ describe("drawGraph", () => {
 			existing,
 			5,
 			1,
+			true,
 		);
 		expect(existing.batch).toHaveBeenCalled();
 		expect(result).toBe(existing);
@@ -131,6 +133,8 @@ describe("drawGraph", () => {
 			nodeRelSize: vi.fn(() => fgInstance),
 			linkColor: vi.fn(() => fgInstance),
 			linkWidth: vi.fn(() => fgInstance),
+			nodeCanvasObject: vi.fn(() => fgInstance),
+			nodeCanvasObjectMode: vi.fn(() => fgInstance),
 		};
 		mockForceGraph.mockReturnValue(fgInstance);
 		mockGet.mockResolvedValue({ data: { nodes: [], edges: [] } });
@@ -141,6 +145,7 @@ describe("drawGraph", () => {
 			undefined,
 			5,
 			1,
+			true,
 		);
 		expect(mockForceGraph).toHaveBeenCalledWith(container);
 		expect(result).toEqual(fgInstance);
@@ -156,6 +161,8 @@ describe("drawGraph", () => {
 			nodeRelSize: vi.fn(() => fgInstance),
 			linkColor: vi.fn(() => fgInstance),
 			linkWidth: vi.fn(() => fgInstance),
+			nodeThreeObject: vi.fn(() => fgInstance),
+			nodeThreeObjectExtend: vi.fn(() => fgInstance),
 		} as unknown as object;
 		mockForceGraph3D.mockReturnValue(fgInstance);
 		mockGet.mockResolvedValue({ data: { nodes: [], edges: [] } });
@@ -166,6 +173,7 @@ describe("drawGraph", () => {
 			undefined,
 			5,
 			1,
+			true,
 		);
 		expect(mockForceGraph3D).toHaveBeenCalledWith(container);
 		expect(result).toEqual(fgInstance);

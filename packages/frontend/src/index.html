@@ -109,6 +109,21 @@
 						Current: <span x-text="labelScale.toFixed(1)"></span>em
 					</div>
 				</div>
+				<div class="mb-4">
+					<h5>Show labels</h5>
+					<div class="form-check form-switch">
+						<input
+							class="form-check-input"
+							type="checkbox"
+							id="toggleLabels"
+							x-model="showLabels"
+							@change="onShowLabelsChange()"
+						>
+						<label class="form-check-label" for="toggleLabels">
+							Display labels
+						</label>
+					</div>
+				</div>
 			</div>
 		</div>
 

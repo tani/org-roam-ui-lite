@@ -5,7 +5,10 @@ vi.mock("openapi-fetch", () => ({
   default: vi.fn(() => ({ GET: (...args: unknown[]) => mockGet(...args) })),
 }));
 
-const mockRenderer = vi.fn(async (..._args: unknown[]) => ({}));
+const mockRenderer = vi.fn(async (...args: unknown[]) => {
+  void args;
+  return {};
+});
 vi.mock("../src/renderers/cytoscape.ts", () => ({
   default: (...args: unknown[]) => mockRenderer(...args),
 }));

@@ -15,7 +15,10 @@ Object.defineProperty(window, "matchMedia", {
 function createGraph() {
   return { onNodeClick: vi.fn(), off: vi.fn(), on: vi.fn() };
 }
-const mockDrawGraph = vi.fn(async (..._args: unknown[]) => createGraph());
+const mockDrawGraph = vi.fn(async (...args: unknown[]) => {
+  void args;
+  return createGraph();
+});
 const mockApplyNodeStyle = vi.fn();
 const mockHighlightNeighborhood = vi.fn();
 const mockResetHighlight = vi.fn();
@@ -27,11 +30,14 @@ vi.mock("../src/graph.ts", () => ({
   resetHighlight: () => mockResetHighlight(),
 }));
 
-const mockOpenNode = vi.fn(async (_theme?: unknown, _id?: unknown) => ({
-  id: "1",
-  title: "Node",
-  body: h("div"),
-}));
+const mockOpenNode = vi.fn(async (...args: unknown[]) => {
+  void args;
+  return {
+    id: "1",
+    title: "Node",
+    body: h("div"),
+  };
+});
 vi.mock("../src/node.ts", () => ({
   openNode: (theme: unknown, id: unknown) => mockOpenNode(theme, id),
 }));

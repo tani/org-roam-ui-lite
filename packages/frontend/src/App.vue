@@ -77,7 +77,6 @@ import { openNode } from "./node.ts";
 void SettingsPanel;
 void DetailsPanel;
 
-// biome-ignore lint/correctness/noUnusedVariables: referenced in template
 const themes = Themes;
 const theme = ref<Theme>(
 	matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light",
@@ -86,9 +85,7 @@ const nodeSize = ref(10);
 const labelScale = ref(0.5);
 const showLabels = ref(true);
 const layout = ref<Layout>("cose");
-// biome-ignore lint/correctness/noUnusedVariables: referenced in template
 const layouts = Layouts;
-// biome-ignore lint/correctness/noUnusedVariables: referenced in template
 const renderers = Renderers;
 const renderer = ref<Renderer>("force-graph");
 const graph = ref<GraphInstance>();
@@ -151,28 +148,24 @@ async function refresh(): Promise<void> {
 }
 
 /** Change layout and refresh the graph. */
-// biome-ignore lint/correctness/noUnusedVariables: referenced in template
 function setLayout(newLayout: Layout): void {
 	layout.value = newLayout;
 	void refresh();
 }
 
 /** Change renderer and refresh. */
-// biome-ignore lint/correctness/noUnusedVariables: referenced in template
 function setRenderer(newRenderer: Renderer): void {
 	renderer.value = newRenderer;
 	graph.value = undefined;
 }
 
 /** Switch between themes and refresh. */
-// biome-ignore lint/correctness/noUnusedVariables: referenced in template
 function setTheme(newTheme: Theme): void {
 	theme.value = newTheme;
 	void refresh();
 }
 
 /** Adjust node size in the graph. */
-// biome-ignore lint/correctness/noUnusedVariables: referenced in template
 function onSizeChange(): void {
 	if (renderer.value === "cytoscape")
 		applyNodeStyle(graph.value as Core, {
@@ -183,7 +176,6 @@ function onSizeChange(): void {
 }
 
 /** Adjust label scale in the graph. */
-// biome-ignore lint/correctness/noUnusedVariables: referenced in template
 function onScaleChange(): void {
 	if (renderer.value === "cytoscape")
 		applyNodeStyle(graph.value as Core, {
@@ -193,7 +185,6 @@ function onScaleChange(): void {
 }
 
 /** Toggle label visibility. */
-// biome-ignore lint/correctness/noUnusedVariables: referenced in template
 function onShowLabelsChange(): void {
 	void refresh();
 }
@@ -218,13 +209,11 @@ function closeDetails(): void {
 }
 
 /** Toggle the details pane. */
-// biome-ignore lint/correctness/noUnusedVariables: referenced in template
 function toggleDetails(): void {
 	detailsOpen.value ? closeDetails() : openDetails();
 }
 
 /** Toggle the settings pane. */
-// biome-ignore lint/correctness/noUnusedVariables: referenced in template
 function toggleSettings(): void {
 	settingsOpen.value = !settingsOpen.value;
 }

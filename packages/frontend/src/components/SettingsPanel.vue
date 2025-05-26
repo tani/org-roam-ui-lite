@@ -94,37 +94,31 @@ const emit = defineEmits<{
 }>();
 
 /** Emit theme update event. */
-// biome-ignore lint/correctness/noUnusedVariables: used in template
 function onThemeChange(ev: Event): void {
 	emit("update:theme", (ev.target as HTMLSelectElement).value as Theme);
 }
 
 /** Emit renderer update event. */
-// biome-ignore lint/correctness/noUnusedVariables: used in template
 function onRendererChange(ev: Event): void {
 	emit("update:renderer", (ev.target as HTMLSelectElement).value as Renderer);
 }
 
 /** Emit layout update event. */
-// biome-ignore lint/correctness/noUnusedVariables: used in template
 function onLayoutChange(ev: Event): void {
 	emit("update:layout", (ev.target as HTMLSelectElement).value as Layout);
 }
 
 /** Emit node size update event. */
-// biome-ignore lint/correctness/noUnusedVariables: used in template
 function onNodeSize(ev: Event): void {
 	emit("update:nodeSize", Number((ev.target as HTMLInputElement).value));
 }
 
 /** Emit label scale update event. */
-// biome-ignore lint/correctness/noUnusedVariables: used in template
 function onLabelScale(ev: Event): void {
 	emit("update:labelScale", Number((ev.target as HTMLInputElement).value));
 }
 
 /** Emit show labels update event. */
-// biome-ignore lint/correctness/noUnusedVariables: used in template
 function onShowLabels(ev: Event): void {
 	emit("update:showLabels", (ev.target as HTMLInputElement).checked);
 }

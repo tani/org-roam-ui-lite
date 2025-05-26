@@ -1,16 +1,16 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-let mockGet: ReturnType<typeof vi.fn>;
+const mockGet = vi.fn();
 vi.mock("openapi-fetch", () => ({
 	default: vi.fn(() => ({ GET: (...args: unknown[]) => mockGet(...args) })),
 }));
 
-let mockCytoscape: ReturnType<typeof vi.fn>;
+const mockCytoscape = vi.fn();
 vi.mock("cytoscape", () => ({
 	default: (...args: unknown[]) => mockCytoscape(...args),
 }));
 
-let mockForceGraph: ReturnType<typeof vi.fn>;
+const mockForceGraph = vi.fn();
 vi.mock("force-graph", () => ({
 	default: class {
 		constructor(...args: unknown[]) {
@@ -19,7 +19,7 @@ vi.mock("force-graph", () => ({
 	},
 }));
 
-let mockForceGraph3D: ReturnType<typeof vi.fn>;
+const mockForceGraph3D = vi.fn();
 vi.mock("3d-force-graph", () => ({
 	default: class {
 		constructor(...args: unknown[]) {
@@ -45,11 +45,6 @@ import type { Layout } from "../src/graph-types.ts";
 import { openNode } from "../src/node.ts";
 
 const NODE_ID = "11111111-1111-4111-8111-111111111111";
-
-mockGet = vi.fn();
-mockCytoscape = vi.fn();
-mockForceGraph = vi.fn();
-mockForceGraph3D = vi.fn();
 
 describe("highlightNeighborhood", () => {
 	it("sets opacity based on neighborhood", () => {

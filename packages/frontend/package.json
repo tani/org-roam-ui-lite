@@ -31,6 +31,6 @@
 	"devDependencies": {
 		"@types/hast": "^3.0.4",
 		"@vitejs/plugin-vue": "^5.2.4",
-		"vite": "npm:rolldown-vite@^6.3.9"
+		"vite": "^6.3.5"
 	}
 }

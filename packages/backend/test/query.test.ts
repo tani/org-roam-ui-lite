@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 
 import { encodeBase64url } from "../src/base64url.ts";
 
-let mockReadFile: ReturnType<typeof vi.fn>;
+const mockReadFile = vi.fn();
 vi.mock("node:fs/promises", () => ({
 	readFile: (...args: unknown[]) => mockReadFile(...args),
 }));
@@ -69,15 +69,12 @@ function makeResourceDb(row: { id: string; title: string; file: string }) {
 	};
 }
 
-let mockCreateDatabase: ReturnType<typeof vi.fn>;
+const mockCreateDatabase = vi.fn();
 vi.mock("../src/database.ts", () => ({
 	createDatabase: (...args: unknown[]) => mockCreateDatabase(...args),
 }));
 
 import { fetchGraph, fetchNode, fetchResource } from "../src/query.ts";
-
-mockReadFile = vi.fn();
-mockCreateDatabase = vi.fn();
 
 describe("fetchGraph", () => {
 	it("filters invalid edges", async () => {

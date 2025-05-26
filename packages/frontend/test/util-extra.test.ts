@@ -34,7 +34,7 @@ vi.mock("../src/processor.ts", () => ({
 	),
 }));
 
-import { dimOthers, renderGraph } from "../src/graph.ts";
+import { drawGraph, highlightNeighborhood } from "../src/graph.ts";
 import { openNode } from "../src/node.ts";
 
 const NODE_ID = "11111111-1111-4111-8111-111111111111";
@@ -44,7 +44,7 @@ mockCytoscape = vi.fn();
 mockForceGraph = vi.fn();
 mockForceGraph3D = vi.fn();
 
-describe("dimOthers", () => {
+describe("highlightNeighborhood", () => {
 	it("sets opacity based on neighborhood", () => {
 		const node1 = { isNode: () => true, style: vi.fn() };
 		const node2 = { isNode: () => true, style: vi.fn() };
@@ -54,18 +54,18 @@ describe("dimOthers", () => {
 			$id: vi.fn(() => focus),
 			elements: vi.fn(() => [node1, node2, edge]),
 		} as unknown as import("cytoscape").Core;
-		dimOthers(graph, "id");
+		highlightNeighborhood(graph, "id");
 		expect(node1.style).toHaveBeenCalledWith("opacity", 1);
 		expect(edge.style).toHaveBeenCalledWith("opacity", 1);
 		expect(node2.style).toHaveBeenCalledWith("opacity", 0.15);
 	});
 
 	it("handles undefined graph", () => {
-		expect(() => dimOthers(undefined, "id")).not.toThrow();
+		expect(() => highlightNeighborhood(undefined, "id")).not.toThrow();
 	});
 });
 
-describe("renderGraph", () => {
+describe("drawGraph", () => {
 	const container = document.createElement("div");
 	beforeEach(() => {
 		mockCytoscape.mockReset();
@@ -83,7 +83,7 @@ describe("renderGraph", () => {
 				edges: [],
 			},
 		});
-		const result = await renderGraph(
+		const result = await drawGraph(
 			"cytoscape",
 			"cose",
 			container,
@@ -109,7 +109,7 @@ describe("renderGraph", () => {
 				edges: [],
 			},
 		});
-		const result = await renderGraph(
+		const result = await drawGraph(
 			"cytoscape",
 			"fcose",
 			container,
@@ -134,7 +134,7 @@ describe("renderGraph", () => {
 		};
 		mockForceGraph.mockReturnValue(fgInstance);
 		mockGet.mockResolvedValue({ data: { nodes: [], edges: [] } });
-		const result = await renderGraph(
+		const result = await drawGraph(
 			"force-graph",
 			"cose",
 			container,
@@ -159,7 +159,7 @@ describe("renderGraph", () => {
 		} as unknown as object;
 		mockForceGraph3D.mockReturnValue(fgInstance);
 		mockGet.mockResolvedValue({ data: { nodes: [], edges: [] } });
-		const result = await renderGraph(
+		const result = await drawGraph(
 			"3d-force-graph",
 			"cose",
 			container,

@@ -1,6 +1,6 @@
 import type { Core } from "cytoscape";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { setElementsStyle, setNodeStyle } from "../src/graph.ts";
+import { applyElementsStyle, applyNodeStyle } from "../src/graph.ts";
 import { getCssVariable, pickColor } from "../src/style.ts";
 
 const ACCENT_VARIABLES = [
@@ -46,33 +46,33 @@ describe("pickColor", () => {
 	});
 });
 
-describe("setElementsStyle", () => {
+describe("applyElementsStyle", () => {
 	it("applies each style pair", () => {
 		const mockStyle = vi.fn();
 		const graph = {
 			elements: vi.fn(() => ({ style: mockStyle })),
 		} as unknown as Core;
-		setElementsStyle(graph, { width: 2, color: "red" });
+		applyElementsStyle(graph, { width: 2, color: "red" });
 		expect(mockStyle).toHaveBeenNthCalledWith(1, "width", 2);
 		expect(mockStyle).toHaveBeenNthCalledWith(2, "color", "red");
 	});
 
 	it("handles undefined graph", () => {
-		expect(() => setElementsStyle(undefined, { foo: 1 })).not.toThrow();
+		expect(() => applyElementsStyle(undefined, { foo: 1 })).not.toThrow();
 	});
 });
 
-describe("setNodeStyle", () => {
+describe("applyNodeStyle", () => {
 	it("applies style to nodes", () => {
 		const mockStyle = vi.fn();
 		const graph = {
 			nodes: vi.fn(() => ({ style: mockStyle })),
 		} as unknown as Core;
-		setNodeStyle(graph, { opacity: 0.5 });
+		applyNodeStyle(graph, { opacity: 0.5 });
 		expect(mockStyle).toHaveBeenCalledWith({ opacity: 0.5 });
 	});
 
 	it("handles undefined graph", () => {
-		expect(() => setNodeStyle(undefined, { foo: 1 })).not.toThrow();
+		expect(() => applyNodeStyle(undefined, { foo: 1 })).not.toThrow();
 	});
 });

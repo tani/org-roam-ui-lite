@@ -190,7 +190,11 @@ Alpine.data("app", () => ({
 
 	/** Show preview for a linked node */
 	async showPreview(anchor: HTMLAnchorElement): Promise<void> {
+		this.previewAnchor = anchor;
 		const node = await openNode(this.theme, anchor.href.replace("id:", ""));
+
+		if (this.previewAnchor !== anchor) return;
+
 		const div = document.createElement("div");
 		div.className = "card position-fixed p-2 preview-popover responsive-wide";
 		div.innerHTML = node.html;
@@ -199,7 +203,6 @@ Alpine.data("app", () => ({
 		div.style.left = `${rect.left}px`;
 		document.body.appendChild(div);
 		this.previewEl = div;
-		this.previewAnchor = anchor;
 		div.addEventListener("mouseleave", () => {
 			this.hidePreview();
 		});

@@ -14,7 +14,22 @@
       <button type="button" class="btn-close" @click="$emit('close')" aria-label="Close"></button>
     </div>
     <div class="offcanvas-body">
-<div ref="rendered"></div>
+      <div
+        ref="_rendered"
+        @click="_onRenderedClick"
+        @mouseover="_onRenderedMouseOver"
+        @mouseout="_onRenderedMouseOut"
+      >
+        <component :is="selected.body" />
+      </div>
+      <PreviewPopover
+        v-if="preview"
+        :content="preview.body"
+        :x="preview.x"
+        :y="preview.y"
+        ref="previewComponent"
+        @leave="hidePreview"
+      />
       <div v-show="selected.backlinks?.length" class="mt-3">
         <h5><i class="bi bi-link-45deg"></i>Backlinks</h5>
         <ul class="list-unstyled">
@@ -31,10 +46,13 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, render, type VNode, watch } from "vue";
+import { ref, type VNode, watch } from "vue";
 import type { components } from "../api.d.ts";
 import type { Theme } from "../graph-types.ts";
 import { openNode } from "../node.ts";
+import PreviewPopover from "./PreviewPopover.vue";
+
+void PreviewPopover;
 
 const props = defineProps<{
 	open: boolean;
@@ -47,39 +65,36 @@ const emit = defineEmits<{
 	(e: "openNode", id: string): void;
 }>();
 
-const rendered = ref<HTMLElement>();
-const previewEl = ref<HTMLElement>();
+const _rendered = ref<HTMLElement>();
+const preview = ref<{ body: VNode; x: number; y: number }>();
+const previewComponent = ref<{ el: HTMLElement } | null>(null);
 const previewAnchor = ref<HTMLAnchorElement>();
 
-function renderBody(): void {
-	if (rendered.value) render(props.selected.body ?? null, rendered.value);
+/** Handle user interactions on the rendered HTML. */
+function _onRenderedClick(ev: MouseEvent): void {
+	const a = (ev.target as HTMLElement).closest("a");
+	if (!a || !a.href.startsWith("id:")) return;
+	ev.preventDefault();
+	emit("openNode", a.href.replace("id:", ""));
 }
 
-/** Attach click and hover events to the rendered HTML. */
-function attachEvents(): void {
-	rendered.value?.addEventListener("click", (ev) => {
-		const a = (ev.target as HTMLElement).closest("a");
-		if (!a || !a.href.startsWith("id:")) return;
-		ev.preventDefault();
-		emit("openNode", a.href.replace("id:", ""));
-	});
-	rendered.value?.addEventListener("mouseover", (ev) => {
-		const anchor = (ev.target as HTMLElement).closest("a");
-		if (!anchor || !anchor.href.startsWith("id:")) return;
-		if (previewAnchor.value === anchor) return;
-		void showPreview(anchor as HTMLAnchorElement, ev);
-	});
-	rendered.value?.addEventListener("mouseout", (ev) => {
-		if (!previewAnchor.value) return;
-		const related = ev.relatedTarget as Node | null;
-		if (
-			related &&
-			(previewAnchor.value.contains(related) ||
-				previewEl.value?.contains(related))
-		)
-			return;
-		hidePreview();
-	});
+function _onRenderedMouseOver(ev: MouseEvent): void {
+	const anchor = (ev.target as HTMLElement).closest("a");
+	if (!anchor || !anchor.href.startsWith("id:")) return;
+	if (previewAnchor.value === anchor) return;
+	void showPreview(anchor as HTMLAnchorElement, ev);
+}
+
+function _onRenderedMouseOut(ev: MouseEvent): void {
+	if (!previewAnchor.value) return;
+	const related = ev.relatedTarget as Node | null;
+	const previewEl = previewComponent.value?.el;
+	if (
+		related &&
+		(previewAnchor.value.contains(related) || previewEl?.contains(related))
+	)
+		return;
+	hidePreview();
 }
 
 /**
@@ -95,26 +110,12 @@ async function showPreview(
 	previewAnchor.value = anchor;
 	const node = await openNode(props.theme, anchor.href.replace("id:", ""));
 	if (previewAnchor.value !== anchor) return;
-	const div = document.createElement("div");
-	div.className = "card position-fixed p-2 preview-popover responsive-wide";
-	render(node.body, div);
-	div.style.visibility = "hidden";
-	document.body.appendChild(div);
-	const offset = 20;
-	div.style.left = `${ev.clientX - div.offsetWidth - offset}px`;
-	div.style.top = `${ev.clientY + offset}px`;
-	div.style.visibility = "visible";
-	previewEl.value = div;
-	div.addEventListener("mouseleave", () => {
-		hidePreview();
-	});
+	preview.value = { body: node.body, x: ev.clientX, y: ev.clientY };
 }
 
 /** Remove the preview element if present. */
 function hidePreview(): void {
-	if (previewEl.value) render(null, previewEl.value);
-	previewEl.value?.remove();
-	previewEl.value = undefined;
+	preview.value = undefined;
 	previewAnchor.value = undefined;
 }
 
@@ -129,12 +130,6 @@ watch(
 	() => props.selected,
 	() => {
 		hidePreview();
-		renderBody();
 	},
 );
-
-onMounted(() => {
-	attachEvents();
-	renderBody();
-});
 </script>

@@ -34,7 +34,12 @@ vi.mock("../src/processor.ts", () => ({
 	),
 }));
 
-import { drawGraph, highlightNeighborhood } from "../src/graph.ts";
+import {
+	drawGraph,
+	type GraphInstance,
+	highlightNeighborhood,
+	resetHighlight,
+} from "../src/graph.ts";
 import type { Layout } from "../src/graph-types.ts";
 import { openNode } from "../src/node.ts";
 
@@ -180,6 +185,13 @@ describe("drawGraph", () => {
 		expect(mockForceGraph3D).toHaveBeenCalledWith(container);
 		expect(result).toEqual(fgInstance);
 	});
+
+	it("throws on api error", async () => {
+		mockGet.mockResolvedValue({ data: {}, error: "bad" });
+		await expect(
+			drawGraph("cytoscape", "cose", container, undefined, 5, 1, true),
+		).rejects.toThrow("API error: bad");
+	});
 });
 
 describe("openNode", () => {
@@ -199,5 +211,32 @@ describe("openNode", () => {
 	it("throws on api error", async () => {
 		mockGet.mockResolvedValue({ data: {}, error: "oops" });
 		await expect(openNode("light", NODE_ID)).rejects.toBe("oops");
+	});
+});
+
+describe("resetHighlight", () => {
+	it("resets opacity for cytoscape", () => {
+		const style = vi.fn();
+		const graph = {
+			elements: vi.fn(() => ({ style })),
+		} as unknown as import("cytoscape").Core;
+		resetHighlight(graph);
+		expect(style).toHaveBeenCalledWith("opacity", 1);
+	});
+
+	it("resets colors for force-graph", () => {
+		const nodeColor = vi.fn();
+		const linkColor = vi.fn();
+		const graph = {
+			nodeColor,
+			linkColor,
+		} as unknown as GraphInstance;
+		resetHighlight(graph);
+		expect(nodeColor).toHaveBeenCalledWith("color");
+		expect(linkColor).toHaveBeenCalledWith("color");
+	});
+
+	it("handles undefined graph", () => {
+		expect(() => resetHighlight(undefined)).not.toThrow();
 	});
 });

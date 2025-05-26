@@ -48,12 +48,12 @@ export interface GraphLink extends LinkObject<GraphNode> {
 }
 
 /**
- * Dim unrelated nodes and edges leaving the focused node opaque.
+ * Highlight the neighborhood of the given node while dimming others.
  *
  * @param graph - Graph instance
  * @param focusId - Node id to highlight
  */
-export function dimOthers(
+export function highlightNeighborhood(
 	graph: GraphInstance | undefined,
 	focusId: string,
 ): void {
@@ -100,7 +100,7 @@ export function dimOthers(
  * @param graph - Cytoscape instance
  * @param style - CSS properties to apply
  */
-export function setElementsStyle(
+export function applyElementsStyle(
 	graph: Core | undefined,
 	style: Record<string, unknown>,
 ): void {
@@ -115,7 +115,7 @@ export function setElementsStyle(
  * @param graph - Cytoscape instance
  * @param style - CSS properties to apply
  */
-export function setNodeStyle(
+export function applyNodeStyle(
 	graph: Core | undefined,
 	style: Record<string, unknown>,
 ): void {
@@ -127,10 +127,10 @@ export function setNodeStyle(
  *
  * @param graph - Graph instance
  */
-export function resetDim(graph: GraphInstance | undefined): void {
+export function resetHighlight(graph: GraphInstance | undefined): void {
 	if (!graph) return;
 	if (typeof (graph as Core).elements === "function") {
-		setElementsStyle(graph as Core, { opacity: 1 });
+		applyElementsStyle(graph as Core, { opacity: 1 });
 		return;
 	}
 	const fg = graph as
@@ -148,37 +148,22 @@ export type GraphInstance =
 	| ForceGraph<GraphNode, GraphLink>
 	| ForceGraph3DInstance<GraphNode, GraphLink>;
 
-/**
- * Initialize or update a graph based on selected renderer.
- *
- * @param renderer - Rendering library
- * @param layoutName - Layout algorithm name (Cytoscape only)
- * @param container - DOM element hosting the graph
- * @param existingGraph - Previous graph instance
- * @param nodeSize - Node diameter in pixels
- * @param labelScale - Font scale for node labels
- * @returns The created or updated graph instance
- */
-export async function renderGraph(
-	renderer: Renderer,
-	layoutName: Layout,
-	container: HTMLElement,
-	existingGraph: GraphInstance | undefined,
-	nodeSize: number,
-	labelScale: number,
-): Promise<GraphInstance> {
+interface GraphData {
+	nodes: GraphNode[];
+	edges: GraphLink[];
+}
+
+/** Fetch graph data from the backend API. */
+async function fetchGraphData(): Promise<GraphData> {
 	const { data, error } = await api.GET("/api/graph.json");
 
 	if (error) throw new Error(`API error: ${error}`);
 
-	const baseNodes: GraphNode[] = data.nodes.map((n) => ({
+	const nodes: GraphNode[] = data.nodes.map((n) => ({
 		id: n.id,
 		label: n.title,
 		color: pickColor(n.id),
 	}));
-	const radius = nodeSize / 2;
-	const area = Math.PI * radius * radius;
-	const volume = (4 / 3) * Math.PI * radius * radius * radius;
 	const edgeColor = getCssVariable("--bs-secondary");
 	const edges: GraphLink[] = data.edges.map((e) => ({
 		source: e.source,
@@ -186,86 +171,85 @@ export async function renderGraph(
 		color: edgeColor,
 	}));
 
-	if (renderer === "cytoscape") {
-		const { default: cytoscape } = await import("cytoscape");
-		const elements = [
-			...baseNodes.map((n) => ({ data: n })),
-			...edges.map((e) => ({ data: e })),
-		];
+	return { nodes, edges };
+}
 
-		const style = [
-			{ selector: "edge", style: { width: 1 } },
-			{
-				selector: "node",
-				style: {
-					width: nodeSize,
-					height: nodeSize,
-					"font-size": `${labelScale}em`,
-					label: "data(label)",
-					"font-family": getCssVariable("--bs-font-sans-serif"),
-					color: getCssVariable("--bs-body-color"),
-					"background-color": "data(color)",
-				},
+/** Render or update the graph using Cytoscape. */
+async function renderWithCytoscape(
+	nodes: GraphNode[],
+	edges: GraphLink[],
+	layoutName: Layout,
+	container: HTMLElement,
+	existing: Core | undefined,
+	nodeSize: number,
+	labelScale: number,
+): Promise<Core> {
+	const { default: cytoscape } = await import("cytoscape");
+	const elements = [
+		...nodes.map((n) => ({ data: n })),
+		...edges.map((e) => ({ data: e })),
+	];
+
+	const style = [
+		{ selector: "edge", style: { width: 1 } },
+		{
+			selector: "node",
+			style: {
+				width: nodeSize,
+				height: nodeSize,
+				"font-size": `${labelScale}em`,
+				label: "data(label)",
+				"font-family": getCssVariable("--bs-font-sans-serif"),
+				color: getCssVariable("--bs-body-color"),
+				"background-color": "data(color)",
 			},
-		];
+		},
+	];
 
-		layoutName = layoutName === "fcose" ? "cose" : layoutName;
+	layoutName = layoutName === "fcose" ? "cose" : layoutName;
 
-		const layout = {
-			name: layoutName,
-			tile: false,
-			animate: "end",
-			animationDuration: 700,
-		} as LayoutOptions;
+	const layout = {
+		name: layoutName,
+		tile: false,
+		animate: "end",
+		animationDuration: 700,
+	} as LayoutOptions;
 
-		const cy = existingGraph as Core | undefined;
-		if (!cy) {
-			const graph = cytoscape({
-				container,
-				elements,
-				layout,
-				minZoom: 0.5,
-				maxZoom: 4,
-				style,
-			});
-			return graph;
-		}
-		cy.batch(() => {
-			cy.elements().remove();
-			cy.add(elements);
-			cy.style(style);
-			cy.layout(layout).run();
+	if (!existing) {
+		return cytoscape({
+			container,
+			elements,
+			layout,
+			minZoom: 0.5,
+			maxZoom: 4,
+			style,
 		});
-		return cy;
 	}
 
-	if (renderer === "force-graph") {
-		const { default: ForceGraphCtor } = await import("force-graph");
-		const nodes = baseNodes.map((n) => ({ ...n, val: area }));
-		let fg = existingGraph as ForceGraph<GraphNode, GraphLink> | undefined;
-		if (!fg) fg = new ForceGraphCtor<GraphNode, GraphLink>(container);
-		fg.nodeId("id")
-			.nodeLabel("label")
-			.nodeColor("color")
-			.nodeVal("val")
-			.nodeRelSize(1)
-			.linkColor("color")
-			.linkWidth(2)
-			.graphData({ nodes, links: edges });
-		return fg;
-	}
+	existing.batch(() => {
+		existing.elements().remove();
+		existing.add(elements);
+		existing.style(style);
+		existing.layout(layout).run();
+	});
 
-	const nodes = baseNodes.map((n) => ({ ...n, val: volume }));
-	const { default: ForceGraph3D } = await import("3d-force-graph");
-	let fg3d = existingGraph as
-		| ForceGraph3DInstance<GraphNode, GraphLink>
-		| undefined;
-	if (!fg3d)
-		fg3d = new ForceGraph3D(container) as unknown as ForceGraph3DInstance<
-			GraphNode,
-			GraphLink
-		>;
-	fg3d
+	return existing;
+}
+
+/** Render or update the graph using force-graph. */
+async function renderWithForceGraph(
+	nodes: GraphNode[],
+	edges: GraphLink[],
+	container: HTMLElement,
+	existing: ForceGraph<GraphNode, GraphLink> | undefined,
+	nodeSize: number,
+): Promise<ForceGraph<GraphNode, GraphLink>> {
+	const { default: ForceGraphCtor } = await import("force-graph");
+	const radius = nodeSize / 2;
+	const area = Math.PI * radius * radius;
+	const fgNodes = nodes.map((n) => ({ ...n, val: area }));
+	if (!existing) existing = new ForceGraphCtor<GraphNode, GraphLink>(container);
+	existing
 		.nodeId("id")
 		.nodeLabel("label")
 		.nodeColor("color")
@@ -273,6 +257,77 @@ export async function renderGraph(
 		.nodeRelSize(1)
 		.linkColor("color")
 		.linkWidth(2)
-		.graphData({ nodes, links: edges });
-	return fg3d;
+		.graphData({ nodes: fgNodes, links: edges });
+	return existing;
+}
+
+/** Render or update the graph using 3d-force-graph. */
+async function renderWith3DForceGraph(
+	nodes: GraphNode[],
+	edges: GraphLink[],
+	container: HTMLElement,
+	existing: ForceGraph3DInstance<GraphNode, GraphLink> | undefined,
+	nodeSize: number,
+): Promise<ForceGraph3DInstance<GraphNode, GraphLink>> {
+	const { default: ForceGraph3D } = await import("3d-force-graph");
+	const radius = nodeSize / 2;
+	const volume = (4 / 3) * Math.PI * radius * radius * radius;
+	const fgNodes = nodes.map((n) => ({ ...n, val: volume }));
+	if (!existing)
+		existing = new ForceGraph3D(container) as unknown as ForceGraph3DInstance<
+			GraphNode,
+			GraphLink
+		>;
+	existing
+		.nodeId("id")
+		.nodeLabel("label")
+		.nodeColor("color")
+		.nodeVal("val")
+		.nodeRelSize(1)
+		.linkColor("color")
+		.linkWidth(2)
+		.graphData({ nodes: fgNodes, links: edges });
+	return existing;
+}
+
+/**
+ * Initialize or update a graph based on the selected renderer.
+ */
+export async function drawGraph(
+	renderer: Renderer,
+	layoutName: Layout,
+	container: HTMLElement,
+	existingGraph: GraphInstance | undefined,
+	nodeSize: number,
+	labelScale: number,
+): Promise<GraphInstance> {
+	const { nodes, edges } = await fetchGraphData();
+
+	if (renderer === "cytoscape")
+		return renderWithCytoscape(
+			nodes,
+			edges,
+			layoutName,
+			container,
+			existingGraph as Core | undefined,
+			nodeSize,
+			labelScale,
+		);
+
+	if (renderer === "force-graph")
+		return renderWithForceGraph(
+			nodes,
+			edges,
+			container,
+			existingGraph as ForceGraph<GraphNode, GraphLink> | undefined,
+			nodeSize,
+		);
+
+	return renderWith3DForceGraph(
+		nodes,
+		edges,
+		container,
+		existingGraph as ForceGraph3DInstance<GraphNode, GraphLink> | undefined,
+		nodeSize,
+	);
 }

@@ -3,15 +3,15 @@ import Alpine from "alpinejs";
 import type { Core } from "cytoscape";
 import type { components } from "./api.d.ts";
 import {
-	dimOthers,
+	applyNodeStyle,
+	drawGraph,
 	type GraphInstance,
+	highlightNeighborhood,
 	type Layout,
 	Layouts,
 	type Renderer,
 	Renderers,
-	renderGraph,
-	resetDim,
-	setNodeStyle,
+	resetHighlight,
 	type Theme,
 	Themes,
 } from "./graph.ts";
@@ -57,7 +57,7 @@ Alpine.data("app", () => ({
 	/** Initialize the application and render the graph */
 	async init() {
 		// Initial graph render
-		this.graph = await renderGraph(
+		this.graph = await drawGraph(
 			this.renderer,
 			this.layout,
 			this.$refs.graph,
@@ -83,7 +83,7 @@ Alpine.data("app", () => ({
 
 	/** Re-render the graph with current settings */
 	async refresh() {
-		this.graph = await renderGraph(
+		this.graph = await drawGraph(
 			this.renderer,
 			this.layout,
 			this.$refs.graph,
@@ -116,7 +116,7 @@ Alpine.data("app", () => ({
 	/** Adjust node size in the graph */
 	onSizeChange() {
 		if (this.renderer === "cytoscape")
-			setNodeStyle(this.graph as Core, {
+			applyNodeStyle(this.graph as Core, {
 				width: this.nodeSize,
 				height: this.nodeSize,
 			});
@@ -126,7 +126,9 @@ Alpine.data("app", () => ({
 	/** Adjust label scale in the graph */
 	onScaleChange() {
 		if (this.renderer === "cytoscape")
-			setNodeStyle(this.graph as Core, { "font-size": `${this.labelScale}em` });
+			applyNodeStyle(this.graph as Core, {
+				"font-size": `${this.labelScale}em`,
+			});
 		else void this.refresh();
 	},
 
@@ -140,13 +142,13 @@ Alpine.data("app", () => ({
 	/** Show the details pane and dim other nodes */
 	openDetails() {
 		this.detailsOpen = true;
-		dimOthers(this.graph, this.selected.id);
+		highlightNeighborhood(this.graph, this.selected.id);
 	},
 
 	/** Hide the details pane and restore styles */
 	closeDetails() {
 		this.detailsOpen = false;
-		resetDim(this.graph);
+		resetHighlight(this.graph);
 	},
 
 	/** Toggle the details pane */

@@ -173,7 +173,7 @@ Alpine.data("app", () => ({
 			const anchor = (ev.target as HTMLElement).closest("a");
 			if (!anchor || !anchor.href.startsWith("id:")) return;
 			if (this.previewAnchor === anchor) return;
-			void this.showPreview(anchor as HTMLAnchorElement);
+			void this.showPreview(anchor as HTMLAnchorElement, ev);
 		});
 		this.$refs.rendered.addEventListener("mouseout", (ev) => {
 			if (!this.previewAnchor) return;
@@ -188,8 +188,13 @@ Alpine.data("app", () => ({
 		});
 	},
 
-	/** Show preview for a linked node */
-	async showPreview(anchor: HTMLAnchorElement): Promise<void> {
+	/**
+	 * Show preview for a linked node near the mouse cursor.
+	 *
+	 * @param anchor - Hovered anchor element
+	 * @param ev - Mouse event
+	 */
+	async showPreview(anchor: HTMLAnchorElement, ev: MouseEvent): Promise<void> {
 		this.previewAnchor = anchor;
 		const node = await openNode(this.theme, anchor.href.replace("id:", ""));
 
@@ -198,10 +203,12 @@ Alpine.data("app", () => ({
 		const div = document.createElement("div");
 		div.className = "card position-fixed p-2 preview-popover responsive-wide";
 		div.innerHTML = node.html;
-		const rect = anchor.getBoundingClientRect();
-		div.style.top = `${rect.bottom + 8}px`;
-		div.style.left = `${rect.left}px`;
+		div.style.visibility = "hidden";
 		document.body.appendChild(div);
+		const offset = 20;
+		div.style.left = `${ev.clientX - div.offsetWidth - offset}px`;
+		div.style.top = `${ev.clientY + offset}px`;
+		div.style.visibility = "visible";
 		this.previewEl = div;
 		div.addEventListener("mouseleave", () => {
 			this.hidePreview();

@@ -109,7 +109,7 @@ html {
 		width: 85vw;
 	}
 	.preview-popover.responsive-wide {
-		width: 85vw;
+		width: min(calc(100% - 85vw), 85vw);
 	}
 }
 
@@ -119,7 +119,7 @@ html {
 		width: 70vw;
 	}
 	.preview-popover.responsive-wide {
-		width: 70vw;
+		width: min(calc(100% - 70vw), 70vw);
 	}
 }
 
@@ -129,7 +129,7 @@ html {
 		width: 60vw;
 	}
 	.preview-popover.responsive-wide {
-		width: 60vw;
+		width: min(calc(100% - 60vw), 60vw);
 	}
 }
 
@@ -140,7 +140,7 @@ html {
 		max-width: 800px;
 	}
 	.preview-popover.responsive-wide {
-		width: 50vw;
+		width: min(calc(100% - 50vw), 50vw);
 		max-width: 800px;
 	}
 }

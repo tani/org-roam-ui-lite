@@ -1,5 +1,5 @@
 import userEvent from "@testing-library/user-event";
-import { cleanup, render } from "@testing-library/vue";
+import { cleanup, fireEvent, render } from "@testing-library/vue";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { h } from "vue";
 
@@ -93,6 +93,7 @@ describe("DetailsPanel", () => {
 		const anchor = container.querySelector("a") as HTMLElement;
 		await user.hover(anchor);
 		await Promise.resolve();
+		await Promise.resolve();
 		expect(openNode).toHaveBeenCalledWith("light", "2");
 		expect(document.body.querySelector(".preview-popover")).toBeTruthy();
 		await rerender({
@@ -101,6 +102,53 @@ describe("DetailsPanel", () => {
 			theme: "light",
 		});
 		await Promise.resolve();
+		expect(document.body.querySelector(".preview-popover")).toBeNull();
+	});
+
+	it("emits openNode when internal link clicked", async () => {
+		const _user = userEvent.setup();
+		const body = h("p", [h("a", { href: "id:2" }, "link")]);
+		const { container, emitted } = render(
+			DetailsPanel as unknown as Record<string, unknown>,
+			{
+				props: {
+					open: true,
+					selected: { ...sampleNode, body },
+					theme: "light",
+				},
+			},
+		);
+		const anchor = container.querySelector("a") as HTMLAnchorElement;
+		const event = new MouseEvent("click", { bubbles: true, cancelable: true });
+		anchor.dispatchEvent(event);
+		await Promise.resolve();
+		expect(event.defaultPrevented).toBe(true);
+		expect(emitted().openNode[0]).toEqual(["2"]);
+	});
+
+	it("keeps preview when moving to popover", async () => {
+		const user = userEvent.setup();
+		const body = h("p", [h("a", { href: "id:2" }, "link")]);
+		const { container } = render(
+			DetailsPanel as unknown as Record<string, unknown>,
+			{
+				props: {
+					open: true,
+					selected: { ...sampleNode, body },
+					theme: "light",
+				},
+			},
+		);
+		const anchor = container.querySelector("a") as HTMLElement;
+		await user.hover(anchor);
+		await Promise.resolve();
+		const preview = document.body.querySelector(
+			".preview-popover",
+		) as HTMLElement;
+		expect(preview).toBeTruthy();
+		await fireEvent.mouseOut(anchor, { relatedTarget: preview });
+		await Promise.resolve();
+		await fireEvent.mouseOut(anchor, { relatedTarget: null });
 		expect(document.body.querySelector(".preview-popover")).toBeNull();
 	});
 });

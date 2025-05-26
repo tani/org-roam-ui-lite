@@ -27,13 +27,13 @@ vi.mock("../src/graph.ts", () => ({
 	resetHighlight: () => mockResetHighlight(),
 }));
 
-const mockOpenNode = vi.fn(async () => ({
+const mockOpenNode = vi.fn(async (_theme?: unknown, _id?: unknown) => ({
 	id: "1",
 	title: "Node",
 	body: h("div"),
 }));
 vi.mock("../src/node.ts", () => ({
-	openNode: () => mockOpenNode(),
+	openNode: (theme: unknown, id: unknown) => mockOpenNode(theme, id),
 }));
 
 import App from "../src/App.vue";
@@ -136,5 +136,69 @@ describe("App", () => {
 		if (range) await fireEvent.input(range, { target: { value: "20" } });
 		expect(mockApplyNodeStyle).toHaveBeenCalled();
 		expect(mockDrawGraph).not.toHaveBeenCalled();
+	});
+
+	it("opens node when graph emits click", async () => {
+		const { container } = render(App as unknown as Record<string, unknown>);
+		await Promise.resolve();
+		const graph = await mockDrawGraph.mock.results[0].value;
+		const cb = graph.onNodeClick.mock.calls[0][0] as (node: {
+			id: string;
+		}) => Promise<void>;
+		await cb({ id: "2" });
+		await Promise.resolve();
+		expect(mockOpenNode).toHaveBeenCalledWith("light", "2");
+		expect(mockHighlightNeighborhood).toHaveBeenCalled();
+		expect(
+			container.querySelector("#offcanvasDetails")?.classList.contains("show"),
+		).toBe(true);
+	});
+
+	it("refreshes when node size changes in force-graph mode", async () => {
+		const _user = userEvent.setup();
+		const { container } = render(App as unknown as Record<string, unknown>);
+		await Promise.resolve();
+		mockDrawGraph.mockClear();
+		const range = container.querySelector(
+			"input[type='range']",
+		) as HTMLInputElement;
+		if (range) await fireEvent.input(range, { target: { value: "15" } });
+		expect(mockDrawGraph).toHaveBeenCalled();
+	});
+
+	it("refreshes when label scale changes in force-graph mode", async () => {
+		const _user = userEvent.setup();
+		const { container } = render(App as unknown as Record<string, unknown>);
+		await Promise.resolve();
+		mockDrawGraph.mockClear();
+		const range = container.querySelectorAll(
+			"input[type='range']",
+		)[1] as HTMLInputElement;
+		if (range) await fireEvent.input(range, { target: { value: "1" } });
+		expect(mockDrawGraph).toHaveBeenCalled();
+	});
+
+	it("changes layout and refreshes", async () => {
+		const _user = userEvent.setup();
+		const { getAllByRole } = render(App as unknown as Record<string, unknown>);
+		await Promise.resolve();
+		await _user.selectOptions(getAllByRole("combobox")[1], "cytoscape");
+		await Promise.resolve();
+		mockDrawGraph.mockClear();
+		await _user.selectOptions(getAllByRole("combobox")[2], "circle");
+		await Promise.resolve();
+		expect(mockDrawGraph).toHaveBeenCalled();
+	});
+
+	it("refreshes when toggling label visibility", async () => {
+		const user = userEvent.setup();
+		const { container } = render(App as unknown as Record<string, unknown>);
+		await Promise.resolve();
+		mockDrawGraph.mockClear();
+		const checkbox = container.querySelector(
+			"input[type='checkbox']",
+		) as HTMLInputElement;
+		if (checkbox) await user.click(checkbox);
+		expect(mockDrawGraph).toHaveBeenCalled();
 	});
 });

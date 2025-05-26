@@ -34,50 +34,21 @@ Alpine.data("app", () => ({
 	graph: undefined as GraphInstance | undefined,
 	previewEl: undefined as HTMLElement | undefined,
 	previewAnchor: undefined as HTMLAnchorElement | undefined,
-	previewNodeId: undefined as string | undefined,
-	mouseX: 0,
-	mouseY: 0,
-	/** Attach click and hover events to graph nodes */
+	/** Attach node click events based on the current renderer */
 	bindGraphEvents() {
 		if (!this.graph) return;
-
-		(this.$refs.graph as HTMLElement).onmousemove = (ev) => {
-			this.mouseX = ev.clientX;
-			this.mouseY = ev.clientY;
-		};
-
 		if (this.renderer === "cytoscape") {
 			const cy = this.graph as Core;
 			cy.off("tap", "node");
-			cy.off("mouseover", "node");
-			cy.off("mouseout", "node");
 			cy.on("tap", "node", ({ target }) => {
 				void this.openNode(target.id());
-			});
-			cy.on("mouseover", "node", (ev) => {
-				const id = ev.target.id();
-				if (this.previewNodeId === id) return;
-				const me = ev.originalEvent as MouseEvent;
-				void this.showNodePreview(id, me.clientX, me.clientY);
-			});
-			cy.on("mouseout", "node", () => {
-				if (this.previewNodeId) this.hidePreview();
 			});
 		} else {
 			const fg = this.graph as unknown as {
 				onNodeClick: (cb: (node: { id: string }) => void) => void;
-				onNodeHover: (cb: (node: { id: string } | null) => void) => void;
 			};
 			fg.onNodeClick((node: { id: string }) => {
 				void this.openNode(node.id);
-			});
-			fg.onNodeHover((node: { id: string } | null) => {
-				if (node) {
-					if (this.previewNodeId === node.id) return;
-					void this.showNodePreview(node.id, this.mouseX, this.mouseY);
-				} else if (this.previewNodeId) {
-					this.hidePreview();
-				}
 			});
 		}
 	},
@@ -217,11 +188,7 @@ Alpine.data("app", () => ({
 		});
 	},
 
-	/**
-	 * Show preview for a linked node.
-	 *
-	 * @param anchor - Anchor element for the node link
-	 */
+	/** Show preview for a linked node */
 	async showPreview(anchor: HTMLAnchorElement): Promise<void> {
 		const node = await openNode(this.theme, anchor.href.replace("id:", ""));
 		const div = document.createElement("div");
@@ -238,35 +205,11 @@ Alpine.data("app", () => ({
 		});
 	},
 
-	/**
-	 * Show preview for a graph node at the given position.
-	 *
-	 * @param nodeId - Identifier of the node
-	 * @param x - Horizontal viewport coordinate
-	 * @param y - Vertical viewport coordinate
-	 */
-	async showNodePreview(nodeId: string, x: number, y: number): Promise<void> {
-		const node = await openNode(this.theme, nodeId);
-		const div = document.createElement("div");
-		div.className = "card position-fixed p-2 preview-popover responsive-wide";
-		div.innerHTML = node.html;
-		div.style.top = `${y + 8}px`;
-		div.style.left = `${x}px`;
-		document.body.appendChild(div);
-		this.previewEl = div;
-		this.previewNodeId = nodeId;
-		div.addEventListener("mouseleave", () => {
-			this.hidePreview();
-		});
-	},
-	/**
-	 * Remove the preview element if present.
-	 */
+	/** Remove the preview element if present */
 	hidePreview() {
 		this.previewEl?.remove();
 		this.previewEl = undefined;
 		this.previewAnchor = undefined;
-		this.previewNodeId = undefined;
 	},
 }));
 

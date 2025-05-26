@@ -68,7 +68,7 @@
 						</template>
 					</select>
 				</div>
-				<div class="mb-4">
+				<div class="mb-4" x-show="renderer === 'cytoscape'">
 					<h5>Layout</h5>
 					<select
 						class="form-select"
@@ -95,7 +95,7 @@
 					</div>
 				</div>
 				<!-- Font size -->
-				<div class="mb-4">
+				<div class="mb-4" x-show="renderer !== '3d-force-graph'">
 					<h5>Font size</h5>
 					<input
 						type="range"
@@ -109,7 +109,7 @@
 						Current: <span x-text="labelScale.toFixed(1)"></span>em
 					</div>
 				</div>
-				<div class="mb-4">
+				<div class="mb-4" x-show="renderer !== '3d-force-graph'">
 					<h5>Show labels</h5>
 					<div class="form-check form-switch">
 						<input

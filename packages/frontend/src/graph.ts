@@ -1,6 +1,7 @@
-import ForceGraph3D, { type ForceGraph3DInstance } from "3d-force-graph";
-import cytoscape, { type Core, type LayoutOptions } from "cytoscape";
-import ForceGraph, { type LinkObject, type NodeObject } from "force-graph";
+import type { ForceGraph3DInstance } from "3d-force-graph";
+import type { Core, LayoutOptions } from "cytoscape";
+import type ForceGraph from "force-graph";
+import type { LinkObject, NodeObject } from "force-graph";
 import createClient from "openapi-fetch";
 import type { paths } from "./api.d.ts";
 import { alphaColor, getCssVariable, pickColor } from "./style.ts";
@@ -140,14 +141,7 @@ export function resetDim(graph: GraphInstance | undefined): void {
 }
 
 /**
- * Initialize or update the Cytoscape graph.
- *
- * @param layoutName - Layout algorithm name
- * @param container - DOM element hosting the graph
- * @param existingGraph - Previous Cytoscape instance
- * @param nodeSize - Node diameter in pixels
- * @param labelScale - Font scale for node labels
- * @returns The created or updated Cytoscape instance
+ * Graph instance for any renderer.
  */
 export type GraphInstance =
 	| Core
@@ -193,6 +187,7 @@ export async function renderGraph(
 	}));
 
 	if (renderer === "cytoscape") {
+		const { default: cytoscape } = await import("cytoscape");
 		const elements = [
 			...baseNodes.map((n) => ({ data: n })),
 			...edges.map((e) => ({ data: e })),
@@ -245,9 +240,10 @@ export async function renderGraph(
 	}
 
 	if (renderer === "force-graph") {
+		const { default: ForceGraphCtor } = await import("force-graph");
 		const nodes = baseNodes.map((n) => ({ ...n, val: area }));
 		let fg = existingGraph as ForceGraph<GraphNode, GraphLink> | undefined;
-		if (!fg) fg = new ForceGraph<GraphNode, GraphLink>(container);
+		if (!fg) fg = new ForceGraphCtor<GraphNode, GraphLink>(container);
 		fg.nodeId("id")
 			.nodeLabel("label")
 			.nodeColor("color")
@@ -260,6 +256,7 @@ export async function renderGraph(
 	}
 
 	const nodes = baseNodes.map((n) => ({ ...n, val: volume }));
+	const { default: ForceGraph3D } = await import("3d-force-graph");
 	let fg3d = existingGraph as
 		| ForceGraph3DInstance<GraphNode, GraphLink>
 		| undefined;

@@ -9,7 +9,7 @@ export default defineConfigWithVueTs(
   {
     ignores: ["out/**", "**/dist/**", "node_modules/**", "openapi.ts"],
   },
-  pluginVue.configs["flat/essential"],
+  pluginVue.configs["flat/recommended"],
   vueTsConfigs.recommended,
   prettier,
 );

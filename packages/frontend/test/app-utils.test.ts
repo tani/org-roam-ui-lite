@@ -1,6 +1,6 @@
 import type { Core } from "cytoscape";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { applyElementsStyle, applyNodeStyle } from "../src/graph.ts";
+import { applyElementsStyle, applyNodeStyle } from "../src/graph-style.ts";
 import { getCssVariable, pickColor } from "../src/style.ts";
 
 const ACCENT_VARIABLES = [

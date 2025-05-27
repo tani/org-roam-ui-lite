@@ -25,6 +25,8 @@ const mockResetHighlight = vi.fn();
 
 vi.mock("../src/graph.ts", () => ({
   drawGraph: (...args: unknown[]) => mockDrawGraph(...args),
+}));
+vi.mock("../src/graph-style.ts", () => ({
   applyNodeStyle: () => mockApplyNodeStyle(),
   highlightNeighborhood: () => mockHighlightNeighborhood(),
   resetHighlight: () => mockResetHighlight(),

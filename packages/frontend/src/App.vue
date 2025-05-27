@@ -56,12 +56,12 @@ import { onMounted, ref, type VNode, watch } from "vue";
 import type { components } from "./api.d.ts";
 import DetailsPanel from "./components/DetailsPanel.vue";
 import SettingsPanel from "./components/SettingsPanel.vue";
+import { drawGraph } from "./graph.ts";
 import {
   applyNodeStyle,
-  drawGraph,
   highlightNeighborhood,
   resetHighlight,
-} from "./graph.ts";
+} from "./graph-style.ts";
 import {
   type GraphInstance,
   type Layout,

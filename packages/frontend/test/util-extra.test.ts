@@ -38,12 +38,8 @@ vi.mock("../src/processor.ts", () => ({
 }));
 
 import { h } from "vue";
-import {
-  drawGraph,
-  type GraphInstance,
-  highlightNeighborhood,
-  resetHighlight,
-} from "../src/graph.ts";
+import { drawGraph, type GraphInstance } from "../src/graph.ts";
+import { highlightNeighborhood, resetHighlight } from "../src/graph-style.ts";
 import type { Layout } from "../src/graph-types.ts";
 import { openNode } from "../src/node.ts";
 import { alphaColor } from "../src/style.ts";

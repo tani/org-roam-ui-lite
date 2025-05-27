@@ -21,13 +21,13 @@
     "npm-run-all": "^4.1.5",
     "openapi-typescript": "^7.8.0",
     "prettier": "^3.5.3",
-    "tsx": "^4.19.4",
+    "jiti": "^2.4.2",
     "vitest": "^3.2.0-beta.2"
   },
   "scripts": {
     "version": "nix run .#update-npm-deps-hash && git add flake.nix",
-    "prebuild": "tsx openapi.ts | tee packages/frontend/src/api.d.ts packages/backend/src/api.d.ts > /dev/null && prettier --write packages/frontend/src/api.d.ts packages/backend/src/api.d.ts",
-    "build": "npm run build --workspaces && tsx ./scripts/build.ts",
+    "prebuild": "jiti openapi.ts | tee packages/frontend/src/api.d.ts packages/backend/src/api.d.ts > /dev/null && prettier --write packages/frontend/src/api.d.ts packages/backend/src/api.d.ts",
+    "build": "npm run build --workspaces && jiti ./scripts/build.ts",
     "export": "npm run build && node ./scripts/export.js -r ./dist",
     "dev": "npm-run-all -p dev:frontend 'dev:backend -- {@}' --",
     "dev:frontend": "npm --workspace=packages/frontend run dev --",

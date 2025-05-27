@@ -139,3 +139,34 @@ watch(
   },
 );
 </script>
+
+<style scoped>
+.offcanvas.offcanvas-end.responsive-wide {
+width: 90vw;
+}
+
+@media (min-width: 576px) {
+.offcanvas.offcanvas-end.responsive-wide {
+width: 85vw;
+}
+}
+
+@media (min-width: 768px) {
+.offcanvas.offcanvas-end.responsive-wide {
+width: 70vw;
+}
+}
+
+@media (min-width: 992px) {
+.offcanvas.offcanvas-end.responsive-wide {
+width: 60vw;
+}
+}
+
+@media (min-width: 1200px) {
+.offcanvas.offcanvas-end.responsive-wide {
+width: 50vw;
+max-width: 800px;
+}
+}
+</style>

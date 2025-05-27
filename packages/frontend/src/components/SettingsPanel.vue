@@ -1,20 +1,20 @@
 <template>
   <div
+    id="offcanvasSettings"
     class="offcanvas offcanvas-start"
     tabindex="-1"
-    id="offcanvasSettings"
     aria-labelledby="offcanvasSettingsLabel"
     :class="{ show: open }"
   >
     <div class="offcanvas-header">
-      <h4 class="offcanvas-title" id="offcanvasSettingsLabel">
+      <h4 id="offcanvasSettingsLabel" class="offcanvas-title">
         <i class="bi bi-gear-fill"></i>Settings
       </h4>
       <button
         type="button"
         class="btn-close"
-        @click="$emit('close')"
         aria-label="Close"
+        @click="$emit('close')"
       ></button>
     </div>
     <div class="offcanvas-body">
@@ -38,7 +38,7 @@
           </option>
         </select>
       </div>
-      <div class="mb-4" v-show="renderer === 'cytoscape'">
+      <div v-show="renderer === 'cytoscape'" class="mb-4">
         <h5>Layout</h5>
         <select class="form-select" :value="layout" @change="onLayoutChange">
           <option v-for="l in layouts" :key="l" :value="l">{{ l }}</option>
@@ -58,7 +58,7 @@
           >px
         </div>
       </div>
-      <div class="mb-4" v-show="renderer !== '3d-force-graph'">
+      <div v-show="renderer !== '3d-force-graph'" class="mb-4">
         <h5>Font size</h5>
         <input
           type="range"
@@ -73,13 +73,13 @@
           >em
         </div>
       </div>
-      <div class="mb-4" v-show="renderer !== '3d-force-graph'">
+      <div v-show="renderer !== '3d-force-graph'" class="mb-4">
         <h5>Show labels</h5>
         <div class="form-check form-switch">
           <input
+            id="toggleLabels"
             class="form-check-input"
             type="checkbox"
-            id="toggleLabels"
             :checked="showLabels"
             @change="onShowLabels"
           />

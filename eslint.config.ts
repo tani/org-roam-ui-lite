@@ -4,11 +4,10 @@ import {
   vueTsConfigs,
 } from "@vue/eslint-config-typescript";
 import prettier from "@vue/eslint-config-prettier";
+import gitignore from "eslint-config-flat-gitignore";
 
 export default defineConfigWithVueTs(
-  {
-    ignores: ["out/**", "**/dist/**", "node_modules/**", "openapi.ts"],
-  },
+  gitignore(),
   pluginVue.configs["flat/recommended"],
   vueTsConfigs.recommended,
   prettier,

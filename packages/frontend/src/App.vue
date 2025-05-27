@@ -17,9 +17,9 @@
       @update:theme="setTheme"
       @update:renderer="setRenderer"
       @update:layout="setLayout"
-      @update:nodeSize="onSizeChange"
-      @update:labelScale="onScaleChange"
-      @update:showLabels="onShowLabelsChange"
+      @update:node-size="onSizeChange"
+      @update:label-scale="onScaleChange"
+      @update:show-labels="onShowLabelsChange"
     />
 
     <button
@@ -36,7 +36,7 @@
       :selected="selected"
       :open="detailsOpen"
       @close="closeDetails"
-      @openNode="openNodeAction"
+      @open-node="openNodeAction"
     />
 
     <button

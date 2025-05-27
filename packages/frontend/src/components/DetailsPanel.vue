@@ -1,21 +1,21 @@
 <template>
   <div
+    id="offcanvasDetails"
     class="offcanvas offcanvas-end responsive-wide"
     tabindex="-1"
-    id="offcanvasDetails"
     aria-labelledby="offcanvasDetailsLabel"
     :class="{ show: open }"
   >
     <div class="offcanvas-header">
-      <h4 class="offcanvas-title" id="offcanvasDetailsLabel">
+      <h4 id="offcanvasDetailsLabel" class="offcanvas-title">
         <i class="bi bi-file-earmark-text"></i>
         <span>{{ selected.title ?? "Click a node to view details" }}</span>
       </h4>
       <button
         type="button"
         class="btn-close"
-        @click="$emit('close')"
         aria-label="Close"
+        @click="$emit('close')"
       ></button>
     </div>
     <div class="offcanvas-body">
@@ -28,10 +28,10 @@
       </div>
       <PreviewPopover
         v-if="preview"
+        ref="previewComponent"
         :content="preview.body"
         :x="preview.x"
         :y="preview.y"
-        ref="previewComponent"
         @leave="hidePreview"
       />
       <div v-show="selected.backlinks?.length" class="mt-3">
@@ -142,31 +142,31 @@ watch(
 
 <style scoped>
 .offcanvas.offcanvas-end.responsive-wide {
-width: 90vw;
+  width: 90vw;
 }
 
 @media (min-width: 576px) {
-.offcanvas.offcanvas-end.responsive-wide {
-width: 85vw;
-}
+  .offcanvas.offcanvas-end.responsive-wide {
+    width: 85vw;
+  }
 }
 
 @media (min-width: 768px) {
-.offcanvas.offcanvas-end.responsive-wide {
-width: 70vw;
-}
+  .offcanvas.offcanvas-end.responsive-wide {
+    width: 70vw;
+  }
 }
 
 @media (min-width: 992px) {
-.offcanvas.offcanvas-end.responsive-wide {
-width: 60vw;
-}
+  .offcanvas.offcanvas-end.responsive-wide {
+    width: 60vw;
+  }
 }
 
 @media (min-width: 1200px) {
-.offcanvas.offcanvas-end.responsive-wide {
-width: 50vw;
-max-width: 800px;
-}
+  .offcanvas.offcanvas-end.responsive-wide {
+    width: 50vw;
+    max-width: 800px;
+  }
 }
 </style>

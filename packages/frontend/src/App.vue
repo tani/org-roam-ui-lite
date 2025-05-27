@@ -52,7 +52,7 @@ import { onMounted, ref, watch } from "vue";
 import { useUiStore } from "./store/ui.ts";
 import DetailsPanel from "./components/DetailsPanel.vue";
 import SettingsPanel from "./components/SettingsPanel.vue";
-import { drawGraph } from "./graph/graph.ts";
+import { drawGraph, destroyGraph } from "./graph/graph.ts";
 import {
   applyNodeStyle,
   highlightNeighborhood,
@@ -179,6 +179,7 @@ function toggleSettings(): void {
 }
 
 watch(renderer, () => {
+  destroyGraph(graph.value, graphRef.value as HTMLElement);
   graph.value = undefined;
   void refresh();
 });

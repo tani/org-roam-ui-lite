@@ -36,7 +36,11 @@
       </div>
       <div v-show="rendererModel === 'cytoscape'" class="mb-4">
         <h5>Layout</h5>
-        <select v-model="layoutModel" class="form-select">
+        <select
+          v-model="layoutModel"
+          class="form-select"
+          @change="$emit('update:layout', layoutModel)"
+        >
           <option v-for="l in layouts" :key="l" :value="l">{{ l }}</option>
         </select>
       </div>
@@ -81,59 +85,25 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from "vue";
+import { defineModel } from "vue";
 import type { Layout, Renderer, Theme } from "../graph-types.ts";
 
-const props = defineProps<{
+defineProps<{
   open: boolean;
   themes: { value: Theme; label: string }[];
   renderers: { value: Renderer; label: string }[];
   layouts: Layout[];
-  theme: Theme;
-  renderer: Renderer;
-  layout: Layout;
-  nodeSize: number;
-  labelScale: number;
-  showLabels: boolean;
 }>();
 
-const emit = defineEmits<{
+const themeModel = defineModel<Theme>("theme");
+const rendererModel = defineModel<Renderer>("renderer");
+const layoutModel = defineModel<Layout>("layout");
+const nodeSizeModel = defineModel<number>("nodeSize");
+const labelScaleModel = defineModel<number>("labelScale");
+const showLabelsModel = defineModel<boolean>("showLabels");
+
+defineEmits<{
   (e: "close"): void;
-  (e: "update:theme", value: Theme): void;
-  (e: "update:renderer", value: Renderer): void;
   (e: "update:layout", value: Layout): void;
-  (e: "update:nodeSize", value: number): void;
-  (e: "update:labelScale", value: number): void;
-  (e: "update:showLabels", value: boolean): void;
 }>();
-
-const themeModel = computed({
-  get: () => props.theme,
-  set: (value: Theme) => emit("update:theme", value),
-});
-
-const rendererModel = computed({
-  get: () => props.renderer,
-  set: (value: Renderer) => emit("update:renderer", value),
-});
-
-const layoutModel = computed({
-  get: () => props.layout,
-  set: (value: Layout) => emit("update:layout", value),
-});
-
-const nodeSizeModel = computed({
-  get: () => props.nodeSize,
-  set: (value: number) => emit("update:nodeSize", value),
-});
-
-const labelScaleModel = computed({
-  get: () => props.labelScale,
-  set: (value: number) => emit("update:labelScale", value),
-});
-
-const showLabelsModel = computed({
-  get: () => props.showLabels,
-  set: (value: boolean) => emit("update:showLabels", value),
-});
 </script>

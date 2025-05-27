@@ -3,23 +3,18 @@
     <div ref="graphRef" class="h-100 w-100"></div>
 
     <SettingsPanel
+      v-model:theme="theme"
+      v-model:renderer="renderer"
+      v-model:layout="layout"
+      v-model:node-size="nodeSize"
+      v-model:label-scale="labelScale"
+      v-model:show-labels="showLabels"
       :open="settingsOpen"
       :themes="themes"
-      :theme="theme"
       :renderers="renderers"
-      :renderer="renderer"
       :layouts="layouts"
-      :layout="layout"
-      :node-size="nodeSize"
-      :label-scale="labelScale"
-      :show-labels="showLabels"
-      @close="store.toggleSettings()"
-      @update:theme="setTheme"
-      @update:renderer="setRenderer"
       @update:layout="setLayout"
-      @update:node-size="onSizeChange"
-      @update:label-scale="onScaleChange"
-      @update:show-labels="onShowLabelsChange"
+      @close="store.toggleSettings()"
     />
 
     <button
@@ -67,9 +62,7 @@ import {
   type GraphInstance,
   type Layout,
   Layouts,
-  type Renderer,
   Renderers,
-  type Theme,
   Themes,
 } from "./graph-types.ts";
 import { openNode } from "./node.ts";
@@ -152,45 +145,6 @@ function setLayout(newLayout: Layout): void {
   void refresh();
 }
 
-/** Change renderer and refresh. */
-function setRenderer(newRenderer: Renderer): void {
-  store.renderer = newRenderer;
-  graph.value = undefined;
-}
-
-/** Switch between themes and refresh. */
-function setTheme(newTheme: Theme): void {
-  store.theme = newTheme;
-  void refresh();
-}
-
-/** Adjust node size in the graph. */
-function onSizeChange(value: number): void {
-  store.nodeSize = value;
-  if (renderer.value === "cytoscape")
-    applyNodeStyle(graph.value as Core, {
-      width: value,
-      height: value,
-    });
-  else void refresh();
-}
-
-/** Adjust label scale in the graph. */
-function onScaleChange(value: number): void {
-  store.labelScale = value;
-  if (renderer.value === "cytoscape")
-    applyNodeStyle(graph.value as Core, {
-      "font-size": `${value}em`,
-    });
-  else void refresh();
-}
-
-/** Toggle label visibility. */
-function onShowLabelsChange(value: boolean): void {
-  store.showLabels = value;
-  void refresh();
-}
-
 /** Fetch and display details for node ID. */
 async function openNodeAction(nodeId: string): Promise<void> {
   const node = await openNode(theme.value, nodeId);
@@ -228,6 +182,28 @@ watch(renderer, () => {
   graph.value = undefined;
   void refresh();
 });
+watch(theme, () => {
+  void refresh();
+});
+watch(nodeSize, (value) => {
+  if (renderer.value === "cytoscape")
+    applyNodeStyle(graph.value as Core, {
+      width: value,
+      height: value,
+    });
+  else void refresh();
+});
 
+watch(labelScale, (value) => {
+  if (renderer.value === "cytoscape")
+    applyNodeStyle(graph.value as Core, {
+      "font-size": `${value}em`,
+    });
+  else void refresh();
+});
+
+watch(showLabels, () => {
+  void refresh();
+});
 onMounted(init);
 </script>

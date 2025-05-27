@@ -148,25 +148,25 @@ async function refresh(): Promise<void> {
 
 /** Change layout and refresh the graph. */
 function setLayout(newLayout: Layout): void {
-  store.setLayout(newLayout);
+  store.layout = newLayout;
   void refresh();
 }
 
 /** Change renderer and refresh. */
 function setRenderer(newRenderer: Renderer): void {
-  store.setRenderer(newRenderer);
+  store.renderer = newRenderer;
   graph.value = undefined;
 }
 
 /** Switch between themes and refresh. */
 function setTheme(newTheme: Theme): void {
-  store.setTheme(newTheme);
+  store.theme = newTheme;
   void refresh();
 }
 
 /** Adjust node size in the graph. */
 function onSizeChange(value: number): void {
-  store.setNodeSize(value);
+  store.nodeSize = value;
   if (renderer.value === "cytoscape")
     applyNodeStyle(graph.value as Core, {
       width: value,
@@ -177,7 +177,7 @@ function onSizeChange(value: number): void {
 
 /** Adjust label scale in the graph. */
 function onScaleChange(value: number): void {
-  store.setLabelScale(value);
+  store.labelScale = value;
   if (renderer.value === "cytoscape")
     applyNodeStyle(graph.value as Core, {
       "font-size": `${value}em`,
@@ -187,7 +187,7 @@ function onScaleChange(value: number): void {
 
 /** Toggle label visibility. */
 function onShowLabelsChange(value: boolean): void {
-  store.toggleLabels(value);
+  store.showLabels = value;
   void refresh();
 }
 
@@ -200,13 +200,13 @@ async function openNodeAction(nodeId: string): Promise<void> {
 
 /** Show the details pane and dim other nodes. */
 function openDetails(): void {
-  store.openDetails();
+  store.detailsOpen = true;
   highlightNeighborhood(graph.value, selected.value.id);
 }
 
 /** Hide the details pane and restore styles. */
 function closeDetails(): void {
-  store.closeDetails();
+  store.detailsOpen = false;
   resetHighlight(graph.value);
 }
 
@@ -222,9 +222,9 @@ function toggleDetails(): void {
 /** Toggle the settings pane. */
 function toggleSettings(): void {
   if (settingsOpen.value) {
-    store.closeSettings();
+    store.settingsOpen = false;
   } else {
-    store.openSettings();
+    store.settingsOpen = true;
   }
 }
 

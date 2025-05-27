@@ -2,6 +2,7 @@ import userEvent from "@testing-library/user-event";
 import { cleanup, fireEvent, render } from "@testing-library/vue";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { h } from "vue";
+import { createPinia } from "pinia";
 
 Object.defineProperty(window, "matchMedia", {
   writable: true,
@@ -60,7 +61,9 @@ beforeEach(() => {
 
 describe("App", () => {
   it("initializes graph on mount", async () => {
-    render(App as unknown as Record<string, unknown>);
+    render(App as unknown as Record<string, unknown>, {
+      global: { plugins: [createPinia()] },
+    });
     await Promise.resolve();
     expect(mockDrawGraph).toHaveBeenCalledWith(
       "force-graph",
@@ -75,7 +78,9 @@ describe("App", () => {
 
   it("toggles settings panel", async () => {
     const user = userEvent.setup();
-    const { container } = render(App as unknown as Record<string, unknown>);
+    const { container } = render(App as unknown as Record<string, unknown>, {
+      global: { plugins: [createPinia()] },
+    });
     await Promise.resolve();
     const btn = container.querySelector("i.bi-gear")
       ?.parentElement as HTMLElement;
@@ -91,7 +96,9 @@ describe("App", () => {
 
   it("toggles details panel and highlights nodes", async () => {
     const user = userEvent.setup();
-    const { container } = render(App as unknown as Record<string, unknown>);
+    const { container } = render(App as unknown as Record<string, unknown>, {
+      global: { plugins: [createPinia()] },
+    });
     await Promise.resolve();
     const btn = container.querySelector("i.bi-chevron-left")
       ?.parentElement as HTMLElement;
@@ -109,7 +116,9 @@ describe("App", () => {
 
   it("updates document theme on selection", async () => {
     const user = userEvent.setup();
-    const { getAllByRole } = render(App as unknown as Record<string, unknown>);
+    const { getAllByRole } = render(App as unknown as Record<string, unknown>, {
+      global: { plugins: [createPinia()] },
+    });
     await Promise.resolve();
     const selects = getAllByRole("combobox");
     await user.selectOptions(selects[0], "dark");
@@ -120,7 +129,9 @@ describe("App", () => {
 
   it("changes renderer via settings and refreshes", async () => {
     const user = userEvent.setup();
-    const { getAllByRole } = render(App as unknown as Record<string, unknown>);
+    const { getAllByRole } = render(App as unknown as Record<string, unknown>, {
+      global: { plugins: [createPinia()] },
+    });
     await Promise.resolve();
     mockDrawGraph.mockClear();
     await user.selectOptions(getAllByRole("combobox")[1], "cytoscape");
@@ -132,6 +143,7 @@ describe("App", () => {
     const user = userEvent.setup();
     const { getAllByRole, container } = render(
       App as unknown as Record<string, unknown>,
+      { global: { plugins: [createPinia()] } },
     );
     await Promise.resolve();
     await user.selectOptions(getAllByRole("combobox")[1], "cytoscape");
@@ -147,7 +159,9 @@ describe("App", () => {
   });
 
   it("opens node when graph emits click", async () => {
-    const { container } = render(App as unknown as Record<string, unknown>);
+    const { container } = render(App as unknown as Record<string, unknown>, {
+      global: { plugins: [createPinia()] },
+    });
     await Promise.resolve();
     const graph = await mockDrawGraph.mock.results[0].value;
     const cb = graph.onNodeClick.mock.calls[0][0] as (node: {
@@ -163,7 +177,9 @@ describe("App", () => {
   });
 
   it("refreshes when node size changes in force-graph mode", async () => {
-    const { container } = render(App as unknown as Record<string, unknown>);
+    const { container } = render(App as unknown as Record<string, unknown>, {
+      global: { plugins: [createPinia()] },
+    });
     await Promise.resolve();
     mockDrawGraph.mockClear();
     const range = container.querySelector(
@@ -174,7 +190,9 @@ describe("App", () => {
   });
 
   it("refreshes when label scale changes in force-graph mode", async () => {
-    const { container } = render(App as unknown as Record<string, unknown>);
+    const { container } = render(App as unknown as Record<string, unknown>, {
+      global: { plugins: [createPinia()] },
+    });
     await Promise.resolve();
     mockDrawGraph.mockClear();
     const range = container.querySelectorAll(
@@ -186,7 +204,9 @@ describe("App", () => {
 
   it("changes layout and refreshes", async () => {
     const user = userEvent.setup();
-    const { getAllByRole } = render(App as unknown as Record<string, unknown>);
+    const { getAllByRole } = render(App as unknown as Record<string, unknown>, {
+      global: { plugins: [createPinia()] },
+    });
     await Promise.resolve();
     await user.selectOptions(getAllByRole("combobox")[1], "cytoscape");
     await Promise.resolve();
@@ -198,7 +218,9 @@ describe("App", () => {
 
   it("refreshes when toggling label visibility", async () => {
     const user = userEvent.setup();
-    const { container } = render(App as unknown as Record<string, unknown>);
+    const { container } = render(App as unknown as Record<string, unknown>, {
+      global: { plugins: [createPinia()] },
+    });
     await Promise.resolve();
     mockDrawGraph.mockClear();
     const checkbox = container.querySelector(

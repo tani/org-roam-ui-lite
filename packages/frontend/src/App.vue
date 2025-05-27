@@ -52,8 +52,9 @@
 
 <script setup lang="ts">
 import type { Core } from "cytoscape";
-import { onMounted, ref, type VNode, watch } from "vue";
-import type { components } from "./api.d.ts";
+import { storeToRefs } from "pinia";
+import { onMounted, ref, watch } from "vue";
+import { useUiStore } from "./store.ts";
 import DetailsPanel from "./components/DetailsPanel.vue";
 import SettingsPanel from "./components/SettingsPanel.vue";
 import { drawGraph } from "./graph.ts";
@@ -77,23 +78,22 @@ void SettingsPanel;
 void DetailsPanel;
 
 const themes = Themes;
-const theme = ref<Theme>(
-  matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light",
-);
-const nodeSize = ref(10);
-const labelScale = ref(0.5);
-const showLabels = ref(true);
-const layout = ref<Layout>("cose");
 const layouts = Layouts;
 const renderers = Renderers;
-const renderer = ref<Renderer>("force-graph");
 const graph = ref<GraphInstance>();
-const selected = ref<components["schemas"]["Node"] & { body?: VNode }>(
-  {} as components["schemas"]["Node"] & { body?: VNode },
-);
-const settingsOpen = ref(false);
-const detailsOpen = ref(false);
 const graphRef = ref<HTMLElement>();
+const store = useUiStore();
+const {
+  theme,
+  renderer,
+  layout,
+  nodeSize,
+  labelScale,
+  showLabels,
+  settingsOpen,
+  detailsOpen,
+  selected,
+} = storeToRefs(store);
 
 function bindGraphEvents(): void {
   if (!graph.value) return;
@@ -148,43 +148,46 @@ async function refresh(): Promise<void> {
 
 /** Change layout and refresh the graph. */
 function setLayout(newLayout: Layout): void {
-  layout.value = newLayout;
+  store.setLayout(newLayout);
   void refresh();
 }
 
 /** Change renderer and refresh. */
 function setRenderer(newRenderer: Renderer): void {
-  renderer.value = newRenderer;
+  store.setRenderer(newRenderer);
   graph.value = undefined;
 }
 
 /** Switch between themes and refresh. */
 function setTheme(newTheme: Theme): void {
-  theme.value = newTheme;
+  store.setTheme(newTheme);
   void refresh();
 }
 
 /** Adjust node size in the graph. */
-function onSizeChange(): void {
+function onSizeChange(value: number): void {
+  store.setNodeSize(value);
   if (renderer.value === "cytoscape")
     applyNodeStyle(graph.value as Core, {
-      width: nodeSize.value,
-      height: nodeSize.value,
+      width: value,
+      height: value,
     });
   else void refresh();
 }
 
 /** Adjust label scale in the graph. */
-function onScaleChange(): void {
+function onScaleChange(value: number): void {
+  store.setLabelScale(value);
   if (renderer.value === "cytoscape")
     applyNodeStyle(graph.value as Core, {
-      "font-size": `${labelScale.value}em`,
+      "font-size": `${value}em`,
     });
   else void refresh();
 }
 
 /** Toggle label visibility. */
-function onShowLabelsChange(): void {
+function onShowLabelsChange(value: boolean): void {
+  store.toggleLabels(value);
   void refresh();
 }
 
@@ -197,13 +200,13 @@ async function openNodeAction(nodeId: string): Promise<void> {
 
 /** Show the details pane and dim other nodes. */
 function openDetails(): void {
-  detailsOpen.value = true;
+  store.openDetails();
   highlightNeighborhood(graph.value, selected.value.id);
 }
 
 /** Hide the details pane and restore styles. */
 function closeDetails(): void {
-  detailsOpen.value = false;
+  store.closeDetails();
   resetHighlight(graph.value);
 }
 
@@ -218,7 +221,11 @@ function toggleDetails(): void {
 
 /** Toggle the settings pane. */
 function toggleSettings(): void {
-  settingsOpen.value = !settingsOpen.value;
+  if (settingsOpen.value) {
+    store.closeSettings();
+  } else {
+    store.openSettings();
+  }
 }
 
 watch(renderer, () => {

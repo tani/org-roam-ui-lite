@@ -13,7 +13,7 @@
       :node-size="nodeSize"
       :label-scale="labelScale"
       :show-labels="showLabels"
-      @close="settingsOpen = false"
+      @close="store.toggleSettings()"
       @update:theme="setTheme"
       @update:renderer="setRenderer"
       @update:layout="setLayout"
@@ -200,13 +200,13 @@ async function openNodeAction(nodeId: string): Promise<void> {
 
 /** Show the details pane and dim other nodes. */
 function openDetails(): void {
-  store.detailsOpen = true;
+  store.openDetails();
   highlightNeighborhood(graph.value, selected.value.id);
 }
 
 /** Hide the details pane and restore styles. */
 function closeDetails(): void {
-  store.detailsOpen = false;
+  store.closeDetails();
   resetHighlight(graph.value);
 }
 
@@ -221,11 +221,7 @@ function toggleDetails(): void {
 
 /** Toggle the settings pane. */
 function toggleSettings(): void {
-  if (settingsOpen.value) {
-    store.settingsOpen = false;
-  } else {
-    store.settingsOpen = true;
-  }
+  store.toggleSettings();
 }
 
 watch(renderer, () => {
@@ -234,14 +230,4 @@ watch(renderer, () => {
 });
 
 onMounted(init);
-
-watch(
-  theme,
-  (value) => {
-    const doc = document.documentElement;
-    doc.setAttribute("data-bs-theme", value.replace(/.*-/, ""));
-    doc.setAttribute("data-theme", value);
-  },
-  { immediate: true },
-);
 </script>

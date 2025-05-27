@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import { ref, type VNode } from "vue";
+import { ref, watch, type VNode } from "vue";
 import type { components } from "./api.d.ts";
 import type { Layout, Renderer, Theme } from "./graph-types.ts";
 
@@ -21,6 +21,32 @@ export const useUiStore = defineStore(
       {} as components["schemas"]["Node"] & { body?: VNode },
     );
 
+    function toggleSettings(): void {
+      settingsOpen.value = !settingsOpen.value;
+    }
+
+    function openDetails(): void {
+      detailsOpen.value = true;
+    }
+
+    function closeDetails(): void {
+      detailsOpen.value = false;
+    }
+
+    function toggleDetails(): void {
+      detailsOpen.value = !detailsOpen.value;
+    }
+
+    watch(
+      theme,
+      (value) => {
+        const doc = document.documentElement;
+        doc.setAttribute("data-bs-theme", value.replace(/.*-/, ""));
+        doc.setAttribute("data-theme", value);
+      },
+      { immediate: true },
+    );
+
     return {
       theme,
       renderer,
@@ -31,6 +57,10 @@ export const useUiStore = defineStore(
       settingsOpen,
       detailsOpen,
       selected,
+      toggleSettings,
+      openDetails,
+      closeDetails,
+      toggleDetails,
     };
   },
   {

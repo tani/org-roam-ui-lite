@@ -2,7 +2,7 @@ import type { ForceGraph3DInstance } from "3d-force-graph";
 import type { Core } from "cytoscape";
 import type ForceGraph from "force-graph";
 import type { GraphInstance, GraphLink, GraphNode } from "./graph-types.ts";
-import { alphaColor } from "./style.ts";
+import { alphaColor } from "../utils/style.ts";
 
 /**
  * Highlight the neighborhood of the given node while dimming others.

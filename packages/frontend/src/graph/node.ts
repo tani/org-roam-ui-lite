@@ -1,8 +1,8 @@
 import createClient from "openapi-fetch";
 import type { VNode } from "vue";
-import type { components, paths } from "./api.d.ts";
+import type { components, paths } from "../api/api.d.ts";
 import type { Theme } from "./graph.ts";
-import { createOrgHtmlProcessor } from "./processor.ts";
+import { createOrgHtmlProcessor } from "../utils/processor.ts";
 
 const api = createClient<paths>();
 

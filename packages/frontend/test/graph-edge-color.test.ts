@@ -9,11 +9,11 @@ const mockRenderer = vi.fn(async (...args: unknown[]) => {
   void args;
   return {};
 });
-vi.mock("../src/renderers/cytoscape.ts", () => ({
+vi.mock("../src/graph/renderers/cytoscape.ts", () => ({
   default: (...args: unknown[]) => mockRenderer(...args),
 }));
 
-import { drawGraph } from "../src/graph.ts";
+import { drawGraph } from "../src/graph/graph.ts";
 
 beforeEach(() => {
   mockGet.mockReset();

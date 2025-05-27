@@ -1,7 +1,7 @@
 import type { Element, Root } from "hast";
 import { describe, expect, it } from "vitest";
-import { encodeBase64url } from "../src/base64url.ts";
-import rehypeImgSrcFix from "../src/rehype-img-src-fix.ts";
+import { encodeBase64url } from "../src/utils/base64url.ts";
+import rehypeImgSrcFix from "../src/utils/rehype-img-src-fix.ts";
 
 function imgTree(src: string): Root {
   return {

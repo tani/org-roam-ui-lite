@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { alphaColor } from "../src/style.ts";
+import { alphaColor } from "../src/utils/style.ts";
 
 describe("alphaColor", () => {
   it("converts hex colors", () => {

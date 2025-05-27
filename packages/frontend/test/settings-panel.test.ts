@@ -2,7 +2,7 @@ import userEvent from "@testing-library/user-event";
 import { cleanup, fireEvent, render } from "@testing-library/vue";
 import { afterEach, describe, expect, it } from "vitest";
 import SettingsPanel from "../src/components/SettingsPanel.vue";
-import type { Layout, Renderer, Theme } from "../src/graph-types.ts";
+import type { Layout, Renderer, Theme } from "../src/graph/graph-types.ts";
 
 afterEach(() => cleanup());
 

@@ -54,9 +54,9 @@
 
 <script setup lang="ts">
 import { ref, type VNode, watch } from "vue";
-import type { components } from "../api.d.ts";
-import type { Theme } from "../graph-types.ts";
-import { openNode } from "../node.ts";
+import type { components } from "../api/api.d.ts";
+import type { Theme } from "../graph/graph-types.ts";
+import { openNode } from "../graph/node.ts";
 import PreviewPopover from "./PreviewPopover.vue";
 
 void PreviewPopover;

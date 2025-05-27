@@ -35,7 +35,7 @@ vi.mock("shiki", () => ({
   getSingletonHighlighter: (...args: unknown[]) => mockGetHighlighter(...args),
 }));
 
-import { createOrgHtmlProcessor } from "../src/processor.ts";
+import { createOrgHtmlProcessor } from "../src/utils/processor.ts";
 
 function createProcess(theme = "light") {
   return createOrgHtmlProcessor(theme, "abc");

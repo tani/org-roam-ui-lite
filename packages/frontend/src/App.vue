@@ -49,23 +49,23 @@
 import type { Core } from "cytoscape";
 import { storeToRefs } from "pinia";
 import { onMounted, ref, watch } from "vue";
-import { useUiStore } from "./store.ts";
+import { useUiStore } from "./store/ui.ts";
 import DetailsPanel from "./components/DetailsPanel.vue";
 import SettingsPanel from "./components/SettingsPanel.vue";
-import { drawGraph } from "./graph.ts";
+import { drawGraph } from "./graph/graph.ts";
 import {
   applyNodeStyle,
   highlightNeighborhood,
   resetHighlight,
-} from "./graph-style.ts";
+} from "./graph/graph-style.ts";
 import {
   type GraphInstance,
   type Layout,
   Layouts,
   Renderers,
   Themes,
-} from "./graph-types.ts";
-import { openNode } from "./node.ts";
+} from "./graph/graph-types.ts";
+import { openNode } from "./graph/node.ts";
 
 void SettingsPanel;
 void DetailsPanel;

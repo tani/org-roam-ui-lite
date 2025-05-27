@@ -28,7 +28,7 @@ vi.mock("3d-force-graph", () => ({
   },
 }));
 
-vi.mock("../src/processor.ts", () => ({
+vi.mock("../src/utils/processor.ts", () => ({
   createOrgHtmlProcessor: vi.fn(() => {
     return (_str: string) => {
       void _str;
@@ -38,11 +38,14 @@ vi.mock("../src/processor.ts", () => ({
 }));
 
 import { h } from "vue";
-import { drawGraph, type GraphInstance } from "../src/graph.ts";
-import { highlightNeighborhood, resetHighlight } from "../src/graph-style.ts";
-import type { Layout } from "../src/graph-types.ts";
-import { openNode } from "../src/node.ts";
-import { alphaColor } from "../src/style.ts";
+import { drawGraph, type GraphInstance } from "../src/graph/graph.ts";
+import {
+  highlightNeighborhood,
+  resetHighlight,
+} from "../src/graph/graph-style.ts";
+import type { Layout } from "../src/graph/graph-types.ts";
+import { openNode } from "../src/graph/node.ts";
+import { alphaColor } from "../src/utils/style.ts";
 
 const NODE_ID = "11111111-1111-4111-8111-111111111111";
 

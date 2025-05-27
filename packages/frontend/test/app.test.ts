@@ -24,10 +24,10 @@ const mockApplyNodeStyle = vi.fn();
 const mockHighlightNeighborhood = vi.fn();
 const mockResetHighlight = vi.fn();
 
-vi.mock("../src/graph.ts", () => ({
+vi.mock("../src/graph/graph.ts", () => ({
   drawGraph: (...args: unknown[]) => mockDrawGraph(...args),
 }));
-vi.mock("../src/graph-style.ts", () => ({
+vi.mock("../src/graph/graph-style.ts", () => ({
   applyNodeStyle: () => mockApplyNodeStyle(),
   highlightNeighborhood: () => mockHighlightNeighborhood(),
   resetHighlight: () => mockResetHighlight(),
@@ -41,7 +41,7 @@ const mockOpenNode = vi.fn(async (...args: unknown[]) => {
     body: h("div"),
   };
 });
-vi.mock("../src/node.ts", () => ({
+vi.mock("../src/graph/node.ts", () => ({
   openNode: (theme: unknown, id: unknown) => mockOpenNode(theme, id),
 }));
 

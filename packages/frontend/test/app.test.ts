@@ -25,8 +25,10 @@ const mockApplyNodeStyle = vi.fn();
 const mockHighlightNeighborhood = vi.fn();
 const mockResetHighlight = vi.fn();
 
+const mockDestroyGraph = vi.fn();
 vi.mock("../src/graph/graph.ts", () => ({
   drawGraph: (...args: unknown[]) => mockDrawGraph(...args),
+  destroyGraph: (...args: unknown[]) => mockDestroyGraph(...args),
 }));
 vi.mock("../src/graph/graph-style.ts", () => ({
   applyNodeStyle: () => mockApplyNodeStyle(),
@@ -55,6 +57,7 @@ beforeEach(() => {
   mockApplyNodeStyle.mockClear();
   mockHighlightNeighborhood.mockClear();
   mockResetHighlight.mockClear();
+  mockDestroyGraph.mockClear();
   mockOpenNode.mockClear();
   document.documentElement.removeAttribute("data-theme");
   document.documentElement.removeAttribute("data-bs-theme");

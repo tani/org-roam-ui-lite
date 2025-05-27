@@ -78,3 +78,25 @@ export async function drawGraph(
     showLabels,
   );
 }
+
+/**
+ * Stop and remove the given graph instance.
+ *
+ * @param instance - Graph instance to destroy
+ * @param container - Container element holding the graph
+ */
+export function destroyGraph(
+  instance: GraphInstance | undefined,
+  container: HTMLElement,
+): void {
+  if (!instance) return;
+  if (typeof (instance as { destroy?: () => void }).destroy === "function") {
+    (instance as unknown as { destroy: () => void }).destroy();
+  } else if (
+    typeof (instance as { pauseAnimation?: () => void }).pauseAnimation ===
+    "function"
+  ) {
+    (instance as unknown as { pauseAnimation: () => void }).pauseAnimation();
+  }
+  container.replaceChildren();
+}

@@ -1,7 +1,10 @@
 import type { Core } from "cytoscape";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { applyElementsStyle, applyNodeStyle } from "../src/graph-style.ts";
-import { getCssVariable, pickColor } from "../src/style.ts";
+import {
+  applyElementsStyle,
+  applyNodeStyle,
+} from "../src/graph/graph-style.ts";
+import { getCssVariable, pickColor } from "../src/utils/style.ts";
 
 const ACCENT_VARIABLES = [
   "--bs-blue",

@@ -6,7 +6,7 @@ import type {
   Layout,
   RendererFunction,
 } from "../graph-types.ts";
-import { getCssVariable } from "../style.ts";
+import { getCssVariable } from "../../utils/style.ts";
 
 /**
  * Render or update a graph using 3d-force-graph.

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { decodeBase64url, encodeBase64url } from "../src/base64url.ts";
+import { decodeBase64url, encodeBase64url } from "../src/utils/base64url.ts";
 
 describe("encodeBase64url/decodeBase64url", () => {
   it("round trip", () => {

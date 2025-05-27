@@ -86,7 +86,7 @@
 
 <script setup lang="ts">
 import { defineModel } from "vue";
-import type { Layout, Renderer, Theme } from "../graph-types.ts";
+import type { Layout, Renderer, Theme } from "../graph/graph-types.ts";
 
 defineProps<{
   open: boolean;

@@ -3,8 +3,8 @@ import type {
   GraphInstance,
   GraphLink,
   GraphNode,
-} from "../src/graph-types.ts";
-import renderForceGraph from "../src/renderers/force-graph.ts";
+} from "../src/graph/graph-types.ts";
+import renderForceGraph from "../src/graph/renderers/force-graph.ts";
 
 const ctorMock = vi.fn();
 let lastInstance: GraphInstance & Record<string, unknown>;

@@ -1,7 +1,7 @@
 import { defineStore } from "pinia";
 import { ref, watch, type VNode } from "vue";
-import type { components } from "./api.d.ts";
-import type { Layout, Renderer, Theme } from "./graph-types.ts";
+import type { components } from "../api/api.d.ts";
+import type { Layout, Renderer, Theme } from "../graph/graph-types.ts";
 
 /** Pinia store for shared UI state. */
 export const useUiStore = defineStore(

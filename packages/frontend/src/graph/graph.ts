@@ -1,5 +1,5 @@
 import createClient from "openapi-fetch";
-import type { paths } from "./api.d.ts";
+import type { paths } from "../api/api.d.ts";
 import type {
   GraphInstance,
   GraphLink,
@@ -13,7 +13,7 @@ import { Layouts, Renderers, Themes } from "./graph-types.ts";
 import renderCytoscape from "./renderers/cytoscape.ts";
 import renderForceGraph from "./renderers/force-graph.ts";
 import renderForceGraph3D from "./renderers/force-graph-3d.ts";
-import { getCssVariable, pickColor } from "./style.ts";
+import { getCssVariable, pickColor } from "../utils/style.ts";
 
 const api = createClient<paths>();
 

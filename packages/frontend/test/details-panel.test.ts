@@ -3,10 +3,10 @@ import { cleanup, fireEvent, render } from "@testing-library/vue";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { h } from "vue";
 
-vi.mock("../src/node.ts", () => ({ openNode: vi.fn() }));
+vi.mock("../src/graph/node.ts", () => ({ openNode: vi.fn() }));
 
 import DetailsPanel from "../src/components/DetailsPanel.vue";
-import { openNode } from "../src/node.ts";
+import { openNode } from "../src/graph/node.ts";
 
 const mockOpenNode = vi.mocked(openNode);
 

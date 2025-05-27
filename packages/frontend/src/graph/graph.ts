@@ -10,9 +10,6 @@ import type {
   Theme,
 } from "./graph-types.ts";
 import { Layouts, Renderers, Themes } from "./graph-types.ts";
-import renderCytoscape from "./renderers/cytoscape.ts";
-import renderForceGraph from "./renderers/force-graph.ts";
-import renderForceGraph3D from "./renderers/force-graph-3d.ts";
 import { getCssVariable, pickColor } from "../utils/style.ts";
 
 const api = createClient<paths>();
@@ -46,10 +43,13 @@ async function fetchGraphData(): Promise<GraphData> {
   return { nodes, edges };
 }
 
-const rendererMap: Record<Renderer, RendererFunction> = {
-  cytoscape: renderCytoscape,
-  "force-graph": renderForceGraph,
-  "3d-force-graph": renderForceGraph3D,
+const rendererMap: Record<
+  Renderer,
+  () => Promise<{ default: RendererFunction }>
+> = {
+  cytoscape: () => import("./renderers/cytoscape.ts"),
+  "force-graph": () => import("./renderers/force-graph.ts"),
+  "3d-force-graph": () => import("./renderers/force-graph-3d.ts"),
 };
 
 /**
@@ -65,8 +65,9 @@ export async function drawGraph(
   showLabels: boolean,
 ): Promise<GraphInstance> {
   const { nodes, edges } = await fetchGraphData();
+  const rendererMod = await rendererMap[renderer]();
 
-  return rendererMap[renderer](
+  return rendererMod.default(
     nodes,
     edges,
     layoutName,

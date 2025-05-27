@@ -7,6 +7,7 @@ import type {
   RendererFunction,
 } from "../graph-types.ts";
 import { getCssVariable } from "../../utils/style.ts";
+import ForceGraph3D from "3d-force-graph";
 
 /**
  * Render or update a graph using 3d-force-graph.
@@ -19,7 +20,7 @@ import { getCssVariable } from "../../utils/style.ts";
  * @param nodeSize - Display size for nodes
  * @returns The 3d-force-graph instance used for rendering
  */
-const renderForceGraph3D: RendererFunction = async (
+const renderForceGraph3D: RendererFunction = (
   nodes: GraphNode[],
   edges: GraphLink[],
   _layout: Layout,
@@ -28,8 +29,7 @@ const renderForceGraph3D: RendererFunction = async (
   nodeSize: number,
   labelScale: number,
   showLabels: boolean,
-): Promise<GraphInstance> => {
-  const { default: ForceGraph3D } = await import("3d-force-graph");
+): GraphInstance => {
   void labelScale;
   void showLabels;
   const radius = nodeSize / 2;

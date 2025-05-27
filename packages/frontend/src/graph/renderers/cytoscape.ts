@@ -7,6 +7,7 @@ import type {
   RendererFunction,
 } from "../graph-types.ts";
 import { getCssVariable } from "../../utils/style.ts";
+import cytoscape from "cytoscape";
 
 /**
  * Render or update a graph using Cytoscape.
@@ -21,7 +22,7 @@ import { getCssVariable } from "../../utils/style.ts";
  * @param showLabels - Whether to display labels
  * @returns The Cytoscape instance used for rendering
  */
-const renderCytoscape: RendererFunction = async (
+const renderCytoscape: RendererFunction = (
   nodes: GraphNode[],
   edges: GraphLink[],
   layout: Layout,
@@ -30,8 +31,7 @@ const renderCytoscape: RendererFunction = async (
   nodeSize: number,
   labelScale: number,
   showLabels: boolean,
-): Promise<GraphInstance> => {
-  const { default: cytoscape } = await import("cytoscape");
+): GraphInstance => {
   const elements = [
     ...nodes.map((n) => ({ data: n })),
     ...edges.map((e) => ({ data: e })),

@@ -56,4 +56,4 @@ export type RendererFunction = (
   nodeSize: number,
   labelScale: number,
   showLabels: boolean,
-) => Promise<GraphInstance>;
+) => GraphInstance;

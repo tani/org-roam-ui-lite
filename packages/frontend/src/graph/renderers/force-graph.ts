@@ -7,6 +7,7 @@ import type {
   RendererFunction,
 } from "../graph-types.ts";
 import { getCssVariable } from "../../utils/style.ts";
+import ForceGraphCtor from "force-graph";
 
 /**
  * Render or update a graph using force-graph.
@@ -21,7 +22,7 @@ import { getCssVariable } from "../../utils/style.ts";
  * @param showLabels - Whether to display labels
  * @returns The force-graph instance used for rendering
  */
-const renderForceGraph: RendererFunction = async (
+const renderForceGraph: RendererFunction = (
   nodes: GraphNode[],
   edges: GraphLink[],
   _layout: Layout,
@@ -30,8 +31,7 @@ const renderForceGraph: RendererFunction = async (
   nodeSize: number,
   labelScale: number,
   showLabels: boolean,
-): Promise<GraphInstance> => {
-  const { default: ForceGraphCtor } = await import("force-graph");
+): GraphInstance => {
   const radius = nodeSize / 2;
   const area = Math.PI * radius * radius;
   const fgNodes = nodes.map((n) => ({ ...n, val: area }));

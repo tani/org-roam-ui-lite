@@ -1,12 +1,11 @@
 import type { RehypeMermaidOptions } from "rehype-mermaid";
 import rehypeRaw from "rehype-raw";
 import rehypeReact from "rehype-react";
-// import rehypeStringify from "rehype-stringify";
 import { unified } from "unified";
 import uniorgParse from "uniorg-parse";
 import uniorgRehype from "uniorg-rehype";
-import type { VNode } from "vue";
 import { Fragment, jsx } from "vue/jsx-runtime";
+import type { VNode } from "vue";
 
 type Detect = {
   mermaid: boolean;
@@ -78,9 +77,6 @@ export function createOrgHtmlProcessor<Theme extends string>(
     }
 
     if (detected.languages.length > 0) {
-      const { transformerCopyButton } = await import(
-        "@rehype-pretty/transformers"
-      );
       const { default: rehypePrettyCode } = await import("rehype-pretty-code");
       const { getSingletonHighlighter } = await import("shiki");
       const highlighter = await getSingletonHighlighter({
@@ -98,12 +94,6 @@ export function createOrgHtmlProcessor<Theme extends string>(
       processor.use(rehypePrettyCode, {
         theme: theme.endsWith("dark") ? "vitesse-dark" : "vitesse-light",
         getHighlighter: () => Promise.resolve(highlighter),
-        transformers: [
-          transformerCopyButton({
-            visibility: "always",
-            feedbackDuration: 3_000,
-          }),
-        ],
       });
     }
 
@@ -120,6 +110,7 @@ export function createOrgHtmlProcessor<Theme extends string>(
         elementAttributeNameCase: "html",
       });
 
-    return (await processor.process(orgContent)).result as VNode;
+    const vnode = (await processor.process(orgContent)).result as VNode;
+    return vnode;
   };
 }

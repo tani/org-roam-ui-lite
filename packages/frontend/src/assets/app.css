@@ -1,5 +1,4 @@
 @import url("./themes.css");
-@import url("./code.css");
 @import url("bootstrap/dist/css/bootstrap.min.css");
 @import url("bootstrap-icons/font/bootstrap-icons.css");
 /* Removed webfonts */
@@ -87,4 +86,8 @@ html {
 	width: 100%;
 	height: 100%;
 	z-index: 1;
+}
+pre {
+    padding: 10px;
+    border-radius: 5px;
 }

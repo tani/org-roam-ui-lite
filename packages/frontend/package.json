@@ -7,7 +7,6 @@
 		"build": "vite build"
 	},
 	"dependencies": {
-		"@rehype-pretty/transformers": "^0.13.2",
 		"3d-force-graph": "^1.77.0",
 		"bootstrap": "^5.3.5",
 		"bootstrap-icons": "^1.11.3",

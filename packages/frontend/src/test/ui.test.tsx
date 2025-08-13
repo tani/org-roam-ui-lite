@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { describe, expect, it } from "vitest";
-import type { components } from "../api/api.d";
+import type { components } from "../api/api.d.ts";
 import { initialState, type UiState, uiReducer } from "../store/reducer";
 
 const testInitialState: UiState = {

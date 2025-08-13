@@ -1,7 +1,16 @@
 {
-	"files": [],
-	"references": [
-		{ "path": "./packages/frontend-react" },
-		{ "path": "./packages/backend" }
-	]
+  "compilerOptions": {
+    "noEmit": true,
+    "esModuleInterop": true,
+    "target": "es2022",
+    "module": "es2022",
+    "moduleResolution": "bundler",
+    "strict": true,
+    "allowImportingTsExtensions": true,
+    "skipLibCheck": true,
+    "jsx": "react-jsx",
+    "types": [
+      "@testing-library/jest-dom"
+    ]
+  }
 }

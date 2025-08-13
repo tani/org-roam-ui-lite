@@ -18,7 +18,7 @@ paths:
         Serves the main front-end UI page (usually `index.html`), located in `org-roam-ui-lite-static-root`.
         This acts as the SPA entry point and loads the graph viewer client.
       responses:
-        '200':
+        "200":
           description: Static HTML page
           content:
             text/html:
@@ -32,7 +32,7 @@ paths:
       description: >
         Alias to `/`. Loads the same static HTML file that bootstraps the UI.
       responses:
-        '200':
+        "200":
           description: HTML file
           content:
             text/html:
@@ -52,7 +52,7 @@ paths:
             type: string
             example: app.js
       responses:
-        '200':
+        "200":
           description: Static file
           content:
             "*/*":
@@ -63,12 +63,12 @@ paths:
     get:
       summary: Get full node-edge graph
       responses:
-        '200':
+        "200":
           description: Graph data returned
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Graph'
+                $ref: "#/components/schemas/Graph"
 
   /api/node/{id}.json:
     get:
@@ -80,13 +80,13 @@ paths:
           schema:
             type: string
       responses:
-        '200':
+        "200":
           description: Node found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Node'
-        '404':
+                $ref: "#/components/schemas/Node"
+        "404":
           description: Node not found
           content:
             application/json:
@@ -118,14 +118,14 @@ paths:
             type: string
             description: Base64url-encoded filename (without directory)
       responses:
-        '200':
+        "200":
           description: Binary asset returned
           content:
             image/*:
               schema:
                 type: string
                 format: binary
-        '404':
+        "404":
           description: Asset not found
           content:
             application/json:
@@ -146,11 +146,11 @@ components:
         nodes:
           type: array
           items:
-            $ref: '#/components/schemas/NodeSummary'
+            $ref: "#/components/schemas/NodeSummary"
         edges:
           type: array
           items:
-            $ref: '#/components/schemas/Edge'
+            $ref: "#/components/schemas/Edge"
 
     NodeSummary:
       type: object
@@ -192,4 +192,4 @@ components:
         backlinks:
           type: array
           items:
-            $ref: '#/components/schemas/Backlink'
+            $ref: "#/components/schemas/Backlink"

@@ -12,14 +12,17 @@ export default function rehypeImgSrcFix(nodeId: string): (tree: Root) => void {
   const ignorePattern = /^(data:|https?:|\/\/|\/api\/node\/|#|\s*$)/;
   return (tree: Root) => {
     visit(tree, "element", (node: Element) => {
-      if (node.tagName !== "img" || typeof node.properties?.src !== "string")
+      if (node.tagName !== "img" || typeof node.properties?.src !== "string") {
         return;
+      }
 
       const src = node.properties.src.trim();
       if (ignorePattern.test(src)) return;
 
       const [base, extension = ""] = src.split(/(?=\.[^.]+$)/);
-      node.properties!.src = `/api/node/${nodeId}/${encodeBase64url(base)}${extension}`;
+      node.properties!.src = `/api/node/${nodeId}/${
+        encodeBase64url(base)
+      }${extension}`;
     });
   };
 }

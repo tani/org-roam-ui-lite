@@ -1,7 +1,7 @@
 import createClient from "openapi-fetch";
-import type { VNode } from "vue";
+import type { ReactNode } from "react";
 import type { components, paths } from "../api/api.d.ts";
-import type { Theme } from "./graph.ts";
+import type { Theme } from "./graph-types.ts"; // Corrected import path
 import { createOrgHtmlProcessor } from "../utils/processor.ts";
 
 const api = createClient<paths>();
@@ -16,7 +16,7 @@ const api = createClient<paths>();
 export async function openNode(
   theme: Theme,
   nodeId: string,
-): Promise<components["schemas"]["Node"] & { body: VNode }> {
+): Promise<components["schemas"]["Node"] & { body: ReactNode }> {
   const { data, error } = await api.GET("/api/node/{id}.json", {
     params: { path: { id: nodeId } },
   });

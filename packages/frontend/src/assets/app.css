@@ -5,86 +5,56 @@
 /* Removed webfonts */
 
 :root {
-	--bs-font-monospace:
-		ui-monospace,
-		SFMono-Regular,
-		Menlo,
-		Monaco,
-		Consolas,
-		"Liberation Mono",
-		"Noto Sans Mono",
-		"Noto Sans Mono CJK JP",
-		"Noto Sans Mono CJK KR",
-		"Noto Sans Mono CJK SC",
-		"Noto Sans Mono CJK TC",
-		monospace,
-		"Apple Color Emoji",
-		"Segoe UI Emoji",
-		"Segoe UI Symbol",
-		"Noto Color Emoji";
-	--bs-font-sans-serif:
-		system-ui,
-		-apple-system,
-		BlinkMacSystemFont,
-		"Segoe UI",
-		Roboto,
-		"Helvetica Neue",
-		Arial,
-		"Noto Sans",
-		"Hiragino Sans",
-		"Hiragino Kaku Gothic ProN",
-		"Meiryo",
-		"MS PGothic",
-		"Malgun Gothic",
-		"Apple SD Gothic Neo",
-		"PingFang SC",
-		"PingFang TC",
-		"Noto Sans CJK JP",
-		"Noto Sans CJK KR",
-		"Noto Sans CJK SC",
-		"Noto Sans CJK TC",
-		"Source Han Sans",
-		sans-serif,
-		"Apple Color Emoji",
-		"Segoe UI Emoji",
-		"Segoe UI Symbol",
-		"Noto Color Emoji";
-	--h-scale-ratio: 1.08;
-	--h-base-size: 1rem;
+  --bs-font-monospace:
+    ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
+    "Noto Sans Mono", "Noto Sans Mono CJK JP", "Noto Sans Mono CJK KR",
+    "Noto Sans Mono CJK SC", "Noto Sans Mono CJK TC", monospace,
+    "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol",
+    "Noto Color Emoji";
+  --bs-font-sans-serif:
+    system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, "Noto Sans", "Hiragino Sans",
+    "Hiragino Kaku Gothic ProN", "Meiryo", "MS PGothic", "Malgun Gothic",
+    "Apple SD Gothic Neo", "PingFang SC", "PingFang TC", "Noto Sans CJK JP",
+    "Noto Sans CJK KR", "Noto Sans CJK SC", "Noto Sans CJK TC",
+    "Source Han Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji",
+    "Segoe UI Symbol", "Noto Color Emoji";
+  --h-scale-ratio: 1.08;
+  --h-base-size: 1rem;
 }
 
 h1 {
-	font-size: calc(var(--h-base-size) * pow(var(--h-scale-ratio), 5));
+  font-size: calc(var(--h-base-size) * pow(var(--h-scale-ratio), 5));
 }
 h2 {
-	font-size: calc(var(--h-base-size) * pow(var(--h-scale-ratio), 4));
+  font-size: calc(var(--h-base-size) * pow(var(--h-scale-ratio), 4));
 }
 h3 {
-	font-size: calc(var(--h-base-size) * pow(var(--h-scale-ratio), 3));
+  font-size: calc(var(--h-base-size) * pow(var(--h-scale-ratio), 3));
 }
 h4 {
-	font-size: calc(var(--h-base-size) * pow(var(--h-scale-ratio), 2));
+  font-size: calc(var(--h-base-size) * pow(var(--h-scale-ratio), 2));
 }
 h5 {
-	font-size: calc(var(--h-base-size) * pow(var(--h-scale-ratio), 1));
+  font-size: calc(var(--h-base-size) * pow(var(--h-scale-ratio), 1));
 }
 h6 {
-	font-size: calc(var(--h-base-size) * pow(var(--h-scale-ratio), 0));
+  font-size: calc(var(--h-base-size) * pow(var(--h-scale-ratio), 0));
 }
 
 body,
 html {
-	margin: 0;
-	padding: 0;
-	width: 100%;
-	height: 100%;
-	overflow: hidden;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
 }
 #graph {
-	position: absolute;
-	top: 0;
-	left: 0;
-	width: 100%;
-	height: 100%;
-	z-index: 1;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
 }

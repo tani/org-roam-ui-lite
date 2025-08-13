@@ -1,12 +1,11 @@
 import type { RehypeMermaidOptions } from "rehype-mermaid";
 import rehypeRaw from "rehype-raw";
 import rehypeReact from "rehype-react";
-// import rehypeStringify from "rehype-stringify";
 import { unified } from "unified";
 import uniorgParse from "uniorg-parse";
 import uniorgRehype from "uniorg-rehype";
-import type { VNode } from "vue";
-import { Fragment, jsx } from "vue/jsx-runtime";
+import type { ReactNode } from "react";
+import { Fragment, jsx, jsxs } from "react/jsx-runtime";
 
 type Detect = {
   mermaid: boolean;
@@ -36,14 +35,14 @@ function detect(orgContent: string): Detect {
   };
 }
 
-type Process = (str: string) => Promise<VNode>;
+type Process = (str: string) => Promise<ReactNode>;
 
 /**
- * Create a processor that converts Org markup into a Vue VNode.
+ * Create a processor that converts Org markup into a ReactNode.
  *
  * @param theme - Color theme
  * @param nodeId - Node identifier used for resource links
- * @returns Function that processes an Org string to a VNode
+ * @returns Function that processes an Org string to a ReactNode
  */
 export function createOrgHtmlProcessor<Theme extends string>(
   theme: Theme,
@@ -115,11 +114,10 @@ export function createOrgHtmlProcessor<Theme extends string>(
       .use(rehypeReact, {
         Fragment,
         jsx,
-        jsxs: jsx,
-        jsxDEV: jsx,
-        elementAttributeNameCase: "html",
+        jsxs,
+        elementAttributeNameCase: "react",
       });
 
-    return (await processor.process(orgContent)).result as VNode;
+    return (await processor.process(orgContent)).result;
   };
 }

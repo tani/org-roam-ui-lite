@@ -9,7 +9,6 @@ export interface paths {
     /**
      * Serve index.html
      * @description Serves the main front-end UI page (usually `index.html`), located in `org-roam-ui-lite-static-root`. This acts as the SPA entry point and loads the graph viewer client.
-     *
      */
     get: {
       parameters: {
@@ -49,7 +48,6 @@ export interface paths {
     /**
      * Serve index.html explicitly
      * @description Alias to `/`. Loads the same static HTML file that bootstraps the UI.
-     *
      */
     get: {
       parameters: {
@@ -89,7 +87,6 @@ export interface paths {
     /**
      * Serve static asset (JS, CSS, images)
      * @description Serves JavaScript, CSS, fonts, or other frontend assets under the static root.
-     *
      */
     get: {
       parameters: {
@@ -217,7 +214,6 @@ export interface paths {
     /**
      * Serve node asset (e.g. images)
      * @description Serves binary assets (images, etc.) referenced in the note with given `id`. The `path` parameter is the Base64url-encoded basename plus extension.
-     *
      */
     get: {
       parameters: {

@@ -77,7 +77,7 @@ export async function fetchNode(
     .where(eq(nodes.id, `"${nodeId}"`))
     .get();
 
-  if (!row)
+  if (!row) {
     return [
       404,
       {
@@ -89,6 +89,7 @@ export async function fetchNode(
         },
       },
     ];
+  }
 
   const raw = await fs.readFile(row.file, "utf8");
   const backlinks = await database
@@ -143,7 +144,7 @@ export async function fetchResource(
     .where(eq(nodes.id, `"${nodeId}"`))
     .get();
 
-  if (!row)
+  if (!row) {
     return [
       404,
       {
@@ -155,6 +156,7 @@ export async function fetchResource(
         },
       },
     ];
+  }
 
   const basePath = path.dirname(row.file);
   const { ext, name } = path.parse(encodedPath);

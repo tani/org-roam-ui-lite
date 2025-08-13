@@ -21,9 +21,10 @@ export default defineConfig({
         // inherit root settings
         extends: true,
         test: {
-          name: "frontend-react",
-          include: ["packages/frontend-react/src/test/**/*.test.ts", "packages/frontend-react/src/test/**/*.test.tsx"],
+          name: "frontend",
+          include: ["packages/frontend/src/test/**/*.test.{ts,tsx}"],
           environment: "jsdom", // frontend uses jsdom
+          setupFiles: ["packages/frontend/src/test/setup.ts"],
         },
       },
       {

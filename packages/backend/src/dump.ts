@@ -88,8 +88,9 @@ async function dumpNodeJsons(
             sourcePath.startsWith("http:") ||
             sourcePath.startsWith("https:") ||
             sourcePath.startsWith("//")
-          )
+          ) {
             return;
+          }
           imageSources.push(sourcePath);
         }
       });
@@ -141,8 +142,8 @@ if (isMain) {
       database: {
         type: "string",
         short: "d",
-        default:
-          process.env.DATABASE ?? `${process.env.HOME}/.emacs.d/org-roam.db`,
+        default: process.env.DATABASE ??
+          `${process.env.HOME}/.emacs.d/org-roam.db`,
       },
     },
     allowPositionals: true,

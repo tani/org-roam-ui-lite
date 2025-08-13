@@ -15,7 +15,7 @@ import { getCssVariable, pickColor } from "../utils/style.ts";
 const api = createClient<paths>();
 
 export { Layouts, Renderers, Themes };
-export type { Layout, Renderer, Theme, GraphInstance, GraphNode, GraphLink };
+export type { GraphInstance, GraphLink, GraphNode, Layout, Renderer, Theme };
 
 interface GraphData {
   nodes: GraphNode[];
@@ -94,7 +94,7 @@ export function destroyGraph(
     (instance as unknown as { destroy: () => void }).destroy();
   } else if (
     typeof (instance as { pauseAnimation?: () => void }).pauseAnimation ===
-    "function"
+      "function"
   ) {
     (instance as unknown as { pauseAnimation: () => void }).pauseAnimation();
   }

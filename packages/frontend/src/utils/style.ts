@@ -35,8 +35,9 @@ const ACCENT_VARIABLES = [
  */
 export function pickColor(key: string): string {
   let sum = 0;
-  for (const ch of key)
+  for (const ch of key) {
     sum = (sum + ch.charCodeAt(0)) % ACCENT_VARIABLES.length;
+  }
   return getCssVariable(ACCENT_VARIABLES[sum]);
 }
 
@@ -50,11 +51,12 @@ export function pickColor(key: string): string {
 export function alphaColor(color: string, alpha: number): string {
   if (color.startsWith("#")) {
     let hex = color.slice(1);
-    if (hex.length === 3)
+    if (hex.length === 3) {
       hex = hex
         .split("")
         .map((c) => c + c)
         .join("");
+    }
     const r = parseInt(hex.slice(0, 2), 16);
     const g = parseInt(hex.slice(2, 4), 16);
     const b = parseInt(hex.slice(4, 6), 16);

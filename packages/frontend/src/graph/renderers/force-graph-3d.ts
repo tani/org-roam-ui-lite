@@ -36,11 +36,12 @@ const renderForceGraph3D: RendererFunction = (
   const volume = (4 / 3) * Math.PI * radius * radius * radius;
   const fgNodes = nodes.map((n) => ({ ...n, val: volume }));
   let fg = existing as ForceGraph3DInstance<GraphNode, GraphLink> | undefined;
-  if (!fg)
+  if (!fg) {
     fg = new ForceGraph3D(container) as unknown as ForceGraph3DInstance<
       GraphNode,
       GraphLink
     >;
+  }
   fg.backgroundColor(getCssVariable("--bs-body-bg"));
   fg.nodeId("id")
     .nodeLabel("label")

@@ -7,9 +7,6 @@ export default tseslint.config(
   js.configs.recommended,
   ...tseslint.configs.recommended,
   {
-    ignores: ["**/dist/", "**/node_modules/", "packages/frontend/"],
-  },
-  {
     files: ["scripts/**/*.js", "scripts/**/*.ts"],
     languageOptions: {
       globals: {
@@ -17,5 +14,5 @@ export default tseslint.config(
         process: "readonly",
       },
     },
-  }
+  },
 );

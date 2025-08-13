@@ -1,4 +1,4 @@
 declare module "*.wasm" {
-  const wasmBinary: ArrayBuffer;
-  export default wasmBinary;
+  const content: ArrayBuffer;
+  export default content;
 }

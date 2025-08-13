@@ -23,11 +23,11 @@
   },
   "scripts": {
     "version": "nix run .#update-npm-deps-hash && git add flake.nix",
-    "prebuild": "jiti openapi.ts | tee packages/frontend-react/src/api/api.d.ts packages/backend/src/api.d.ts > /dev/null && prettier --write packages/frontend-react/src/api/api.d.ts packages/backend/src/api.d.ts",
+    "prebuild": "jiti openapi.ts | tee packages/frontend/src/api/api.d.ts packages/backend/src/api.d.ts > /dev/null && prettier --write packages/frontend/src/api/api.d.ts packages/backend/src/api.d.ts",
     "build": "npm run build --workspaces && jiti ./scripts/build.ts",
     "export": "npm run build && node ./scripts/export.js -r ./dist",
     "dev": "npm-run-all -p dev:frontend 'dev:backend -- {@}' --",
-    "dev:frontend": "npm --workspace=packages/frontend-react run dev --",
+    "dev:frontend": "npm --workspace=packages/frontend run dev --",
     "dev:backend": "npm --workspace=packages/backend run dev --",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",

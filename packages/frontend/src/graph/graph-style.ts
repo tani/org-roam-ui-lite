@@ -39,7 +39,7 @@ export function highlightNeighborhood(
     if (String(t) === focusId) neighbors.add(String(s));
   });
   fg.nodeColor((node: GraphNode) =>
-    neighbors.has(String(node.id)) ? node.color : alphaColor(node.color, 0.15),
+    neighbors.has(String(node.id)) ? node.color : alphaColor(node.color, 0.15)
   );
   fg.linkColor((link: GraphLink) => {
     const s = typeof link.source === "object" ? link.source.id : link.source;

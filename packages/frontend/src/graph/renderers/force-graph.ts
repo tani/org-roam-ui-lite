@@ -47,7 +47,7 @@ const renderForceGraph: RendererFunction = (
     .linkWidth(2)
     .graphData({ nodes: fgNodes, links: edges });
 
-  if (showLabels)
+  if (showLabels) {
     fg.nodeCanvasObject((node: GraphNode, ctx, scale) => {
       const label = String(node.label);
       const size = fontSize / scale;
@@ -55,10 +55,13 @@ const renderForceGraph: RendererFunction = (
       ctx.textAlign = "center";
       ctx.textBaseline = "top";
       ctx.fillStyle = getCssVariable("--bs-body-color");
-      if (typeof node.x === "number" && typeof node.y === "number")
+      if (typeof node.x === "number" && typeof node.y === "number") {
         ctx.fillText(label, node.x, node.y + radius + 2);
+      }
     }).nodeCanvasObjectMode(() => "after");
-  else fg.nodeCanvasObject(() => undefined).nodeCanvasObjectMode(() => "after");
+  } else {fg.nodeCanvasObject(() => undefined).nodeCanvasObjectMode(() =>
+      "after"
+    );}
 
   return fg;
 };

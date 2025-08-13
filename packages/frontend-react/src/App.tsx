@@ -1,6 +1,6 @@
 import { useEffect, useRef, useCallback } from "react";
 import type { Core } from "cytoscape";
-import { useUiState, useUiDispatch } from "./store/ui.tsx";
+import { useUiState, useUiDispatch } from "./store/hooks.ts";
 import { DetailsPanel } from "./components/DetailsPanel.tsx";
 import { SettingsPanel } from "./components/SettingsPanel.tsx";
 import { drawGraph, destroyGraph } from "./graph/graph.ts";
@@ -93,11 +93,12 @@ function App() {
   };
 
   useEffect(() => {
+    const graphElement = graphRef.current;
     refreshGraph();
 
     return () => {
-      if (graphRef.current) {
-        destroyGraph(graphInstanceRef.current, graphRef.current);
+      if (graphElement) {
+        destroyGraph(graphInstanceRef.current, graphElement);
         graphInstanceRef.current = undefined;
       }
     };
@@ -105,7 +106,7 @@ function App() {
 
   useEffect(() => {
     refreshGraph();
-  }, [theme, showLabels, layout]);
+  }, [theme, showLabels, layout, refreshGraph]);
 
   useEffect(() => {
     if (renderer === "cytoscape") {

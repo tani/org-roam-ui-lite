@@ -5,6 +5,7 @@ import type { Theme } from "../graph/graph-types.ts";
 import { openNode } from "../graph/node.ts";
 import { PreviewPopover } from "./PreviewPopover.tsx";
 import { Button } from "./ui/Button.tsx";
+import { For } from "./ui/For.tsx";
 import { When } from "./ui/When.tsx";
 
 interface DetailsPanelProps {
@@ -126,18 +127,20 @@ export function DetailsPanel({
 								<i className="bi bi-link-45deg"></i>Backlinks
 							</h5>
 							<ul className="list-unstyled">
-								{selected?.backlinks?.map((b) => (
-									<li key={b.source}>
-										<button
-											type="button"
-											className="btn btn-sm btn-link p-0"
-											onClick={() => onOpenNode(b.source)}
-										>
-											<i className="bi bi-chevron-right"></i>
-											<span>{b.title}</span>
-										</button>
-									</li>
-								))}
+								<For list={selected?.backlinks || []}>
+									{({ item: b }) => (
+										<li key={b.source}>
+											<button
+												type="button"
+												className="btn btn-sm btn-link p-0"
+												onClick={() => onOpenNode(b.source)}
+											>
+												<i className="bi bi-chevron-right"></i>
+												<span>{b.title}</span>
+											</button>
+										</li>
+									)}
+								</For>
 							</ul>
 						</div>
 					</When>

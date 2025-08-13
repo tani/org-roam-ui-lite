@@ -28,7 +28,7 @@ vi.mock("sql.js", () => {
 beforeEach(() => {
 	mockReadFile.mockResolvedValue(new Uint8Array([1, 2]));
 	initSqlJs.mockResolvedValue(undefined);
-	mockDrizzle.mockReturnValue("db" as unknown);
+	mockDrizzle.mockReturnValue("db");
 	vi.resetModules();
 });
 

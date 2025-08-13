@@ -30,8 +30,6 @@ function createWrapper() {
 
 describe("useGraphManager Hook", () => {
 	let mockDrawGraph: ReturnType<typeof vi.fn>;
-	let _mockDestroyGraph: ReturnType<typeof vi.fn>;
-	let _mockApplyNodeStyle: ReturnType<typeof vi.fn>;
 	let mockHighlightNeighborhood: ReturnType<typeof vi.fn>;
 	let mockResetHighlight: ReturnType<typeof vi.fn>;
 	let mockOpenNode: ReturnType<typeof vi.fn>;
@@ -57,10 +55,6 @@ describe("useGraphManager Hook", () => {
 		const nodeModule = await import("../../src/graph/node.ts");
 
 		mockDrawGraph = graphModule.drawGraph as ReturnType<typeof vi.fn>;
-		_mockDestroyGraph = graphModule.destroyGraph as ReturnType<typeof vi.fn>;
-		_mockApplyNodeStyle = styleModule.applyNodeStyle as ReturnType<
-			typeof vi.fn
-		>;
 		mockHighlightNeighborhood = styleModule.highlightNeighborhood as ReturnType<
 			typeof vi.fn
 		>;

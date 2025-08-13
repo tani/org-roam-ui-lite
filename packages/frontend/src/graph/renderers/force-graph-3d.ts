@@ -1,5 +1,6 @@
 import type { ForceGraph3DInstance } from "3d-force-graph";
 import ForceGraph3D from "3d-force-graph";
+import type { LinkObject, NodeObject } from "force-graph";
 import { getCssVariable } from "../../utils/style.ts";
 import type {
 	GraphInstance,
@@ -8,6 +9,38 @@ import type {
 	Layout,
 	RendererFunction,
 } from "../graph-types.ts";
+
+/**
+ * Type guard to check if a GraphInstance is a ForceGraph3DInstance
+ */
+function isForceGraph3DInstance(
+	instance: GraphInstance | Record<string, unknown>,
+): instance is ForceGraph3DInstance<NodeObject, LinkObject<NodeObject>> {
+	if (!instance) return false;
+
+	// Check if instance has the required methods for ForceGraph3D
+	const obj = instance as {
+		graphData?: unknown;
+		backgroundColor?: unknown;
+		nodeId?: unknown;
+	};
+
+	return (
+		typeof obj.graphData === "function" &&
+		typeof obj.backgroundColor === "function" &&
+		typeof obj.nodeId === "function"
+	);
+}
+
+/**
+ * Safely create a ForceGraph3D instance with proper typing
+ * Returns the base instance which works with NodeObject/LinkObject types
+ */
+function createForceGraph3DInstance(
+	container: HTMLElement,
+): ForceGraph3DInstance<NodeObject, LinkObject<NodeObject>> {
+	return new ForceGraph3D(container);
+}
 
 /**
  * Render or update a graph using 3d-force-graph.
@@ -25,23 +58,26 @@ const renderForceGraph3D: RendererFunction = (
 	edges: GraphLink[],
 	_layout: Layout,
 	container: HTMLElement,
-	existing: GraphInstance | undefined,
+	existing: GraphInstance | undefined | Record<string, unknown>,
 	nodeSize: number,
 	labelScale: number,
 	showLabels: boolean,
 ): GraphInstance => {
 	void labelScale;
 	void showLabels;
+
+	let fg: ForceGraph3DInstance<NodeObject, LinkObject<NodeObject>>;
+	if (existing && isForceGraph3DInstance(existing)) {
+		fg = existing;
+	} else {
+		fg = createForceGraph3DInstance(container);
+	}
+
+	// Configure with custom node size
 	const radius = nodeSize / 2;
 	const volume = (4 / 3) * Math.PI * radius * radius * radius;
 	const fgNodes = nodes.map((n) => ({ ...n, val: volume }));
-	let fg = existing as ForceGraph3DInstance<GraphNode, GraphLink> | undefined;
-	if (!fg) {
-		fg = new ForceGraph3D(container) as unknown as ForceGraph3DInstance<
-			GraphNode,
-			GraphLink
-		>;
-	}
+
 	fg.backgroundColor(getCssVariable("--bs-body-bg"));
 	fg.nodeId("id")
 		.nodeLabel("label")
@@ -52,7 +88,7 @@ const renderForceGraph3D: RendererFunction = (
 		.linkWidth(2)
 		.graphData({ nodes: fgNodes, links: edges });
 
-	return fg as unknown as GraphInstance;
+	return fg;
 };
 
 export default renderForceGraph3D;

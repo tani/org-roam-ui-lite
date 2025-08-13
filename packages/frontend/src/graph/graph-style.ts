@@ -1,6 +1,4 @@
-import type { ForceGraph3DInstance } from "3d-force-graph";
 import type { Core } from "cytoscape";
-import type ForceGraph from "force-graph";
 import { alphaColor } from "../utils/style.ts";
 import type { GraphInstance, GraphLink, GraphNode } from "./graph-types.ts";
 
@@ -11,26 +9,38 @@ import type { GraphInstance, GraphLink, GraphNode } from "./graph-types.ts";
  * @param focusId - Node id to highlight
  */
 export function highlightNeighborhood(
-	graph: GraphInstance | undefined,
+	graph: GraphInstance | undefined | Record<string, unknown>,
 	focusId: string,
 ): void {
 	if (!graph) return;
 
-	if (typeof (graph as Core).elements === "function") {
-		const cy = graph as Core;
-		const focus = cy.$id(focusId);
-		const neighborhood = focus?.closedNeighborhood();
-		cy.elements().forEach((el) => {
-			const isNeighbor = neighborhood.has(el);
-			el.style("opacity", isNeighbor ? 1 : el.isNode() ? 0.15 : 0.05);
+	const graphObj = graph as {
+		elements?: () => { forEach: (fn: (el: unknown) => void) => void };
+		$id?: (id: string) => {
+			closedNeighborhood?: () => { has: (el: unknown) => boolean };
+		};
+		graphData?: () => { nodes: GraphNode[]; links: GraphLink[] };
+		nodeColor?: (fn: (node: GraphNode) => string) => void;
+		linkColor?: (fn: (link: GraphLink) => string) => void;
+	};
+
+	if (typeof graphObj.elements === "function") {
+		const focus = graphObj.$id?.(focusId);
+		const neighborhood = focus?.closedNeighborhood?.();
+		graphObj.elements().forEach((el: unknown) => {
+			const element = el as {
+				style: (prop: string, value: number) => void;
+				isNode: () => boolean;
+			};
+			const isNeighbor = neighborhood?.has(el);
+			element.style("opacity", isNeighbor ? 1 : element.isNode() ? 0.15 : 0.05);
 		});
 		return;
 	}
 
-	const fg = graph as
-		| ForceGraph<GraphNode, GraphLink>
-		| ForceGraph3DInstance<GraphNode, GraphLink>;
-	const data = fg.graphData();
+	const data = graphObj.graphData?.();
+	if (!data) return;
+
 	const neighbors = new Set<string>([focusId]);
 	data.links.forEach((l) => {
 		const s = typeof l.source === "object" ? l.source.id : l.source;
@@ -38,10 +48,10 @@ export function highlightNeighborhood(
 		if (String(s) === focusId) neighbors.add(String(t));
 		if (String(t) === focusId) neighbors.add(String(s));
 	});
-	fg.nodeColor((node: GraphNode) =>
+	graphObj.nodeColor?.((node: GraphNode) =>
 		neighbors.has(String(node.id)) ? node.color : alphaColor(node.color, 0.15),
 	);
-	fg.linkColor((link: GraphLink) => {
+	graphObj.linkColor?.((link: GraphLink) => {
 		const s = typeof link.source === "object" ? link.source.id : link.source;
 		const t = typeof link.target === "object" ? link.target.id : link.target;
 		const related = neighbors.has(String(s)) && neighbors.has(String(t));
@@ -56,11 +66,14 @@ export function highlightNeighborhood(
  * @param style - CSS properties to apply
  */
 export function applyElementsStyle(
-	graph: Core | undefined,
+	graph: Core | undefined | Record<string, unknown>,
 	style: Record<string, unknown>,
 ): void {
 	for (const [key, value] of Object.entries(style)) {
-		graph?.elements().style(key, value);
+		const coreGraph = graph as {
+			elements?: () => { style: (k: string, v: unknown) => void };
+		};
+		coreGraph?.elements?.()?.style(key, value);
 	}
 }
 
@@ -71,10 +84,13 @@ export function applyElementsStyle(
  * @param style - CSS properties to apply
  */
 export function applyNodeStyle(
-	graph: Core | undefined,
+	graph: Core | undefined | Record<string, unknown>,
 	style: Record<string, unknown>,
 ): void {
-	graph?.nodes().style(style);
+	const coreGraph = graph as {
+		nodes?: () => { style: (s: Record<string, unknown>) => void };
+	};
+	coreGraph?.nodes?.()?.style(style);
 }
 
 /**
@@ -82,15 +98,19 @@ export function applyNodeStyle(
  *
  * @param graph - Graph instance
  */
-export function resetHighlight(graph: GraphInstance | undefined): void {
+export function resetHighlight(
+	graph: GraphInstance | undefined | Record<string, unknown>,
+): void {
 	if (!graph) return;
-	if (typeof (graph as Core).elements === "function") {
-		applyElementsStyle(graph as Core, { opacity: 1 });
+	const graphObj = graph as {
+		elements?: unknown;
+		nodeColor?: (c: string) => void;
+		linkColor?: (c: string) => void;
+	};
+	if (typeof graphObj.elements === "function") {
+		applyElementsStyle(graphObj, { opacity: 1 });
 		return;
 	}
-	const fg = graph as
-		| ForceGraph<GraphNode, GraphLink>
-		| ForceGraph3DInstance<GraphNode, GraphLink>;
-	fg.nodeColor("color");
-	fg.linkColor("color");
+	graphObj.nodeColor?.("color");
+	graphObj.linkColor?.("color");
 }

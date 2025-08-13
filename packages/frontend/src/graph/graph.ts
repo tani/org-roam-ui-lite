@@ -59,7 +59,7 @@ export async function drawGraph(
 	renderer: Renderer,
 	layoutName: Layout,
 	container: HTMLElement,
-	existingGraph: GraphInstance | undefined,
+	existingGraph: GraphInstance | undefined | Record<string, unknown>,
 	nodeSize: number,
 	labelScale: number,
 	showLabels: boolean,
@@ -80,23 +80,44 @@ export async function drawGraph(
 }
 
 /**
+ * Type guard to check if an object has a destroy method
+ */
+function hasDestroyMethod(obj: unknown): obj is { destroy(): void } {
+	return (
+		typeof obj === "object" &&
+		obj !== null &&
+		typeof (obj as { destroy?: unknown }).destroy === "function"
+	);
+}
+
+/**
+ * Type guard to check if an object has a pauseAnimation method
+ */
+function hasPauseAnimationMethod(
+	obj: unknown,
+): obj is { pauseAnimation(): void } {
+	return (
+		typeof obj === "object" &&
+		obj !== null &&
+		typeof (obj as { pauseAnimation?: unknown }).pauseAnimation === "function"
+	);
+}
+
+/**
  * Stop and remove the given graph instance.
  *
  * @param instance - Graph instance to destroy
  * @param container - Container element holding the graph
  */
 export function destroyGraph(
-	instance: GraphInstance | undefined,
+	instance: GraphInstance | undefined | Record<string, unknown>,
 	container: HTMLElement,
 ): void {
 	if (!instance) return;
-	if (typeof (instance as { destroy?: () => void }).destroy === "function") {
-		(instance as unknown as { destroy: () => void }).destroy();
-	} else if (
-		typeof (instance as { pauseAnimation?: () => void }).pauseAnimation ===
-		"function"
-	) {
-		(instance as unknown as { pauseAnimation: () => void }).pauseAnimation();
+	if (hasDestroyMethod(instance)) {
+		instance.destroy();
+	} else if (hasPauseAnimationMethod(instance)) {
+		instance.pauseAnimation();
 	}
 	container.replaceChildren();
 }

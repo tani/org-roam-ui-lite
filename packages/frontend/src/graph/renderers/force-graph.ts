@@ -27,7 +27,7 @@ const renderForceGraph: RendererFunction = (
 	edges: GraphLink[],
 	_layout: Layout,
 	container: HTMLElement,
-	existing: GraphInstance | undefined,
+	existing: GraphInstance | undefined | Record<string, unknown>,
 	nodeSize: number,
 	labelScale: number,
 	showLabels: boolean,

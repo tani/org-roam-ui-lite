@@ -1,10 +1,32 @@
-import type { Core } from "cytoscape";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type {
-	GraphInstance,
-	GraphLink,
-	GraphNode,
-} from "../../src/graph/graph-types.ts";
+import type { GraphLink, GraphNode } from "../../src/graph/graph-types.ts";
+
+// Mock factory functions for creating properly typed test objects
+function createMockCytoscapeInstance(overrides: Record<string, unknown> = {}) {
+	return {
+		$id: vi.fn(),
+		elements: vi.fn(),
+		nodes: vi.fn(),
+		...overrides,
+	};
+}
+
+function createMockForceGraphInstance(overrides: Record<string, unknown> = {}) {
+	return {
+		graphData: vi.fn(),
+		nodeColor: vi.fn(),
+		linkColor: vi.fn(),
+		...overrides,
+	};
+}
+
+function createMockCoreInstance(overrides: Record<string, unknown> = {}) {
+	return {
+		elements: vi.fn(),
+		nodes: vi.fn(),
+		...overrides,
+	};
+}
 
 // Mock style utilities
 vi.mock("../../src/utils/style.ts", () => ({
@@ -68,10 +90,8 @@ describe("Graph Style Module", () => {
 				})),
 			};
 
-			highlightNeighborhood(
-				mockCytoscape as unknown as GraphInstance,
-				"focus-node",
-			);
+			const mockGraphInstance = createMockCytoscapeInstance(mockCytoscape);
+			highlightNeighborhood(mockGraphInstance, "focus-node");
 
 			expect(mockCytoscape.$id).toHaveBeenCalledWith("focus-node");
 			expect(mockElement1.style).toHaveBeenCalledWith("opacity", 1);
@@ -106,10 +126,8 @@ describe("Graph Style Module", () => {
 				(color: string, alpha: number) => `rgba(${color.slice(1)}, ${alpha})`,
 			);
 
-			highlightNeighborhood(
-				mockForceGraph as unknown as GraphInstance,
-				"node1",
-			);
+			const mockGraphInstance = createMockForceGraphInstance(mockForceGraph);
+			highlightNeighborhood(mockGraphInstance, "node1");
 
 			expect(mockForceGraph.nodeColor).toHaveBeenCalled();
 			expect(mockForceGraph.linkColor).toHaveBeenCalled();
@@ -150,10 +168,8 @@ describe("Graph Style Module", () => {
 				linkColor: vi.fn(),
 			};
 
-			highlightNeighborhood(
-				mockForceGraph as unknown as GraphInstance,
-				"node1",
-			);
+			const mockGraphInstance = createMockForceGraphInstance(mockForceGraph);
+			highlightNeighborhood(mockGraphInstance, "node1");
 
 			// Test linkColor callback with object sources
 			const linkColorCallback = mockForceGraph.linkColor.mock.calls[0]?.[0];
@@ -179,7 +195,8 @@ describe("Graph Style Module", () => {
 				opacity: 0.8,
 			};
 
-			applyElementsStyle(mockGraph as unknown as Core, style);
+			const mockCoreInstance = createMockCoreInstance(mockGraph);
+			applyElementsStyle(mockCoreInstance, style);
 
 			expect(mockGraph.elements).toHaveBeenCalled();
 			expect(mockElements.style).toHaveBeenCalledTimes(3);
@@ -215,7 +232,8 @@ describe("Graph Style Module", () => {
 				"background-color": "#00ff00",
 			};
 
-			applyNodeStyle(mockGraph as unknown as Core, style);
+			const mockCoreInstance = createMockCoreInstance(mockGraph);
+			applyNodeStyle(mockCoreInstance, style);
 
 			expect(mockGraph.nodes).toHaveBeenCalled();
 			expect(mockNodes.style).toHaveBeenCalledWith(style);
@@ -250,7 +268,8 @@ describe("Graph Style Module", () => {
 				elements: vi.fn(() => mockElements),
 			};
 
-			resetHighlight(mockCytoscape as unknown as GraphInstance);
+			const mockGraphInstance = createMockCytoscapeInstance(mockCytoscape);
+			resetHighlight(mockGraphInstance);
 
 			expect(mockCytoscape.elements).toHaveBeenCalled();
 			expect(mockElements.style).toHaveBeenCalledWith("opacity", 1);
@@ -264,7 +283,8 @@ describe("Graph Style Module", () => {
 				linkColor: vi.fn(),
 			};
 
-			resetHighlight(mockForceGraph as unknown as GraphInstance);
+			const mockGraphInstance = createMockForceGraphInstance(mockForceGraph);
+			resetHighlight(mockGraphInstance);
 
 			expect(mockForceGraph.nodeColor).toHaveBeenCalledWith("color");
 			expect(mockForceGraph.linkColor).toHaveBeenCalledWith("color");

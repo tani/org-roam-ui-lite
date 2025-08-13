@@ -1,5 +1,11 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { GraphInstance } from "../../src/graph/graph-types.ts";
+
+// Mock factory function for creating properly typed test objects
+function createMockGraphInstance(overrides: Record<string, unknown> = {}) {
+	return {
+		...overrides,
+	};
+}
 
 // Mock openapi-fetch
 const mockGET = vi.fn();
@@ -183,7 +189,9 @@ describe("Graph Module", () => {
 		it("passes existing graph instance to renderer", async () => {
 			const { drawGraph } = graphModule;
 			const mockContainer = document.createElement("div");
-			const existingGraph = { type: "existing" } as unknown as GraphInstance;
+			const existingGraph = createMockGraphInstance({
+				type: "existing",
+			});
 
 			await drawGraph(
 				"cytoscape",
@@ -217,7 +225,8 @@ describe("Graph Module", () => {
 			const mockContainer = document.createElement("div");
 			mockContainer.appendChild(document.createElement("div"));
 
-			destroyGraph(mockInstance as unknown as GraphInstance, mockContainer);
+			const mockGraphInstance = createMockGraphInstance(mockInstance);
+			destroyGraph(mockGraphInstance, mockContainer);
 
 			expect(mockInstance.destroy).toHaveBeenCalled();
 			expect(mockContainer.children.length).toBe(0);
@@ -231,7 +240,8 @@ describe("Graph Module", () => {
 			const mockContainer = document.createElement("div");
 			mockContainer.appendChild(document.createElement("div"));
 
-			destroyGraph(mockInstance as unknown as GraphInstance, mockContainer);
+			const mockGraphInstance = createMockGraphInstance(mockInstance);
+			destroyGraph(mockGraphInstance, mockContainer);
 
 			expect(mockInstance.pauseAnimation).toHaveBeenCalled();
 			expect(mockContainer.children.length).toBe(0);
@@ -244,7 +254,8 @@ describe("Graph Module", () => {
 			const childElement = document.createElement("div");
 			mockContainer.appendChild(childElement);
 
-			destroyGraph(mockInstance as unknown as GraphInstance, mockContainer);
+			const mockGraphInstance = createMockGraphInstance(mockInstance);
+			destroyGraph(mockGraphInstance, mockContainer);
 
 			expect(mockContainer.children.length).toBe(0);
 		});
@@ -261,14 +272,14 @@ describe("Graph Module", () => {
 			expect(mockContainer.children.length).toBe(1);
 		});
 
-		it("clears container even when instance is null", () => {
+		it("clears container even when instance is undefined", () => {
 			const { destroyGraph } = graphModule;
 			const mockContainer = document.createElement("div");
 			mockContainer.appendChild(document.createElement("div"));
 
-			destroyGraph(null as unknown as GraphInstance, mockContainer);
+			destroyGraph(undefined, mockContainer);
 
-			// Should not clear container for null
+			// Should not clear container for undefined
 			expect(mockContainer.children.length).toBe(1);
 		});
 	});

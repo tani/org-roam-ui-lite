@@ -45,14 +45,14 @@ export interface GraphLink extends LinkObject<GraphNode> {
 export type GraphInstance =
 	| Core
 	| ForceGraph<GraphNode, GraphLink>
-	| ForceGraph3DInstance<GraphNode, GraphLink>;
+	| ForceGraph3DInstance<NodeObject, LinkObject<NodeObject>>;
 
 export type RendererFunction = (
 	nodes: GraphNode[],
 	edges: GraphLink[],
 	layout: Layout,
 	container: HTMLElement,
-	existing: GraphInstance | undefined,
+	existing: GraphInstance | undefined | Record<string, unknown>,
 	nodeSize: number,
 	labelScale: number,
 	showLabels: boolean,

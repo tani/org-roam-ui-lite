@@ -4,6 +4,7 @@ import type { components } from "../api/api.d.ts";
 import type { Theme } from "../graph/graph-types.ts";
 import { openNode } from "../graph/node.ts";
 import { PreviewPopover } from "./PreviewPopover.tsx";
+import { Button } from "./ui/Button.tsx";
 
 interface DetailsPanelProps {
 	open: boolean;
@@ -90,38 +91,6 @@ export function DetailsPanel({
 
 	return (
 		<>
-			<style>
-				{`
-        .offcanvas.offcanvas-end.responsive-wide {
-          width: 90vw;
-        }
-
-        @media (min-width: 576px) {
-          .offcanvas.offcanvas-end.responsive-wide {
-            width: 85vw;
-          }
-        }
-
-        @media (min-width: 768px) {
-          .offcanvas.offcanvas-end.responsive-wide {
-            width: 70vw;
-          }
-        }
-
-        @media (min-width: 992px) {
-          .offcanvas.offcanvas-end.responsive-wide {
-            width: 60vw;
-          }
-        }
-
-        @media (min-width: 1200px) {
-          .offcanvas.offcanvas-end.responsive-wide {
-            width: 50vw;
-            max-width: 800px;
-          }
-        }
-      `}
-			</style>
 			<div
 				id="offcanvasDetails"
 				className={`offcanvas offcanvas-end responsive-wide ${
@@ -136,12 +105,7 @@ export function DetailsPanel({
 						<i className="bi bi-file-earmark-text"></i>
 						<span>{selected?.title ?? "Click a node to view details"}</span>
 					</h4>
-					<button
-						type="button"
-						className="btn-close"
-						aria-label="Close"
-						onClick={onClose}
-					></button>
+					<Button variant="close" aria-label="Close" onClick={onClose} />
 				</div>
 				<section
 					className="offcanvas-body"

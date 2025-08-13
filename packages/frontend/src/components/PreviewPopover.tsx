@@ -1,33 +1,36 @@
-import { useLayoutEffect, useRef } from "react";
 import type { ReactNode } from "react";
+import { useLayoutEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 
 interface PreviewPopoverProps {
-  content: ReactNode;
-  x: number;
-  y: number;
-  onLeave: () => void;
+	content: ReactNode;
+	x: number;
+	y: number;
+	onLeave: () => void;
 }
 
-export function PreviewPopover(
-  { content, x, y, onLeave }: PreviewPopoverProps,
-) {
-  const ref = useRef<HTMLDivElement>(null);
+export function PreviewPopover({
+	content,
+	x,
+	y,
+	onLeave,
+}: PreviewPopoverProps) {
+	const ref = useRef<HTMLDivElement>(null);
 
-  useLayoutEffect(() => {
-    if (ref.current) {
-      const offset = 20;
-      const div = ref.current;
-      div.style.left = `${x - div.offsetWidth - offset}px`;
-      div.style.top = `${y + offset}px`;
-      div.style.visibility = "visible";
-    }
-  }, [x, y]);
+	useLayoutEffect(() => {
+		if (ref.current) {
+			const offset = 20;
+			const div = ref.current;
+			div.style.left = `${x - div.offsetWidth - offset}px`;
+			div.style.top = `${y + offset}px`;
+			div.style.visibility = "visible";
+		}
+	}, [x, y]);
 
-  return createPortal(
-    <>
-      <style>
-        {`
+	return createPortal(
+		<>
+			<style>
+				{`
         .preview-popover {
           position: fixed;
           z-index: 1070;
@@ -64,16 +67,18 @@ export function PreviewPopover(
           }
         }
       `}
-      </style>
-      <div
-        ref={ref}
-        className="card position-fixed p-2 preview-popover responsive-wide"
-        style={{ visibility: "hidden" }}
-        onMouseLeave={onLeave}
-      >
-        {content}
-      </div>
-    </>,
-    document.body,
-  );
+			</style>
+			<div
+				ref={ref}
+				className="card position-fixed p-2 preview-popover responsive-wide"
+				style={{ visibility: "hidden" }}
+				onMouseLeave={onLeave}
+				role="tooltip"
+				aria-label="Preview popover"
+			>
+				{content}
+			</div>
+		</>,
+		document.body,
+	);
 }

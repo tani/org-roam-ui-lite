@@ -1,8 +1,8 @@
 import createClient from "openapi-fetch";
 import type { ReactNode } from "react";
 import type { components, paths } from "../api/api.d.ts";
-import type { Theme } from "./graph-types.ts"; // Corrected import path
 import { createOrgHtmlProcessor } from "../utils/processor.ts";
+import type { Theme } from "./graph-types.ts"; // Corrected import path
 
 const api = createClient<paths>();
 
@@ -14,18 +14,18 @@ const api = createClient<paths>();
  * @returns Node information with rendered HTML
  */
 export async function openNode(
-  theme: Theme,
-  nodeId: string,
+	theme: Theme,
+	nodeId: string,
 ): Promise<components["schemas"]["Node"] & { body: ReactNode }> {
-  const { data, error } = await api.GET("/api/node/{id}.json", {
-    params: { path: { id: nodeId } },
-  });
+	const { data, error } = await api.GET("/api/node/{id}.json", {
+		params: { path: { id: nodeId } },
+	});
 
-  if (error) {
-    throw error;
-  }
+	if (error) {
+		throw error;
+	}
 
-  const process = createOrgHtmlProcessor(theme, nodeId);
-  const body = await process(data.raw);
-  return { ...data, body };
+	const process = createOrgHtmlProcessor(theme, nodeId);
+	const body = await process(data.raw);
+	return { ...data, body };
 }

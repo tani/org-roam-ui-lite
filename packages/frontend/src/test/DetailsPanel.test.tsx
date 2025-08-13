@@ -1,33 +1,33 @@
-import { describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen } from "@testing-library/react";
+import { describe, expect, it, vi } from "vitest";
 import { DetailsPanel } from "../components/DetailsPanel";
 
 describe("DetailsPanel", () => {
-  it("renders node details and handles backlink clicks", () => {
-    const handleOpenNode = vi.fn();
-    const mockSelectedNode = {
-      id: "node1",
-      title: "Node 1 Title",
-      raw: "Node 1 Body",
-      body: <div>Node 1 Body</div>,
-      backlinks: [{ source: "node2", title: "Node 2 Title" }],
-    };
+	it("renders node details and handles backlink clicks", () => {
+		const handleOpenNode = vi.fn();
+		const mockSelectedNode = {
+			id: "node1",
+			title: "Node 1 Title",
+			raw: "Node 1 Body",
+			body: <div>Node 1 Body</div>,
+			backlinks: [{ source: "node2", title: "Node 2 Title" }],
+		};
 
-    render(
-      <DetailsPanel
-        open={true}
-        selected={mockSelectedNode}
-        theme="dark"
-        onClose={() => {}}
-        onOpenNode={handleOpenNode}
-      />,
-    );
+		render(
+			<DetailsPanel
+				open={true}
+				selected={mockSelectedNode}
+				theme="dark"
+				onClose={() => {}}
+				onOpenNode={handleOpenNode}
+			/>,
+		);
 
-    expect(screen.getByText("Node 1 Title")).toBeInTheDocument();
-    expect(screen.getByText("Backlinks")).toBeInTheDocument();
+		expect(screen.getByText("Node 1 Title")).toBeInTheDocument();
+		expect(screen.getByText("Backlinks")).toBeInTheDocument();
 
-    const backlinkButton = screen.getByText("Node 2 Title");
-    fireEvent.click(backlinkButton);
-    expect(handleOpenNode).toHaveBeenCalledWith("node2");
-  });
+		const backlinkButton = screen.getByText("Node 2 Title");
+		fireEvent.click(backlinkButton);
+		expect(handleOpenNode).toHaveBeenCalledWith("node2");
+	});
 });

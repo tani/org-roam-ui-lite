@@ -9,10 +9,15 @@ import "./assets/code.css";
 import "./assets/themes.css";
 import "./index.css";
 
-ReactDOM.createRoot(document.getElementById("root")!).render(
-  <React.StrictMode>
-    <UiProvider>
-      <App />
-    </UiProvider>
-  </React.StrictMode>,
+const rootElement = document.getElementById("root");
+if (!rootElement) {
+	throw new Error("Failed to find the root element");
+}
+
+ReactDOM.createRoot(rootElement).render(
+	<React.StrictMode>
+		<UiProvider>
+			<App />
+		</UiProvider>
+	</React.StrictMode>,
 );

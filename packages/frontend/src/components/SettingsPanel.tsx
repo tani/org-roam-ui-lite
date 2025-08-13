@@ -4,6 +4,7 @@ import { FormGroup } from "./ui/FormGroup.tsx";
 import { RangeSlider } from "./ui/RangeSlider.tsx";
 import { Select } from "./ui/Select.tsx";
 import { Switch } from "./ui/Switch.tsx";
+import { When } from "./ui/When.tsx";
 
 interface SettingsPanelProps {
 	open: boolean;
@@ -78,7 +79,7 @@ export function SettingsPanel({
 					/>
 				</FormGroup>
 
-				{renderer === "cytoscape" && (
+				<When condition={renderer === "cytoscape"}>
 					<FormGroup label="Layout">
 						<Select
 							value={layout}
@@ -86,7 +87,7 @@ export function SettingsPanel({
 							onChange={(value) => onLayoutChange(value as Layout)}
 						/>
 					</FormGroup>
-				)}
+				</When>
 
 				<RangeSlider
 					label="Node size"
@@ -97,7 +98,7 @@ export function SettingsPanel({
 					unit="px"
 				/>
 
-				{renderer !== "3d-force-graph" && (
+				<When condition={renderer !== "3d-force-graph"}>
 					<RangeSlider
 						label="Font size"
 						value={labelScale}
@@ -108,9 +109,9 @@ export function SettingsPanel({
 						unit="em"
 						formatter={(v) => v.toFixed(1)}
 					/>
-				)}
+				</When>
 
-				{renderer !== "3d-force-graph" && (
+				<When condition={renderer !== "3d-force-graph"}>
 					<FormGroup label="Show labels">
 						<Switch
 							id="toggleLabels"
@@ -119,7 +120,7 @@ export function SettingsPanel({
 							label="Display labels"
 						/>
 					</FormGroup>
-				)}
+				</When>
 			</div>
 		</div>
 	);

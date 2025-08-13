@@ -1,3 +1,5 @@
+import { When } from "./When.tsx";
+
 interface RangeSliderProps {
 	value: number;
 	min: number;
@@ -23,7 +25,9 @@ export function RangeSlider({
 
 	return (
 		<div className="mb-4">
-			{label && <h5>{label}</h5>}
+			<When condition={!!label}>
+				<h5>{label}</h5>
+			</When>
 			<input
 				type="range"
 				min={min}

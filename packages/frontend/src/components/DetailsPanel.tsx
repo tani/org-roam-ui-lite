@@ -5,6 +5,7 @@ import type { Theme } from "../graph/graph-types.ts";
 import { openNode } from "../graph/node.ts";
 import { PreviewPopover } from "./PreviewPopover.tsx";
 import { Button } from "./ui/Button.tsx";
+import { When } from "./ui/When.tsx";
 
 interface DetailsPanelProps {
 	open: boolean;
@@ -117,13 +118,15 @@ export function DetailsPanel({
 					aria-label="Details content"
 				>
 					<div>{selected?.body}</div>
-					{selected?.backlinks && selected.backlinks.length > 0 && (
+					<When
+						condition={!!(selected?.backlinks && selected.backlinks.length > 0)}
+					>
 						<div className="mt-3">
 							<h5>
 								<i className="bi bi-link-45deg"></i>Backlinks
 							</h5>
 							<ul className="list-unstyled">
-								{selected.backlinks.map((b) => (
+								{selected?.backlinks?.map((b) => (
 									<li key={b.source}>
 										<button
 											type="button"
@@ -137,19 +140,19 @@ export function DetailsPanel({
 								))}
 							</ul>
 						</div>
-					)}
+					</When>
 				</section>
 			</div>
-			{preview && (
+			<When condition={!!preview}>
 				<div ref={previewComponentRef}>
 					<PreviewPopover
-						content={preview.body}
-						x={preview.x}
-						y={preview.y}
+						content={preview?.body}
+						x={preview?.x ?? 0}
+						y={preview?.y ?? 0}
 						onLeave={hidePreview}
 					/>
 				</div>
-			)}
+			</When>
 		</>
 	);
 }

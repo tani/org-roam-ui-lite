@@ -51,13 +51,13 @@ describe("serve", () => {
 		expect(get).toHaveBeenCalledTimes(3);
 		expect(serveImpl).toHaveBeenCalledWith({ fetch: "fetch", port: 123 });
 
-		const graphHandler = get.mock.calls[0][1];
+		const graphHandler = get.mock.calls[0]?.[1];
 		const graphCtx = { json: vi.fn(), req: { param: vi.fn() } };
 		await graphHandler(graphCtx as never);
 		expect(fetchGraph).toHaveBeenCalledWith("db");
 		expect(graphCtx.json).toHaveBeenCalledWith({}, 200);
 
-		const nodeHandler = get.mock.calls[1][1];
+		const nodeHandler = get.mock.calls[1]?.[1];
 		const nodeCtx = {
 			json: vi.fn(),
 			req: { param: vi.fn(() => "id.json") },
@@ -65,7 +65,7 @@ describe("serve", () => {
 		await nodeHandler(nodeCtx as never);
 		expect(fetchNode).toHaveBeenCalledWith("db", "id");
 
-		const resHandler = get.mock.calls[2][1];
+		const resHandler = get.mock.calls[2]?.[1];
 		const resCtxOk = {
 			req: { param: vi.fn((n) => (n === "id" ? "1" : "pic.png")) },
 			json: vi.fn(),

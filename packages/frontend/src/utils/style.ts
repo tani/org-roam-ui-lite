@@ -38,7 +38,8 @@ export function pickColor(key: string): string {
 	for (const ch of key) {
 		sum = (sum + ch.charCodeAt(0)) % ACCENT_VARIABLES.length;
 	}
-	return getCssVariable(ACCENT_VARIABLES[sum]);
+	const variable = ACCENT_VARIABLES[sum];
+	return getCssVariable(variable || ACCENT_VARIABLES[0] || "--bs-primary");
 }
 
 /**

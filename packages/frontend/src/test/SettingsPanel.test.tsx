@@ -1,7 +1,7 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
-import { SettingsPanel } from "../components/SettingsPanel";
-import { Layouts, Renderers, Themes } from "../graph/graph-types";
+import { SettingsPanel } from "../components/SettingsPanel.tsx";
+import { Layouts, Renderers, Themes } from "../graph/graph-types.ts";
 
 describe("SettingsPanel", () => {
 	it("renders the settings panel and handles close", () => {

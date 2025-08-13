@@ -1,6 +1,6 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
-import { DetailsPanel } from "../components/DetailsPanel";
+import { DetailsPanel } from "../components/DetailsPanel.tsx";
 
 describe("DetailsPanel", () => {
 	it("renders node details and handles backlink clicks", () => {

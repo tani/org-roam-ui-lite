@@ -1,14 +1,22 @@
 {
+	// Visit https://aka.ms/tsconfig to read more about this file
 	"compilerOptions": {
-		"noEmit": true,
-		"esModuleInterop": true,
-		"target": "es2022",
-		"module": "es2022",
-		"moduleResolution": "bundler",
+		"module": "nodenext",
+		"target": "esnext",
+		"types": ["@testing-library/jest-dom"],
+		"sourceMap": true,
+		"declaration": true,
+		"declarationMap": true,
+		"noUncheckedIndexedAccess": true,
+		"exactOptionalPropertyTypes": true,
 		"strict": true,
-		"allowImportingTsExtensions": true,
-		"skipLibCheck": true,
 		"jsx": "react-jsx",
-		"types": ["@testing-library/jest-dom"]
+		"verbatimModuleSyntax": true,
+		"isolatedModules": true,
+		"noUncheckedSideEffectImports": true,
+		"moduleDetection": "force",
+		"skipLibCheck": true,
+		"noEmit": true,
+		"allowImportingTsExtensions": true
 	}
 }

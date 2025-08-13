@@ -24,7 +24,9 @@ function detect(orgContent: string): Detect {
 	const languages = new Set<string>();
 	let match = languageRegex.exec(orgContent);
 	while (match) {
-		languages.add(match[1]);
+		if (match[1]) {
+			languages.add(match[1]);
+		}
 		match = languageRegex.exec(orgContent);
 	}
 

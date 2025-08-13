@@ -107,7 +107,7 @@ describe("fetchNode", () => {
 		};
 		const body = result[1].content["application/json"] as NodeBody;
 		expect(body.id).toBe(NODE_ID);
-		expect(body.backlinks[0].source).toBe("2");
+		expect(body.backlinks[0]?.source).toBe("2");
 		expect(body.raw).toBe("ORG");
 	});
 });

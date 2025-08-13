@@ -48,7 +48,7 @@ export async function serve(databasePath: string, port: number): Promise<void> {
 		const encodedPath = context.req.param("encoded_path");
 		const result = await fetchResource(databasePath, nodeId, encodedPath);
 		if (result[0] === 200) {
-			return new Response(result[1].content["image/*"], {
+			return new Response(result[1].content["image/*"] as BodyInit, {
 				headers: {
 					"Content-Type": lookup(encodedPath) || "application/octet-stream",
 				},

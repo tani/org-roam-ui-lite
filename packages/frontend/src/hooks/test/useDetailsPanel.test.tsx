@@ -1,8 +1,8 @@
 import { renderHook } from "@testing-library/react";
-import { describe, expect, it, vi, beforeEach } from "vitest";
 import type { ReactNode } from "react";
-import { useDetailsPanel } from "../useDetailsPanel.ts";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { UiProvider } from "../../store/provider.tsx";
+import { useDetailsPanel } from "../useDetailsPanel.ts";
 
 // Create a wrapper for hooks that need UiProvider context
 function createWrapper() {

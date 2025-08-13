@@ -1,9 +1,9 @@
 import { describe, expect, it } from "vitest";
 import {
-	RESPONSIVE_BREAKPOINTS,
 	generateResponsiveCSS,
-	responsiveWidthCSS,
 	previewPopoverCSS,
+	RESPONSIVE_BREAKPOINTS,
+	responsiveWidthCSS,
 } from "../responsive.ts";
 
 describe("Responsive Utilities", () => {

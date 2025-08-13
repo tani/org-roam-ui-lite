@@ -1,6 +1,6 @@
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { Button } from "../Button.tsx";
+import { Button } from "../../../src/components/ui/Button.tsx";
 
 afterEach(() => {
 	cleanup();

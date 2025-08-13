@@ -1,7 +1,7 @@
 import { cleanup, render } from "@testing-library/react";
 import { createRef } from "react";
 import { afterEach, describe, expect, it } from "vitest";
-import { GraphContainer } from "../GraphContainer.tsx";
+import { GraphContainer } from "../../src/components/GraphContainer.tsx";
 
 afterEach(() => {
 	cleanup();

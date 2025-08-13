@@ -1,6 +1,6 @@
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { GraphControls } from "../GraphControls.tsx";
+import { GraphControls } from "../../src/components/GraphControls.tsx";
 
 afterEach(() => {
 	cleanup();

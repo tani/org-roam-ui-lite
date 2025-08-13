@@ -4,7 +4,7 @@ import {
 	previewPopoverCSS,
 	RESPONSIVE_BREAKPOINTS,
 	responsiveWidthCSS,
-} from "../responsive.ts";
+} from "../../src/utils/responsive.ts";
 
 describe("Responsive Utilities", () => {
 	describe("RESPONSIVE_BREAKPOINTS", () => {

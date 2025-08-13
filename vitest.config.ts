@@ -22,12 +22,9 @@ export default defineConfig({
 				extends: true,
 				test: {
 					name: "frontend",
-					include: [
-						"packages/frontend/src/test/**/*.test.{ts,tsx}",
-						"packages/frontend/src/**/test/*.test.{ts,tsx}",
-					],
+					include: ["packages/frontend/test/**/*.test.{ts,tsx}"],
 					environment: "jsdom", // frontend uses jsdom
-					setupFiles: ["packages/frontend/src/test/setup.ts"],
+					setupFiles: ["packages/frontend/test/setup.ts"],
 				},
 			},
 			{

@@ -30,13 +30,11 @@ export function DetailsPanel({
 	const containerRef = useRef<HTMLElement>(null);
 	const previewComponentRef = useRef<HTMLDivElement>(null);
 
-	const handleRenderedKeyDown = (ev: React.KeyboardEvent<HTMLElement>) => {
-		if (ev.key === "Enter" || ev.key === " ") {
-			const a = (ev.target as HTMLElement).closest("a");
-			if (!a || !a.href.startsWith("id:")) return;
-			ev.preventDefault();
-			onOpenNode(a.href.replace("id:", ""));
-		}
+	const handleRenderedOnClick = (ev: React.MouseEvent<HTMLElement>) => {
+		const a = (ev.target as HTMLElement).closest("a");
+		if (!a || !a.href.startsWith("id:")) return;
+		ev.preventDefault();
+		onOpenNode(a.href.replace("id:", ""));
 	};
 
 	const handleRenderedMouseOver = (
@@ -110,7 +108,8 @@ export function DetailsPanel({
 				<section
 					className="offcanvas-body"
 					ref={containerRef}
-					onKeyDown={handleRenderedKeyDown}
+					onClick={handleRenderedOnClick}
+					onKeyDown={(_) => {}}
 					onMouseOver={handleRenderedMouseOver}
 					onMouseOut={handleRenderedMouseOut}
 					onFocus={handleRenderedMouseOver}

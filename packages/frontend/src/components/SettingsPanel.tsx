@@ -1,4 +1,9 @@
 import type { Layout, Renderer, Theme } from "../graph/graph-types.ts";
+import { Button } from "./ui/Button.tsx";
+import { FormGroup } from "./ui/FormGroup.tsx";
+import { RangeSlider } from "./ui/RangeSlider.tsx";
+import { Select } from "./ui/Select.tsx";
+import { Switch } from "./ui/Switch.tsx";
 
 interface SettingsPanelProps {
 	open: boolean;
@@ -54,103 +59,66 @@ export function SettingsPanel({
 				<h4 id="offcanvasSettingsLabel" className="offcanvas-title">
 					<i className="bi bi-gear-fill"></i> Settings
 				</h4>
-				<button
-					type="button"
-					className="btn-close"
-					aria-label="Close"
-					onClick={onClose}
-				></button>
+				<Button variant="close" aria-label="Close" onClick={onClose} />
 			</div>
 			<div className="offcanvas-body">
-				<div className="mb-4">
-					<h5>Theme</h5>
-					<select
-						className="form-select"
+				<FormGroup label="Theme">
+					<Select
 						value={theme}
-						onChange={(e) => onThemeChange(e.target.value as Theme)}
-					>
-						{themes.map((t) => (
-							<option key={t.value} value={t.value}>
-								{t.label}
-							</option>
-						))}
-					</select>
-				</div>
-				<div className="mb-4">
-					<h5>Renderer</h5>
-					<select
-						className="form-select"
-						value={renderer}
-						onChange={(e) => onRendererChange(e.target.value as Renderer)}
-					>
-						{renderers.map((r) => (
-							<option key={r.value} value={r.value}>
-								{r.label}
-							</option>
-						))}
-					</select>
-				</div>
-				{renderer === "cytoscape" && (
-					<div className="mb-4">
-						<h5>Layout</h5>
-						<select
-							className="form-select"
-							value={layout}
-							onChange={(e) => onLayoutChange(e.target.value as Layout)}
-						>
-							{layouts.map((l) => (
-								<option key={l} value={l}>
-									{l}
-								</option>
-							))}
-						</select>
-					</div>
-				)}
-				<div className="mb-4">
-					<h5>Node size</h5>
-					<input
-						type="range"
-						min="5"
-						max="30"
-						value={nodeSize}
-						onChange={(e) => onNodeSizeChange(Number(e.target.value))}
+						options={themes}
+						onChange={(value) => onThemeChange(value as Theme)}
 					/>
-					<div>
-						Current: <span>{nodeSize}</span>px
-					</div>
-				</div>
-				{renderer !== "3d-force-graph" && (
-					<div className="mb-4">
-						<h5>Font size</h5>
-						<input
-							type="range"
-							min="0.3"
-							max="1.5"
-							step="0.1"
-							value={labelScale}
-							onChange={(e) => onLabelScaleChange(Number(e.target.value))}
+				</FormGroup>
+
+				<FormGroup label="Renderer">
+					<Select
+						value={renderer}
+						options={renderers}
+						onChange={(value) => onRendererChange(value as Renderer)}
+					/>
+				</FormGroup>
+
+				{renderer === "cytoscape" && (
+					<FormGroup label="Layout">
+						<Select
+							value={layout}
+							options={layouts}
+							onChange={(value) => onLayoutChange(value as Layout)}
 						/>
-						<div>
-							Current: <span>{labelScale.toFixed(1)}</span>em
-						</div>
-					</div>
+					</FormGroup>
 				)}
+
+				<RangeSlider
+					label="Node size"
+					value={nodeSize}
+					min={5}
+					max={30}
+					onChange={onNodeSizeChange}
+					unit="px"
+				/>
+
 				{renderer !== "3d-force-graph" && (
-					<div className="mb-4">
-						<h5>Show labels</h5>
-						<div className="form-check form-switch">
-							<input
-								id="toggleLabels"
-								className="form-check-input"
-								type="checkbox"
-								checked={showLabels}
-								onChange={(e) => onShowLabelsChange(e.target.checked)}
-							/>
-							<label className="form-check-label" htmlFor="toggleLabels">
-								Display labels
-							</label>
-						</div>
-					</div>
+					<RangeSlider
+						label="Font size"
+						value={labelScale}
+						min={0.3}
+						max={1.5}
+						step={0.1}
+						onChange={onLabelScaleChange}
+						unit="em"
+						formatter={(v) => v.toFixed(1)}
+					/>
+				)}
+
+				{renderer !== "3d-force-graph" && (
+					<FormGroup label="Show labels">
+						<Switch
+							id="toggleLabels"
+							checked={showLabels}
+							onChange={onShowLabelsChange}
+							label="Display labels"
+						/>
+					</FormGroup>
 				)}
 			</div>
 		</div>

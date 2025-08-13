@@ -1,20 +1,11 @@
-import type { Core } from "cytoscape";
-import { useCallback, useEffect, useRef } from "react";
 import { DetailsPanel } from "./components/DetailsPanel.tsx";
+import { GraphContainer } from "./components/GraphContainer.tsx";
+import { GraphControls } from "./components/GraphControls.tsx";
 import { SettingsPanel } from "./components/SettingsPanel.tsx";
-import { destroyGraph, drawGraph } from "./graph/graph.ts";
-import {
-	applyNodeStyle,
-	highlightNeighborhood,
-	resetHighlight,
-} from "./graph/graph-style.ts";
-import {
-	type GraphInstance,
-	Layouts,
-	Renderers,
-	Themes,
-} from "./graph/graph-types.ts";
-import { openNode } from "./graph/node.ts";
+import { GlobalStyles } from "./components/ui/GlobalStyles.tsx";
+import { Layouts, Renderers, Themes } from "./graph/graph-types.ts";
+import { useDetailsPanel } from "./hooks/useDetailsPanel.ts";
+import { useGraphManager } from "./hooks/useGraphManager.ts";
 import { useUiDispatch, useUiState } from "./store/hooks.ts";
 
 function App() {
@@ -32,115 +23,29 @@ function App() {
 		selected,
 	} = state;
 
-	const graphRef = useRef<HTMLDivElement>(null);
-	const graphInstanceRef = useRef<GraphInstance | undefined>(undefined);
-
-	const openNodeAction = useCallback(
-		async (nodeId: string) => {
-			const node = await openNode(theme, nodeId);
-			dispatch({ type: "SET_STATE", payload: { selected: node } });
-			dispatch({ type: "OPEN_DETAILS" });
-		},
-		[theme, dispatch],
-	);
-
-	const bindGraphEvents = useCallback(() => {
-		const graph = graphInstanceRef.current;
-		if (!graph) return;
-
-		if (renderer === "cytoscape") {
-			const cy = graph as Core;
-			cy.off("tap", "node");
-			cy.on("tap", "node", (evt) => {
-				void openNodeAction(evt.target.id());
-			});
-		} else {
-			interface ClickableGraph {
-				onNodeClick(cb: (node: { id: string }) => void): void;
-			}
-			const fg = graph as ClickableGraph;
-			fg.onNodeClick((node: { id: string }) => {
-				void openNodeAction(node.id);
-			});
-		}
-	}, [renderer, openNodeAction]);
-
-	const refreshGraph = useCallback(async () => {
-		if (!graphRef.current) return;
-		graphInstanceRef.current = await drawGraph(
+	const { graphRef, openNodeAction, highlightNode, resetNodeHighlight } =
+		useGraphManager({
+			theme,
 			renderer,
 			layout,
-			graphRef.current,
-			graphInstanceRef.current,
 			nodeSize,
 			labelScale,
 			showLabels,
-		);
-		bindGraphEvents();
-	}, [renderer, layout, nodeSize, labelScale, showLabels, bindGraphEvents]);
+			detailsOpen,
+			selectedId: selected.id,
+		});
 
-	const closeDetails = () => {
-		dispatch({ type: "CLOSE_DETAILS" });
-		resetHighlight(graphInstanceRef.current);
-	};
-
-	const toggleDetails = () => {
-		if (detailsOpen) {
-			closeDetails();
-		} else {
-			dispatch({ type: "OPEN_DETAILS" });
-			if (selected.id) {
-				highlightNeighborhood(graphInstanceRef.current, selected.id);
-			}
-		}
-	};
-
-	useEffect(() => {
-		const graphElement = graphRef.current;
-		refreshGraph();
-
-		return () => {
-			if (graphElement) {
-				destroyGraph(graphInstanceRef.current, graphElement);
-				graphInstanceRef.current = undefined;
-			}
-		};
-	}, [refreshGraph]);
-
-	useEffect(() => {
-		refreshGraph();
-	}, [refreshGraph]);
-
-	useEffect(() => {
-		if (renderer === "cytoscape") {
-			applyNodeStyle(graphInstanceRef.current as Core, {
-				width: nodeSize,
-				height: nodeSize,
-			});
-		} else {
-			refreshGraph();
-		}
-	}, [nodeSize, renderer, refreshGraph]);
-
-	useEffect(() => {
-		if (renderer === "cytoscape") {
-			applyNodeStyle(graphInstanceRef.current as Core, {
-				"font-size": `${labelScale}em`,
-			});
-		} else {
-			refreshGraph();
-		}
-	}, [labelScale, renderer, refreshGraph]);
-
-	useEffect(() => {
-		if (detailsOpen && selected.id) {
-			highlightNeighborhood(graphInstanceRef.current, selected.id);
-		}
-	}, [detailsOpen, selected.id]);
+	const { closeDetails, toggleDetails } = useDetailsPanel({
+		detailsOpen,
+		resetNodeHighlight,
+		highlightNode,
+		selectedId: selected.id,
+	});
 
 	return (
 		<div className="vh-100 vw-100">
-			<div ref={graphRef} className="h-100 w-100" />
+			<GlobalStyles />
+			<GraphContainer graphRef={graphRef} />
 
 			<SettingsPanel
 				open={settingsOpen}
@@ -174,14 +79,10 @@ function App() {
 				onClose={() => dispatch({ type: "TOGGLE_SETTINGS" })}
 			/>
 
-			<button
-				type="button"
-				className="btn btn-outline-secondary position-fixed"
-				style={{ top: "1rem", left: "1rem", zIndex: 1 }}
-				onClick={() => dispatch({ type: "TOGGLE_SETTINGS" })}
-			>
-				<i className="bi bi-gear"></i>
-			</button>
+			<GraphControls
+				onToggleSettings={() => dispatch({ type: "TOGGLE_SETTINGS" })}
+				onToggleDetails={toggleDetails}
+			/>
 
 			<DetailsPanel
 				theme={theme}
@@ -190,15 +91,6 @@ function App() {
 				onClose={closeDetails}
 				onOpenNode={openNodeAction}
 			/>
-
-			<button
-				type="button"
-				className="btn btn-outline-secondary position-fixed"
-				style={{ top: "1rem", right: "1rem", zIndex: 1 }}
-				onClick={toggleDetails}
-			>
-				<i className="bi bi-chevron-left"></i>
-			</button>
 		</div>
 	);
 }

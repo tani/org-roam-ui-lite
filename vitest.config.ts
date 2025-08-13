@@ -1,14 +1,11 @@
 // vitest.config.ts
 
-import vue from "@vitejs/plugin-vue";
-import type { PluginOption } from "vite";
 import { defineConfig } from "vitest/config";
 
 /**
- * Configure Vitest with the Vue plugin and project settings.
+ * Configure Vitest with project settings.
  */
 export default defineConfig({
-  plugins: [vue()] as unknown as PluginOption[],
   test: {
     // default environment for the root project
     environment: "node",
@@ -21,11 +18,11 @@ export default defineConfig({
     // define two inline projects
     projects: [
       {
-        // inherit root settings such as plugins
+        // inherit root settings
         extends: true,
         test: {
-          name: "frontend",
-          include: ["packages/frontend/test/**/*.test.ts"],
+          name: "frontend-react",
+          include: ["packages/frontend-react/src/test/**/*.test.ts", "packages/frontend-react/src/test/**/*.test.tsx"],
           environment: "jsdom", // frontend uses jsdom
         },
       },

@@ -7,15 +7,11 @@
   ],
   "devDependencies": {
     "@testing-library/user-event": "^14.6.1",
-    "@testing-library/vue": "^8.1.0",
     "@types/license-checker": "^25.0.6",
     "@vitest/coverage-v8": "^3.2.0-beta.2",
     "@vitest/ui": "^3.2.0-beta.2",
-    "@vue/eslint-config-prettier": "^10.2.0",
-    "@vue/eslint-config-typescript": "^14.5.0",
     "eslint": "^9.27.0",
     "eslint-config-flat-gitignore": "^2.1.0",
-    "eslint-plugin-vue": "^10.1.0",
     "jiti": "^2.4.2",
     "jsdom": "^26.1.0",
     "lefthook": "^1.11.12",
@@ -27,11 +23,11 @@
   },
   "scripts": {
     "version": "nix run .#update-npm-deps-hash && git add flake.nix",
-    "prebuild": "jiti openapi.ts | tee packages/frontend/src/api/api.d.ts packages/backend/src/api.d.ts > /dev/null && prettier --write packages/frontend/src/api/api.d.ts packages/backend/src/api.d.ts",
+    "prebuild": "jiti openapi.ts | tee packages/frontend-react/src/api/api.d.ts packages/backend/src/api.d.ts > /dev/null && prettier --write packages/frontend-react/src/api/api.d.ts packages/backend/src/api.d.ts",
     "build": "npm run build --workspaces && jiti ./scripts/build.ts",
     "export": "npm run build && node ./scripts/export.js -r ./dist",
     "dev": "npm-run-all -p dev:frontend 'dev:backend -- {@}' --",
-    "dev:frontend": "npm --workspace=packages/frontend run dev --",
+    "dev:frontend": "npm --workspace=packages/frontend-react run dev --",
     "dev:backend": "npm --workspace=packages/backend run dev --",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
@@ -39,5 +35,9 @@
     "test": "vitest",
     "test:ui": "vitest --ui"
   },
-  "version": "0.1.0"
+  "version": "0.1.0",
+  "dependencies": {
+    "@eslint/js": "^9.33.0",
+    "typescript-eslint": "^8.39.1"
+  }
 }

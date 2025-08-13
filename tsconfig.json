@@ -1,12 +1,7 @@
 {
-	"compilerOptions": {
-		"noEmit": true,
-		"esModuleInterop": true,
-		"target": "es2022",
-		"module": "es2022",
-		"moduleResolution": "bundler",
-		"strict": true,
-		"allowImportingTsExtensions": true,
-		"skipLibCheck": true
-	}
+	"files": [],
+	"references": [
+		{ "path": "./packages/frontend-react" },
+		{ "path": "./packages/backend" }
+	]
 }

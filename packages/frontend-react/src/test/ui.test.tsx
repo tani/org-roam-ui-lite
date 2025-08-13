@@ -35,8 +35,8 @@ describe('uiReducer', () => {
   });
 
   it('should handle SET_STATE', () => {
-    const state = { ...testInitialState, theme: 'light' };
-    const nextState = uiReducer(state, { type: 'SET_STATE', payload: { theme: 'dark' } });
+    const state = { ...testInitialState, theme: 'light' as const };
+    const nextState = uiReducer(state, { type: 'SET_STATE', payload: { theme: 'dark' as const } });
     expect(nextState.theme).toBe('dark');
   });
 });

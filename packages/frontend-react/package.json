@@ -7,7 +7,9 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test": "vitest",
+    "check": "tsc --noEmit"
   },
   "dependencies": {
     "@rehype-pretty/transformers": "^0.13.2",

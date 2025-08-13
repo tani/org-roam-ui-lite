@@ -1,14 +1,21 @@
-import pluginVue from "eslint-plugin-vue";
-import {
-  defineConfigWithVueTs,
-  vueTsConfigs,
-} from "@vue/eslint-config-typescript";
-import prettier from "@vue/eslint-config-prettier";
+import js from "@eslint/js";
+import tseslint from "typescript-eslint";
 import gitignore from "eslint-config-flat-gitignore";
 
-export default defineConfigWithVueTs(
+export default tseslint.config(
   gitignore(),
-  pluginVue.configs["flat/recommended"],
-  vueTsConfigs.recommended,
-  prettier,
+  js.configs.recommended,
+  ...tseslint.configs.recommended,
+  {
+    ignores: ["**/dist/", "**/node_modules/", "packages/frontend/"],
+  },
+  {
+    files: ["scripts/**/*.js", "scripts/**/*.ts"],
+    languageOptions: {
+      globals: {
+        console: "readonly",
+        process: "readonly",
+      },
+    },
+  }
 );

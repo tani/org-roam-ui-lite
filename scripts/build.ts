@@ -16,7 +16,7 @@ const FILES: [string, string][] = [
   ["README.md", `${DIST}/README.md`],
   ["LICENSE.md", `${DIST}/LICENSE.md`],
   ["packages/emacs", `${DIST}/emacs`],
-  ["packages/frontend/dist", `${DIST}/frontend/dist`],
+  ["packages/frontend-react/dist", `${DIST}/frontend/dist`],
   ["packages/backend/dist", `${DIST}/backend/dist`],
   ["scripts/export.js", `${DIST}/scripts/export.js`],
 ];

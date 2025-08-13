@@ -1,5 +1,5 @@
 import { useContext } from "react";
-import { UiStateContext, UiDispatchContext } from "./context.tsx";
+import { UiStateContext, UiDispatchContext } from "./context";
 
 export function useUiState() {
   const context = useContext(UiStateContext);

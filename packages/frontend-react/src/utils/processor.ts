@@ -115,7 +115,7 @@ export function createOrgHtmlProcessor<Theme extends string>(
         Fragment,
         jsx,
         jsxs,
-        elementAttributeNameCase: "html",
+        elementAttributeNameCase: "react",
       });
 
     return (await processor.process(orgContent)).result;

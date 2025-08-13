@@ -1,0 +1,31 @@
+pre[data-language] {
+	overflow: auto;
+	border: 1px solid var(--bs-border-color);
+	border-radius: 5px;
+}
+
+pre[data-language]::before {
+	content: attr(data-language);
+	position: sticky;
+	top: 0;
+	left: 0;
+	display: flex;
+	align-items: center;
+	padding-left: 1em;
+	height: 2.1em;
+	border-bottom: 1px solid var(--bs-border-color);
+	user-select: none;
+	pointer-events: none;
+}
+
+pre[data-language] code {
+	padding: 1em;
+}
+
+.rehype-pretty-copy {
+	position: absolute;
+	top: 0;
+	right: 0;
+	border: none;
+	background: none;
+}

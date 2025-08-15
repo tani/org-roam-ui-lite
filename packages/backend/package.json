@@ -4,7 +4,7 @@
 	"type": "module",
 	"scripts": {
 		"dev": "jiti src/serve.ts",
-		"build": "tsdown"
+		"build": "vite build"
 	},
 	"dependencies": {
 		"@hono/node-server": "^1.15.0",

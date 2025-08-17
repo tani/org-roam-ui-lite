@@ -4,9 +4,6 @@ import { join, resolve } from "node:path";
 import process from "node:process";
 import { parseArgs } from "node:util";
 
-/**
- * @returns {never}
- */
 function usage(exitCode = 0) {
 	console.log(
 		`Usage: export.ts -d DB -o OUTPUT -r DIR\n\n` +
@@ -37,7 +34,7 @@ const out = values.o ?? "out";
 
 if (!res || !db || !out) usage(1);
 
-const ROOT_DIR = resolve(res);
+const ROOT_DIR = resolve(res!);
 const OUTPUT_DIR = resolve(out);
 
 try {

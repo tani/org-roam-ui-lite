@@ -6,13 +6,14 @@
     flake-parts.url = "github:hercules-ci/flake-parts";
   };
 
-  outputs = inputs@{ self, systems, flake-parts, nixpkgs, flake-utils, ... }:
+  outputs = inputs@{ flake-parts, nixpkgs, ... }:
     flake-parts.lib.mkFlake { inherit inputs; } {
       imports = [ flake-parts.flakeModules.easyOverlay ];
       systems = nixpkgs.lib.platforms.all;
-      perSystem = { config, pkgs, ... }: let
+      perSystem = { pkgs, ... }: let
         emacsPackages = pkgs.emacsPackagesFor pkgs.emacs;
         packageJson = builtins.fromJSON (builtins.readFile ./package.json);
+        nodejs = pkgs.nodejs_24;
         nodepkg = pkgs.buildNpmPackage rec {
           pname = "org-roam-ui-lite-nodepkg";
           version = packageJson.version;
@@ -32,16 +33,16 @@
           cp -r --no-preserve=ownership ${nodepkg} ./dist
         '';
         serve = pkgs.writeShellScriptBin "org-roam-ui-lite-serve" ''
-          ${pkgs.nodejs}/bin/node ${nodepkg}/backend/dist/serve.js "$@"
+          ${nodejs}/bin/node ${nodepkg}/backend/dist/serve.js "$@"
         '';
         export = pkgs.writeShellScriptBin "org-roam-ui-lite-export" ''
-          ${pkgs.nodejs}/bin/node ${./scripts}/export.js -r "${nodepkg}" "$@"
+          ${nodejs}/bin/node ${./scripts}/export.js -r "${nodepkg}" "$@"
         '';
         elisp = emacsPackages.trivialBuild {
           pname = "org-roam-ui-lite-elisp";
           version = packageJson.version;
           src = ./.;
-          buildInputs = with pkgs; [ nodepkg ];
+          buildInputs = [ nodepkg ];
           installPhase = ''
             runHook preInstall
             install -d $out/share/emacs/site-lisp/org-roam-ui-lite
@@ -68,11 +69,10 @@
             inherit emacs elisp export serve build update-npm-deps-hash;
           };
           devShells.default = pkgs.mkShell {
-            buildInputs = with pkgs; [
-              nodejs
+            buildInputs = [nodejs] ++ (with pkgs; [
               prefetch-npm-deps
               typescript-language-server
-            ];
+            ]);
             shellHook = ''
               export NODEPKG_ENV=development
               echo "🟢  Nodepkg $(node -v) / npm $(npm -v) ready!"

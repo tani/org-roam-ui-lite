@@ -13,21 +13,22 @@
       perSystem = { pkgs, ... }: let
         emacsPackages = pkgs.emacsPackagesFor pkgs.emacs;
         packageJson = builtins.fromJSON (builtins.readFile ./package.json);
-        nodejs = pkgs.nodejs_24;
-        nodepkg = pkgs.buildNpmPackage rec {
-          inherit nodejs;
+        nodejs = pkgs.nodejs;
+        nodepkg = pkgs.stdenv.mkDerivation rec {
           pname = "org-roam-ui-lite-nodepkg";
-          version = packageJson.version;
-          src = ./.;
-          npmDepsHash = "sha256-i/mKhVyW5rJLKknQAA9U7cD6aM7/ZiajSJseInD6yqk=";
-          npmDeps = pkgs.fetchNpmDeps {
-            inherit src;
-            name = "${pname}-${version}-npm-deps";
-            hash = npmDepsHash;
+          version = "0.2.3";
+          src = pkgs.fetchurl {
+            url = "https://github.com/tani/org-roam-ui-lite/releases/download/v${version}/org-roam-ui-lite.zip";
+            sha256 = "sha256-5xp4jXPxTjBemYCNpkbpuPuIAh0rOAu74lyccmE8i20=";
           };
-          NODEPKG_OPTIONS = "--max_old_space_size=2048 --";
-          npmFlags = [ "--ignore-scripts" "--offline" "--no-audit" ];
-          installPhase = "cp -r dist $out";
+          nativeBuildInputs = [ pkgs.unzip ];
+          unpackPhase = ''
+            unzip $src
+          '';
+          installPhase = ''
+            mkdir -p $out
+            cp -r org-roam-ui-lite/* $out/
+          '';
         };
         build = pkgs.writeShellScriptBin "org-roam-ui-lite-build" ''
           rm -rf ./dist
@@ -54,11 +55,6 @@
           packageRequires = with emacsPackages; [ org-roam simple-httpd ];
         };
         emacs = pkgs.emacs.pkgs.withPackages (epkgs: [ elisp ]);
-        update-npm-deps-hash = pkgs.writeShellScriptBin "org-roam-ui-lite-update-npm-deps-hash" ''
-          hash=$(prefetch-npm-deps package-lock.json)
-          echo "New npm-deps hash: $hash" >&2
-          ${pkgs.gnused}/bin/sed -i "s|npmDepsHash = \".*\";|npmDepsHash = \"$hash\";|" flake.nix
-        '';
       in
         {
           overlayAttrs = {
@@ -67,11 +63,10 @@
             org-roam-ui-lite-export = export;
           };
           packages = {
-            inherit emacs elisp export serve build update-npm-deps-hash;
+            inherit emacs elisp export serve build;
           };
           devShells.default = pkgs.mkShell {
             buildInputs = [nodejs] ++ (with pkgs; [
-              prefetch-npm-deps
               typescript-language-server
             ]);
             shellHook = ''

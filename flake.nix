@@ -2,7 +2,7 @@
   description = "org-roam-ui-lite full build with npm and Emacs integration";
 
   inputs = {
-    nixpkgs.url     = "github:NixOS/nixpkgs/nixos-25.05";
+    nixpkgs.url     = "github:NixOS/nixpkgs/nixpkgs-unstable";
     flake-parts.url = "github:hercules-ci/flake-parts";
   };
 

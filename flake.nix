@@ -13,10 +13,10 @@
       perSystem = { pkgs, ... }: let
         emacsPackages = pkgs.emacsPackagesFor pkgs.emacs;
         packageJson = builtins.fromJSON (builtins.readFile ./package.json);
-        nodejs = pkgs.nodejs;
-        nodepkg = pkgs.stdenv.mkDerivation rec {
-          pname = "org-roam-ui-lite-nodepkg";
-          version = "0.2.3";
+        nodejs = pkgs.nodejs_24;
+        bundle = pkgs.stdenv.mkDerivation rec {
+          pname = "org-roam-ui-lite-bundle";
+          version = "0.2.6";
           src = pkgs.fetchurl {
             url = "https://github.com/tani/org-roam-ui-lite/releases/download/v${version}/org-roam-ui-lite.zip";
             sha256 = "sha256-5xp4jXPxTjBemYCNpkbpuPuIAh0rOAu74lyccmE8i20=";
@@ -32,24 +32,24 @@
         };
         build = pkgs.writeShellScriptBin "org-roam-ui-lite-build" ''
           rm -rf ./dist
-          cp -r --no-preserve=ownership ${nodepkg} ./dist
+          cp -r --no-preserve=ownership ${bundle} ./dist
         '';
         serve = pkgs.writeShellScriptBin "org-roam-ui-lite-serve" ''
-          ${nodejs}/bin/node ${nodepkg}/backend/dist/serve.js "$@"
+          ${nodejs}/bin/node ${bundle}/backend/dist/serve.js "$@"
         '';
         export = pkgs.writeShellScriptBin "org-roam-ui-lite-export" ''
-          ${nodejs}/bin/node ${./scripts}/export.ts -r "${nodepkg}" "$@"
+          ${nodejs}/bin/node ${./scripts}/export.ts -r "${bundle}" "$@"
         '';
         elisp = emacsPackages.trivialBuild {
           pname = "org-roam-ui-lite-elisp";
           version = packageJson.version;
           src = ./.;
-          buildInputs = [ nodepkg ];
+          buildInputs = [ bundle ];
           installPhase = ''
             runHook preInstall
             install -d $out/share/emacs/site-lisp/org-roam-ui-lite
-            ln -s ${nodepkg}/emacs $out/share/emacs/site-lisp/org-roam-ui-lite/emacs
-            ln -s ${nodepkg}/frontend $out/share/emacs/site-lisp/org-roam-ui-lite/frontend
+            ln -s ${bundle}/emacs $out/share/emacs/site-lisp/org-roam-ui-lite/emacs
+            ln -s ${bundle}/frontend $out/share/emacs/site-lisp/org-roam-ui-lite/frontend
             runHook postInstall
           '';
           packageRequires = with emacsPackages; [ org-roam simple-httpd ];
@@ -70,8 +70,8 @@
               typescript-language-server
             ]);
             shellHook = ''
-              export NODEPKG_ENV=development
-              echo "🟢  Nodepkg $(node -v) / npm $(npm -v) ready!"
+              export bundle_ENV=development
+              echo "🟢  bundle $(node -v) / npm $(npm -v) ready!"
             '';
           };
         };

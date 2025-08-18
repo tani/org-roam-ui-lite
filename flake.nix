@@ -15,6 +15,7 @@
         packageJson = builtins.fromJSON (builtins.readFile ./package.json);
         nodejs = pkgs.nodejs_24;
         nodepkg = pkgs.buildNpmPackage rec {
+          inherit nodejs;
           pname = "org-roam-ui-lite-nodepkg";
           version = packageJson.version;
           src = ./.;
@@ -36,7 +37,7 @@
           ${nodejs}/bin/node ${nodepkg}/backend/dist/serve.js "$@"
         '';
         export = pkgs.writeShellScriptBin "org-roam-ui-lite-export" ''
-          ${nodejs}/bin/node ${./scripts}/export.js -r "${nodepkg}" "$@"
+          ${nodejs}/bin/node ${./scripts}/export.ts -r "${nodepkg}" "$@"
         '';
         elisp = emacsPackages.trivialBuild {
           pname = "org-roam-ui-lite-elisp";

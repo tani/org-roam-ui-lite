@@ -3,8 +3,8 @@
 	"private": true,
 	"type": "module",
 	"scripts": {
-		"dev": "jiti src/serve.ts",
-		"build": "vite build"
+		"dev": "node src/serve.ts",
+		"build": "tsdown"
 	},
 	"dependencies": {
 		"@hono/node-server": "^1.15.0",

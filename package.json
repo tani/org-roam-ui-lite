@@ -46,5 +46,5 @@
 		"test": "vitest",
 		"test:ui": "vitest --ui"
 	},
-	"version": "0.2.4"
+	"version": "0.2.5"
 }

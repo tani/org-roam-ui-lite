@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useId, useRef, useState } from "react";
 import type { components } from "../api/api.d.ts";
 import type { Theme } from "../graph/graph-types.ts";
 import { openNode } from "../graph/node.ts";
@@ -89,19 +89,22 @@ export function DetailsPanel({
 		hidePreview();
 	}, [hidePreview]);
 
+	const panelId = useId();
+	const labelId = useId();
+
 	return (
 		<>
 			<div
-				id="offcanvasDetails"
+				id={panelId}
 				className={`offcanvas offcanvas-end responsive-wide ${
 					open ? "show" : ""
 				}`}
 				tabIndex={-1}
 				role="dialog"
-				aria-labelledby="offcanvasDetailsLabel"
+				aria-labelledby={labelId}
 			>
 				<div className="offcanvas-header">
-					<h4 id="offcanvasDetailsLabel" className="offcanvas-title">
+					<h4 id={labelId} className="offcanvas-title">
 						<i className="bi bi-file-earmark-text"></i>
 						<span>{selected?.title ?? "Click a node to view details"}</span>
 					</h4>

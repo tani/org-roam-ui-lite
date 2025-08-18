@@ -34,7 +34,10 @@ const out = values.o ?? "out";
 
 if (!res || !db || !out) usage(1);
 
-const ROOT_DIR = resolve(res!);
+// TypeScript doesn't know that usage() never returns
+if (!res) throw new Error("Missing required -r parameter");
+
+const ROOT_DIR = resolve(res);
 const OUTPUT_DIR = resolve(out);
 
 try {

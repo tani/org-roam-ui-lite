@@ -1,3 +1,4 @@
+import { useId } from "react";
 import type { Layout, Renderer, Theme } from "../graph/graph-types.ts";
 import { Button } from "./ui/Button.tsx";
 import { FormGroup } from "./ui/FormGroup.tsx";
@@ -48,16 +49,20 @@ export function SettingsPanel({
 	onShowLabelsChange,
 	onClose,
 }: SettingsPanelProps) {
+	const panelId = useId();
+	const labelId = useId();
+	const showLabelsSwitchId = useId();
+
 	return (
 		<div
-			id="offcanvasSettings"
+			id={panelId}
 			className={`offcanvas offcanvas-start ${open ? "show" : ""}`}
 			tabIndex={-1}
 			role="dialog"
-			aria-labelledby="offcanvasSettingsLabel"
+			aria-labelledby={labelId}
 		>
 			<div className="offcanvas-header">
-				<h4 id="offcanvasSettingsLabel" className="offcanvas-title">
+				<h4 id={labelId} className="offcanvas-title">
 					<i className="bi bi-gear-fill"></i> Settings
 				</h4>
 				<Button variant="close" aria-label="Close" onClick={onClose} />
@@ -114,7 +119,7 @@ export function SettingsPanel({
 				<When condition={renderer !== "3d-force-graph"}>
 					<FormGroup label="Show labels">
 						<Switch
-							id="toggleLabels"
+							id={showLabelsSwitchId}
 							checked={showLabels}
 							onChange={onShowLabelsChange}
 							label="Display labels"

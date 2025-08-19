@@ -6,6 +6,7 @@ import "bootstrap/dist/css/bootstrap.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import "./assets/app.css";
 import "./assets/code.css";
+import "./assets/mathjax-theater.css";
 import "./assets/themes.css";
 import "./index.css";
 

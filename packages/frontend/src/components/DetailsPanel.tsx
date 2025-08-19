@@ -3,6 +3,7 @@ import { useCallback, useEffect, useId, useRef, useState } from "react";
 import type { components } from "../api/api.d.ts";
 import type { Theme } from "../graph/graph-types.ts";
 import { openNode } from "../graph/node.ts";
+import { MathJaxTheater } from "./MathJaxTheater.tsx";
 import { PreviewPopover } from "./PreviewPopover.tsx";
 import { Button } from "./ui/Button.tsx";
 import { For } from "./ui/For.tsx";
@@ -28,12 +29,25 @@ export function DetailsPanel({
 		x: number;
 		y: number;
 	} | null>(null);
+	const [theaterMath, setTheaterMath] = useState<string | null>(null);
 	const previewAnchorRef = useRef<HTMLAnchorElement | null>(null);
 	const containerRef = useRef<HTMLElement>(null);
 	const previewComponentRef = useRef<HTMLDivElement>(null);
 
 	const handleRenderedOnClick = (ev: React.MouseEvent<HTMLElement>) => {
-		const a = (ev.target as HTMLElement).closest("a");
+		const target = ev.target as HTMLElement;
+
+		// Check if clicked on MathJax formula
+		const mjxContainer = target.closest("mjx-container");
+		if (mjxContainer) {
+			ev.preventDefault();
+			ev.stopPropagation();
+			setTheaterMath(mjxContainer.outerHTML);
+			return;
+		}
+
+		// Check for links
+		const a = target.closest("a");
 		if (!a || !a.href.startsWith("id:")) return;
 		ev.preventDefault();
 		onOpenNode(a.href.replace("id:", ""));
@@ -158,6 +172,12 @@ export function DetailsPanel({
 						onLeave={hidePreview}
 					/>
 				</div>
+			</When>
+			<When condition={!!theaterMath}>
+				<MathJaxTheater
+					mathml={theaterMath || ""}
+					onClose={() => setTheaterMath(null)}
+				/>
 			</When>
 		</>
 	);

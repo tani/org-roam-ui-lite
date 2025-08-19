@@ -1,0 +1,108 @@
+/* Make MathJax formulas clickable */
+mjx-container {
+	cursor: pointer;
+	transition: opacity 0.2s ease;
+}
+
+mjx-container:hover {
+	opacity: 0.8;
+}
+
+.mathjax-theater-overlay {
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background-color: rgba(0, 0, 0, 0.85);
+	backdrop-filter: blur(4px);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	z-index: 9999;
+	animation: fadeIn 0.2s ease-in-out;
+}
+
+.mathjax-theater-content {
+	position: relative;
+	padding: 3rem;
+	background: var(--bs-body-bg);
+	border-radius: var(--bs-border-radius-lg);
+	max-width: 90vw;
+	max-height: 90vh;
+	overflow: auto;
+	box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+	animation: zoomIn 0.3s ease-out;
+}
+
+.mathjax-theater-close {
+	position: absolute;
+	top: 1rem;
+	right: 1rem;
+	z-index: 1;
+}
+
+.mathjax-theater-formula {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	min-height: 100px;
+	overflow: auto;
+	padding: 1rem;
+}
+
+.mathjax-theater-formula mjx-container {
+	max-width: 100%;
+	overflow: visible;
+	display: block !important;
+}
+
+.mathjax-theater-formula mjx-container svg {
+	max-width: calc(90vw - 8rem);
+	max-height: calc(90vh - 8rem);
+	width: auto;
+	height: auto;
+}
+
+.mathjax-theater-formula .MathJax,
+.mathjax-theater-formula .MathJax_Display {
+	max-width: 100%;
+	overflow: visible;
+}
+
+@keyframes fadeIn {
+	from {
+		opacity: 0;
+	}
+	to {
+		opacity: 1;
+	}
+}
+
+@keyframes zoomIn {
+	from {
+		opacity: 0;
+		transform: scale(0.8);
+	}
+	to {
+		opacity: 1;
+		transform: scale(1);
+	}
+}
+
+@media (max-width: 768px) {
+	.mathjax-theater-content {
+		padding: 2rem;
+		max-width: 95vw;
+		max-height: 95vh;
+	}
+
+	.mathjax-theater-formula {
+		padding: 0.5rem;
+	}
+
+	.mathjax-theater-formula mjx-container svg {
+		max-width: calc(95vw - 5rem);
+		max-height: calc(95vh - 5rem);
+	}
+}

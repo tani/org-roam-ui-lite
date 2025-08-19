@@ -16,7 +16,7 @@
         nodejs = pkgs.nodejs_24;
         bundle = pkgs.stdenv.mkDerivation rec {
           pname = "org-roam-ui-lite-bundle";
-          version = "0.2.6";
+          version = "0.2.7";
           src = pkgs.fetchurl {
             url = "https://github.com/tani/org-roam-ui-lite/releases/download/v${version}/org-roam-ui-lite.zip";
             sha256 = "sha256-5xp4jXPxTjBemYCNpkbpuPuIAh0rOAu74lyccmE8i20=";

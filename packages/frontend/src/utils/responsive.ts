@@ -8,30 +8,30 @@ export const RESPONSIVE_BREAKPOINTS = {
 export type Breakpoint = keyof typeof RESPONSIVE_BREAKPOINTS;
 
 export const responsiveWidthCSS = `
-.responsive-wide {
+.responsive-wide.offcanvas.offcanvas-end {
   width: 90vw;
 }
 
 @media (min-width: ${RESPONSIVE_BREAKPOINTS.sm}px) {
-  .responsive-wide {
+  .responsive-wide.offcanvas.offcanvas-end {
     width: 85vw;
   }
 }
 
 @media (min-width: ${RESPONSIVE_BREAKPOINTS.md}px) {
-  .responsive-wide {
+  .responsive-wide.offcanvas.offcanvas-end {
     width: 70vw;
   }
 }
 
 @media (min-width: ${RESPONSIVE_BREAKPOINTS.lg}px) {
-  .responsive-wide {
+  .responsive-wide.offcanvas.offcanvas-end {
     width: 60vw;
   }
 }
 
 @media (min-width: ${RESPONSIVE_BREAKPOINTS.xl}px) {
-  .responsive-wide {
+  .responsive-wide.offcanvas.offcanvas-end {
     width: 50vw;
     max-width: 800px;
   }

@@ -23,23 +23,25 @@
 	--h-base-size: 1rem;
 }
 
-h1 {
-	font-size: calc(var(--h-base-size) * pow(var(--h-scale-ratio), 5));
-}
-h2 {
-	font-size: calc(var(--h-base-size) * pow(var(--h-scale-ratio), 4));
-}
-h3 {
-	font-size: calc(var(--h-base-size) * pow(var(--h-scale-ratio), 3));
-}
-h4 {
-	font-size: calc(var(--h-base-size) * pow(var(--h-scale-ratio), 2));
-}
-h5 {
-	font-size: calc(var(--h-base-size) * pow(var(--h-scale-ratio), 1));
-}
-h6 {
-	font-size: calc(var(--h-base-size) * pow(var(--h-scale-ratio), 0));
+#root {
+	h1 {
+		font-size: calc(var(--h-base-size) * pow(var(--h-scale-ratio), 5));
+	}
+	h2 {
+		font-size: calc(var(--h-base-size) * pow(var(--h-scale-ratio), 4));
+	}
+	h3 {
+		font-size: calc(var(--h-base-size) * pow(var(--h-scale-ratio), 3));
+	}
+	h4 {
+		font-size: calc(var(--h-base-size) * pow(var(--h-scale-ratio), 2));
+	}
+	h5 {
+		font-size: calc(var(--h-base-size) * pow(var(--h-scale-ratio), 1));
+	}
+	h6 {
+		font-size: calc(var(--h-base-size) * pow(var(--h-scale-ratio), 0));
+	}
 }
 
 body,

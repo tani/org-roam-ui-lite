@@ -19,7 +19,7 @@
           version = "0.2.7";
           src = pkgs.fetchurl {
             url = "https://github.com/tani/org-roam-ui-lite/releases/download/v${version}/org-roam-ui-lite.zip";
-            sha256 = "sha256-5xp4jXPxTjBemYCNpkbpuPuIAh0rOAu74lyccmE8i20=";
+            sha256 = "sha256-m23/HzwgfaRxwzzjnZbg6V7YLaB/Zhsj4OGWwbO+VTg=";
           };
           nativeBuildInputs = [ pkgs.unzip ];
           unpackPhase = ''

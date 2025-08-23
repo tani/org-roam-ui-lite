@@ -154,7 +154,7 @@ automatically.
   inspiration.
 - [Hono](https://hono.dev), [Cytoscape.js](https://js.cytoscape.org),
   [Force Graph](https://github.com/vasturiano/force-graph),
-  [Alpine.js](https://alpinejs.dev).
+  [React](https://react.dev).
 - Colour palettes from **Nord**, **Gruvbox** and **Dracula** themes.
 
 Happy note-exploring! 🎈

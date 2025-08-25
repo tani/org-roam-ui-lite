@@ -27,7 +27,9 @@ describe("Responsive Utilities", () => {
 
 	describe("responsiveWidthCSS", () => {
 		it("contains base responsive-wide class", () => {
-			expect(responsiveWidthCSS).toContain(".responsive-wide {");
+			expect(responsiveWidthCSS).toContain(
+				".responsive-wide.offcanvas.offcanvas-end {",
+			);
 			expect(responsiveWidthCSS).toContain("width: 90vw;");
 		});
 
@@ -102,7 +104,9 @@ describe("Responsive Utilities", () => {
 			const result = generateResponsiveCSS();
 
 			// Check for proper CSS structure
-			expect(result).toMatch(/\.responsive-wide\s*\{[\s\S]*?\}/);
+			expect(result).toMatch(
+				/\.responsive-wide\.offcanvas\.offcanvas-end\s*\{[\s\S]*?\}/,
+			);
 			expect(result).toMatch(/\.preview-popover\s*\{[\s\S]*?\}/);
 			expect(result).toMatch(/@media\s*\([^)]+\)\s*\{[\s\S]*?\}/);
 		});

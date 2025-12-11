@@ -54,6 +54,7 @@ mjx-container:hover {
 .mathjax-theater-formula mjx-container {
 	max-width: 100%;
 	overflow: visible;
+	/* biome-ignore lint: overwrite the exising mathjax library */
 	display: block !important;
 }
 

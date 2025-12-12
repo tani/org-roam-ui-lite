@@ -26,7 +26,8 @@ export function MathJaxTheater({ mathml, onClose }: MathJaxTheaterProps) {
 			aria-label="MathJax formula viewer"
 			tabIndex={-1}
 			onClick={handleOverlayClick}
-			onKeyDownCapture={handleKeyDown}
+			onKeyDown={handleKeyDown}
+			onKeyUp={handleKeyDown}
 		>
 			<div className="mathjax-theater-content">
 				<Button
@@ -38,6 +39,7 @@ export function MathJaxTheater({ mathml, onClose }: MathJaxTheaterProps) {
 				/>
 				<div
 					className="mathjax-theater-formula"
+					// biome-ignore lint/security/noDangerouslySetInnerHtml: MathML markup is provided by MathJax rendering and needs raw HTML.
 					dangerouslySetInnerHTML={{ __html: mathml }}
 				/>
 			</div>

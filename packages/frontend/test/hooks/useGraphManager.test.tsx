@@ -175,9 +175,7 @@ describe("useGraphManager Hook", () => {
 			nodeSize: 20,
 		});
 
-		expect(result.current.openNodeAction).toBe(
-			initialFunctions.openNodeAction,
-		);
+		expect(result.current.openNodeAction).toBe(initialFunctions.openNodeAction);
 		expect(result.current.highlightNode).toBe(initialFunctions.highlightNode);
 		expect(result.current.resetNodeHighlight).toBe(
 			initialFunctions.resetNodeHighlight,

@@ -93,12 +93,13 @@ export function DetailsPanel({
 		previewAnchorRef.current = null;
 	}, []);
 
+	const panelId = useId();
+	const labelId = useId();
+
 	if (!open) {
 		return null;
 	}
 
-	const panelId = useId();
-	const labelId = useId();
 	const handleClose = () => {
 		hidePreview();
 		setTheaterMath(null);

@@ -42,8 +42,6 @@ describe("useGraphManager Hook", () => {
 		nodeSize: 10,
 		labelScale: 1,
 		showLabels: true,
-		detailsOpen: false,
-		selectedId: "",
 	};
 
 	beforeEach(async () => {
@@ -74,6 +72,15 @@ describe("useGraphManager Hook", () => {
 		});
 	});
 
+	const attachGraph = async (result: ReturnType<typeof renderHook>) => {
+		const div = document.createElement("div");
+		await act(async () => {
+			result.current.graphRef(div);
+			await Promise.resolve();
+		});
+		return div;
+	};
+
 	it("returns expected interface", () => {
 		const { result } = renderHook(() => useGraphManager(defaultProps), {
 			wrapper: createWrapper(),
@@ -83,71 +90,22 @@ describe("useGraphManager Hook", () => {
 		expect(result.current.openNodeAction).toBeTypeOf("function");
 		expect(result.current.highlightNode).toBeTypeOf("function");
 		expect(result.current.resetNodeHighlight).toBeTypeOf("function");
+		expect(result.current.setRenderer).toBeTypeOf("function");
+		expect(result.current.setLayout).toBeTypeOf("function");
+		expect(result.current.setNodeSize).toBeTypeOf("function");
+		expect(result.current.setLabelScale).toBeTypeOf("function");
+		expect(result.current.setShowLabels).toBeTypeOf("function");
+		expect(result.current.setTheme).toBeTypeOf("function");
 	});
 
-	it("openNodeAction calls openNode and dispatches actions", async () => {
-		const { result } = renderHook(() => useGraphManager(defaultProps), {
-			wrapper: createWrapper(),
-		});
-
-		await act(async () => {
-			await result.current.openNodeAction("test-id");
-		});
-
-		expect(mockOpenNode).toHaveBeenCalledWith("light", "test-id");
-	});
-
-	it("highlightNode calls highlightNeighborhood with current graph instance", () => {
+	it("openNodeAction uses the latest theme from setTheme", async () => {
 		const { result } = renderHook(() => useGraphManager(defaultProps), {
 			wrapper: createWrapper(),
 		});
 
 		act(() => {
-			result.current.highlightNode("test-id");
+			result.current.setTheme("dark");
 		});
-
-		expect(mockHighlightNeighborhood).toHaveBeenCalledWith(
-			undefined, // graph instance starts as undefined
-			"test-id",
-		);
-	});
-
-	it("resetNodeHighlight calls resetHighlight with current graph instance", () => {
-		const { result } = renderHook(() => useGraphManager(defaultProps), {
-			wrapper: createWrapper(),
-		});
-
-		act(() => {
-			result.current.resetNodeHighlight();
-		});
-
-		expect(mockResetHighlight).toHaveBeenCalledWith(undefined);
-	});
-
-	it("handles missing graph element gracefully", () => {
-		const { result } = renderHook(() => useGraphManager(defaultProps), {
-			wrapper: createWrapper(),
-		});
-
-		// Graph ref starts as null, should not throw
-		expect(result.current.graphRef.current).toBeNull();
-
-		// These should not throw even with no graph instance
-		expect(() => {
-			result.current.highlightNode("test-id");
-			result.current.resetNodeHighlight();
-		}).not.toThrow();
-	});
-
-	it("updates theme in openNodeAction", async () => {
-		const { result } = renderHook(
-			() =>
-				useGraphManager({
-					...defaultProps,
-					theme: "dark",
-				}),
-			{ wrapper: createWrapper() },
-		);
 
 		await act(async () => {
 			await result.current.openNodeAction("test-id");
@@ -156,66 +114,76 @@ describe("useGraphManager Hook", () => {
 		expect(mockOpenNode).toHaveBeenCalledWith("dark", "test-id");
 	});
 
-	it("provides stable reference functions", () => {
+	it("highlight and reset helpers forward to graph style helpers", () => {
+		const { result } = renderHook(() => useGraphManager(defaultProps), {
+			wrapper: createWrapper(),
+		});
+
+		act(() => {
+			result.current.highlightNode("test-id");
+			result.current.resetNodeHighlight();
+		});
+
+		expect(mockHighlightNeighborhood).toHaveBeenCalledWith(
+			undefined,
+			"test-id",
+		);
+		expect(mockResetHighlight).toHaveBeenCalledWith(undefined);
+	});
+
+	it("applies node size updates for cytoscape renderer", async () => {
+		const { result } = renderHook(() => useGraphManager(defaultProps), {
+			wrapper: createWrapper(),
+		});
+		await attachGraph(result);
+
+		await act(async () => {
+			await result.current.setNodeSize(15);
+		});
+
+		const { applyNodeStyle } = await import("../../src/graph/graph-style.ts");
+		expect(applyNodeStyle).toHaveBeenCalledWith(mockGraphInstance, {
+			width: 15,
+			height: 15,
+		});
+	});
+
+	it("refreshes the graph when renderer changes", async () => {
+		const { result } = renderHook(() => useGraphManager(defaultProps), {
+			wrapper: createWrapper(),
+		});
+		await attachGraph(result);
+		mockDrawGraph.mockClear();
+
+		await act(async () => {
+			await result.current.setRenderer("force-graph");
+		});
+
+		expect(mockDrawGraph).toHaveBeenCalled();
+	});
+
+	it("provides stable reference functions across rerenders", () => {
 		const { result, rerender } = renderHook((props) => useGraphManager(props), {
 			wrapper: createWrapper(),
 			initialProps: defaultProps,
 		});
 
-		const initialFunctions = {
-			openNodeAction: result.current.openNodeAction,
-			highlightNode: result.current.highlightNode,
-			resetNodeHighlight: result.current.resetNodeHighlight,
-		};
+		const initialFunctions = { ...result.current };
 
 		rerender({
 			...defaultProps,
 			nodeSize: 20,
 		});
 
-		// Functions should remain stable across renders
-		expect(result.current.openNodeAction).toBe(initialFunctions.openNodeAction);
+		expect(result.current.openNodeAction).toBe(
+			initialFunctions.openNodeAction,
+		);
 		expect(result.current.highlightNode).toBe(initialFunctions.highlightNode);
 		expect(result.current.resetNodeHighlight).toBe(
 			initialFunctions.resetNodeHighlight,
 		);
-	});
-
-	it("openNodeAction depends on theme and dispatch", async () => {
-		const { result, rerender } = renderHook((props) => useGraphManager(props), {
-			wrapper: createWrapper(),
-			initialProps: defaultProps,
-		});
-
-		const initialOpenNodeAction = result.current.openNodeAction;
-
-		// Theme change should create new openNodeAction function
-		rerender({
-			...defaultProps,
-			theme: "dark",
-		});
-
-		expect(result.current.openNodeAction).not.toBe(initialOpenNodeAction);
-	});
-
-	it("highlight functions do not depend on props", () => {
-		const { result, rerender } = renderHook((props) => useGraphManager(props), {
-			wrapper: createWrapper(),
-			initialProps: defaultProps,
-		});
-
-		const initialHighlightNode = result.current.highlightNode;
-		const initialResetNodeHighlight = result.current.resetNodeHighlight;
-
-		rerender({
-			...defaultProps,
-			theme: "dark",
-			nodeSize: 20,
-		});
-
-		// Highlight functions should remain the same
-		expect(result.current.highlightNode).toBe(initialHighlightNode);
-		expect(result.current.resetNodeHighlight).toBe(initialResetNodeHighlight);
+		expect(result.current.setNodeSize).toBe(initialFunctions.setNodeSize);
+		expect(result.current.setRenderer).toBe(initialFunctions.setRenderer);
 	});
 
 	it("handles renderer-specific event binding patterns", () => {

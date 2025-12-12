@@ -154,7 +154,7 @@ describe("DetailsPanel", () => {
 		);
 	});
 
-	it("does not apply show class when closed", () => {
+	it("does not render when closed", () => {
 		const mockSelectedNode = {
 			id: "node1",
 			title: "Test Node",
@@ -170,7 +170,7 @@ describe("DetailsPanel", () => {
 			refs: [],
 		};
 
-		const { container } = render(
+		const { queryByRole } = render(
 			<DetailsPanel
 				open={false}
 				selected={mockSelectedNode}
@@ -180,8 +180,7 @@ describe("DetailsPanel", () => {
 			/>,
 		);
 
-		const panel = container.querySelector('[role="dialog"]');
-		expect(panel).not.toHaveClass("show");
+		expect(queryByRole("dialog")).not.toBeInTheDocument();
 	});
 
 	it("renders node body content", () => {

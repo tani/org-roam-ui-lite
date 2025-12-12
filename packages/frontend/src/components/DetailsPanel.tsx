@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { useCallback, useEffect, useId, useRef, useState } from "react";
+import { useCallback, useId, useRef, useState } from "react";
 import type { components } from "../api/api.d.ts";
 import type { Theme } from "../graph/graph-types.ts";
 import { openNode } from "../graph/node.ts";
@@ -93,18 +93,17 @@ export function DetailsPanel({
 		previewAnchorRef.current = null;
 	}, []);
 
-	useEffect(() => {
-		if (!open) {
-			hidePreview();
-		}
-	}, [open, hidePreview]);
-
-	useEffect(() => {
-		hidePreview();
-	}, [hidePreview]);
+	if (!open) {
+		return null;
+	}
 
 	const panelId = useId();
 	const labelId = useId();
+	const handleClose = () => {
+		hidePreview();
+		setTheaterMath(null);
+		onClose();
+	};
 
 	return (
 		<>
@@ -122,7 +121,7 @@ export function DetailsPanel({
 						<i className="bi bi-file-earmark-text"></i>
 						<span>{selected?.title ?? "Click a node to view details"}</span>
 					</h4>
-					<Button variant="close" aria-label="Close" onClick={onClose} />
+					<Button variant="close" aria-label="Close" onClick={handleClose} />
 				</div>
 				<section
 					className="offcanvas-body"

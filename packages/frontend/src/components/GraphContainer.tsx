@@ -1,7 +1,7 @@
-import type { RefObject } from "react";
+import type { Ref } from "react";
 
 interface GraphContainerProps {
-	graphRef: RefObject<HTMLDivElement | null>;
+	graphRef: Ref<HTMLDivElement | null>;
 }
 
 export function GraphContainer({ graphRef }: GraphContainerProps) {

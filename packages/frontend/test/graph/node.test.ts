@@ -41,7 +41,7 @@ describe("openNode", () => {
 
 		const result = await openNode("dark", "test-node");
 
-		expect(mockGET).toHaveBeenCalledWith("/api/node/{id}.json", {
+		expect(mockGET).toHaveBeenCalledWith("api/node/{id}.json", {
 			params: { path: { id: "test-node" } },
 		});
 		expect(mockCreateOrgHtmlProcessor).toHaveBeenCalledWith(

@@ -78,7 +78,7 @@ describe("Graph Module", () => {
 				true,
 			);
 
-			expect(mockGET).toHaveBeenCalledWith("/api/graph.json");
+			expect(mockGET).toHaveBeenCalledWith("api/graph.json");
 			expect(mockCytoscapeRenderer).toHaveBeenCalledWith(
 				expect.arrayContaining([
 					expect.objectContaining({

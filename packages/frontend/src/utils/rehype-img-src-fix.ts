@@ -21,7 +21,7 @@ export default function rehypeImgSrcFix(nodeId: string): (tree: Root) => void {
 
 			const [base, extension = ""] = src.split(/(?=\.[^.]+$)/);
 			if (node.properties && base) {
-				node.properties.src = `/api/node/${nodeId}/${encodeBase64url(
+				node.properties.src = `./api/node/${nodeId}/${encodeBase64url(
 					base,
 				)}${extension}`;
 			}

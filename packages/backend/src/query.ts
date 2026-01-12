@@ -19,7 +19,7 @@ function isUuid(str: unknown): str is string {
 
 type KVPair<T> = { [K in keyof T]: [K, T[K]] }[keyof T];
 
-type GraphResponse = KVPair<paths["/api/graph.json"]["get"]["responses"]>;
+type GraphResponse = KVPair<paths["api/graph.json"]["get"]["responses"]>;
 
 /**
  * Return the entire graph as nodes and edges.
@@ -57,7 +57,7 @@ export async function fetchGraph(databasePath: string): Promise<GraphResponse> {
 	];
 }
 
-type NodeResponse = KVPair<paths["/api/node/{id}.json"]["get"]["responses"]>;
+type NodeResponse = KVPair<paths["api/node/{id}.json"]["get"]["responses"]>;
 
 /**
  * Fetch a single node and its backlinks.
@@ -122,7 +122,7 @@ export async function fetchNode(
 }
 
 type ResourceResponse = KVPair<
-	paths["/api/node/{id}/{path}"]["get"]["responses"]
+	paths["api/node/{id}/{path}"]["get"]["responses"]
 >;
 /**
  * Serve a binary resource attached to a node.

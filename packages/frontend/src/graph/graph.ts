@@ -12,7 +12,7 @@ import type {
 } from "./graph-types.ts";
 import { Layouts, Renderers, Themes } from "./graph-types.ts";
 
-const api = createClient<paths>();
+const api = createClient<paths>({ baseUrl: "./" });
 
 export { Layouts, Renderers, Themes };
 export type { GraphInstance, GraphLink, GraphNode, Layout, Renderer, Theme };
@@ -24,9 +24,10 @@ interface GraphData {
 
 /** Fetch graph data from the backend API. */
 async function fetchGraphData(): Promise<GraphData> {
-	const { data, error } = await api.GET("/api/graph.json");
+	const { data, error } = await api.GET("api/graph.json");
 
-	if (error) throw new Error(`API error: ${error}`);
+	if (error || !data)
+		throw new Error(`API error: ${error || "No data received"}`);
 
 	const nodes: GraphNode[] = data.nodes.map((n) => ({
 		id: n.id,

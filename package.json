@@ -41,7 +41,7 @@
 		"dev:backend": "npm --workspace=packages/backend run dev --",
 		"lint": "biome check .",
 		"lint:fix": "biome check --write .",
-		"check": "tsgo",
+		"check": "tsc --noEmit",
 		"test": "vitest",
 		"test:ui": "vitest --ui"
 	},

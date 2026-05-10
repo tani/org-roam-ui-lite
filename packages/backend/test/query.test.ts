@@ -78,7 +78,7 @@ import { fetchGraph, fetchNode, fetchResource } from "../src/query.ts";
 
 describe("fetchGraph", () => {
 	it("filters invalid edges", async () => {
-		mockCreateDatabase.mockResolvedValue(makeGraphDb());
+		mockCreateDatabase.mockReturnValue(makeGraphDb());
 		const result = await fetchGraph("x");
 		const body = result[1].content["application/json"];
 		expect(body.nodes).toHaveLength(1);
@@ -95,7 +95,7 @@ describe("fetchNode", () => {
 	it("returns node with backlinks and raw", async () => {
 		mockReadFile.mockResolvedValue("ORG");
 		makeNodeDbCalled = false;
-		mockCreateDatabase.mockResolvedValue(
+		mockCreateDatabase.mockReturnValue(
 			makeNodeDb({ id: NODE_ID, title: "t", file: "/tmp/a" }),
 		);
 		const result = await fetchNode("db", NODE_ID);
@@ -115,7 +115,7 @@ describe("fetchNode", () => {
 describe("fetchResource", () => {
 	it("reads resolved file", async () => {
 		const row = { id: NODE_ID, title: "t", file: "/base/file.org" };
-		mockCreateDatabase.mockResolvedValue(makeResourceDb(row));
+		mockCreateDatabase.mockReturnValue(makeResourceDb(row));
 		const encoded = encodeBase64url("images/foo");
 		const full = `${encoded}.png`;
 		const buf = new Uint8Array([1, 2]);

@@ -27,7 +27,7 @@ type GraphResponse = KVPair<paths["api/graph.json"]["get"]["responses"]>;
  * @param databasePath - Path to the database
  */
 export async function fetchGraph(databasePath: string): Promise<GraphResponse> {
-	const database = await createDatabase(databasePath);
+	const database = createDatabase(databasePath);
 	const [nodeRows, edgeRows] = await Promise.all([
 		database.select({ id: nodes.id, title: nodes.title }).from(nodes),
 		database.select({ source: links.source, dest: links.dest }).from(links),
@@ -69,7 +69,7 @@ export async function fetchNode(
 	databasePath: string,
 	nodeId: string,
 ): Promise<NodeResponse> {
-	const database = await createDatabase(databasePath);
+	const database = createDatabase(databasePath);
 	const row = database
 		.select({ id: nodes.id, title: nodes.title, file: files.file })
 		.from(nodes)
@@ -136,7 +136,7 @@ export async function fetchResource(
 	nodeId: string,
 	encodedPath: string,
 ): Promise<ResourceResponse> {
-	const database = await createDatabase(databasePath);
+	const database = createDatabase(databasePath);
 	const row = database
 		.select({ id: nodes.id, title: nodes.title, file: files.file })
 		.from(nodes)

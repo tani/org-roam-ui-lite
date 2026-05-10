@@ -8,11 +8,10 @@
 	},
 	"dependencies": {
 		"@hono/node-server": "^1.15.0",
-		"drizzle-orm": "^0.44.2",
+		"drizzle-orm": "^1.0.0-rc.2",
 		"hono": "^4.8.4",
 		"mime-types": "^3.0.1",
 		"rehype-raw": "^7.0.0",
-		"sql.js": "^1.13.0",
 		"unified": "^11.0.5",
 		"uniorg-parse": "^3.2.0",
 		"uniorg-rehype": "^2.2.0",

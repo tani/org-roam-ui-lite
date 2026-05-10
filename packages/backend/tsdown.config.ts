@@ -5,9 +5,4 @@ export default defineConfig({
 	platform: "node",
 	noExternal: [/.*/],
 	shims: true,
-	inputOptions: {
-		moduleTypes: {
-			".wasm": "binary",
-		},
-	},
 });

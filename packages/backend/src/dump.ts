@@ -45,7 +45,7 @@ async function dumpNodeJsons(
 	databasePath: string,
 	outputPath: string,
 ): Promise<void> {
-	const database = await createDatabase(databasePath);
+	const database = createDatabase(databasePath);
 
 	// Build the unified pipeline once
 	const processor = unified()

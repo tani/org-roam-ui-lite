@@ -1,9 +1,9 @@
-import * as fs from "node:fs/promises";
-import { drizzle, type SQLJsDatabase } from "drizzle-orm/sql-js";
-import initSqlJs, { type SqlJsStatic } from "sql.js";
+import { DatabaseSync } from "node:sqlite";
+import type { NodeSQLiteDatabase } from "drizzle-orm/node-sqlite";
+import { drizzle } from "drizzle-orm/node-sqlite";
 import * as schema from "./schema.ts";
 
-export type Database = SQLJsDatabase<typeof schema>;
+export type Database = NodeSQLiteDatabase<typeof schema>;
 
 /**
  * Open the SQLite database and wrap it with Drizzle.
@@ -11,15 +11,7 @@ export type Database = SQLJsDatabase<typeof schema>;
  * @param databasePath - Path to the database file
  * @returns Drizzle connection bound to the schema
  */
-export async function createDatabase(databasePath: string): Promise<Database> {
-	let SQL: SqlJsStatic;
-	try {
-		const { default: wasmBinary } = await import("sql.js/dist/sql-wasm.wasm");
-		SQL = await initSqlJs({ wasmBinary });
-	} catch {
-		SQL = await initSqlJs();
-	}
-	const blob = new Uint8Array(await fs.readFile(databasePath));
-	const database = new SQL.Database(blob);
-	return drizzle(database, { schema });
+export function createDatabase(databasePath: string): Database {
+	const sqlite = new DatabaseSync(databasePath);
+	return drizzle({ client: sqlite, schema });
 }

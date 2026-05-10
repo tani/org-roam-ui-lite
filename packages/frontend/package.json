@@ -29,6 +29,7 @@
 		"unified": "^11.0.5",
 		"uniorg-parse": "^3.2.1",
 		"uniorg-rehype": "^2.2.0",
+		"shiki": "^4.0.2",
 		"unist-util-visit": "^5.1.0"
 	}
 }

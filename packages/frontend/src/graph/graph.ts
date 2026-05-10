@@ -14,8 +14,8 @@ import { Layouts, Renderers, Themes } from "./graph-types.ts";
 
 const api = createClient<paths>({ baseUrl: "./" });
 
-export { Layouts, Renderers, Themes };
 export type { GraphInstance, GraphLink, GraphNode, Layout, Renderer, Theme };
+export { Layouts, Renderers, Themes };
 
 interface GraphData {
 	nodes: GraphNode[];

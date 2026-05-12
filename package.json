@@ -28,6 +28,7 @@
 		"npm-run-all": "^4.1.5",
 		"openapi-typescript": "^7.13.0",
 		"tsdown": "^0.22.0",
+		"tsx": "^4.21.0",
 		"typescript": "^5.9.3",
 		"vite": "^8.0.11",
 		"vitest": "^4.1.5"
@@ -43,7 +44,9 @@
 		"lint:fix": "biome check --write .",
 		"check": "tsc --noEmit",
 		"test": "vitest",
-		"test:ui": "vitest --ui"
+		"test:ui": "vitest --ui",
+		"example:generate": "tsx examples/org-roam-example.ts",
+		"example:server": "npm run example:generate && npm run dev -- -d \"$PWD/examples/org-roam-example.db\""
 	},
 	"version": "0.3.1"
 }

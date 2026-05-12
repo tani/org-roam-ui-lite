@@ -1,5 +1,4 @@
-import type ForceGraph from "force-graph";
-import ForceGraphCtor from "force-graph";
+import ForceGraph from "force-graph";
 import { getCssVariable } from "../../utils/style.ts";
 import type {
 	GraphInstance,
@@ -36,7 +35,7 @@ const renderForceGraph: RendererFunction = (
 	const area = Math.PI * radius * radius;
 	const fgNodes = nodes.map((n) => ({ ...n, val: area }));
 	let fg = existing as ForceGraph<GraphNode, GraphLink> | undefined;
-	if (!fg) fg = new ForceGraphCtor<GraphNode, GraphLink>(container);
+	if (!fg) fg = new ForceGraph<GraphNode, GraphLink>(container);
 	const fontSize = 36 * labelScale;
 	fg.nodeId("id")
 		.nodeLabel("label")
@@ -48,7 +47,7 @@ const renderForceGraph: RendererFunction = (
 		.graphData({ nodes: fgNodes, links: edges });
 
 	if (showLabels) {
-		fg.nodeCanvasObject((node: GraphNode, ctx, scale) => {
+		fg.nodeCanvasObject((node, ctx, scale) => {
 			const label = String(node.label);
 			const size = fontSize / scale;
 			ctx.font = `${size}px ${getCssVariable("--bs-font-sans-serif")}`;

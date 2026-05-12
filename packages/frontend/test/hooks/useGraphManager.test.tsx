@@ -72,7 +72,9 @@ describe("useGraphManager Hook", () => {
 		});
 	});
 
-	const attachGraph = async (result: any) => {
+	const attachGraph = async (result: {
+		current: ReturnType<typeof useGraphManager>;
+	}) => {
 		const div = document.createElement("div");
 		await act(async () => {
 			result.current.graphRef(div);

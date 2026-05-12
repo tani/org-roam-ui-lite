@@ -9,6 +9,12 @@ import { Button } from "./ui/Button.tsx";
 import { For } from "./ui/For.tsx";
 import { When } from "./ui/When.tsx";
 
+function getIdLinkNodeId(anchor: HTMLAnchorElement): string | null {
+	const href = anchor.getAttribute("href");
+	if (!href?.startsWith("id:")) return null;
+	return href.slice("id:".length);
+}
+
 interface DetailsPanelProps {
 	open: boolean;
 	selected: components["schemas"]["Node"] & { body?: ReactNode };
@@ -48,16 +54,18 @@ export function DetailsPanel({
 
 		// Check for links
 		const a = target.closest("a");
-		if (!a || !a.href.startsWith("id:")) return;
+		if (!a) return;
+		const nodeId = getIdLinkNodeId(a);
+		if (!nodeId) return;
 		ev.preventDefault();
-		onOpenNode(a.href.replace("id:", ""));
+		onOpenNode(nodeId);
 	};
 
 	const handleRenderedMouseOver = (
 		ev: React.MouseEvent<HTMLElement> | React.FocusEvent<HTMLElement>,
 	) => {
 		const anchor = (ev.target as HTMLElement).closest("a");
-		if (!anchor || !anchor.href.startsWith("id:")) return;
+		if (!anchor || !getIdLinkNodeId(anchor)) return;
 		if (previewAnchorRef.current === anchor) return;
 		showPreview(anchor, ev as React.MouseEvent<HTMLElement>);
 	};
@@ -82,7 +90,9 @@ export function DetailsPanel({
 		ev: React.MouseEvent<HTMLElement>,
 	) => {
 		previewAnchorRef.current = anchor;
-		const node = await openNode(theme, anchor.href.replace("id:", ""));
+		const nodeId = getIdLinkNodeId(anchor);
+		if (!nodeId) return;
+		const node = await openNode(theme, nodeId);
 		if (previewAnchorRef.current === anchor) {
 			setPreview({ body: node.body, x: ev.clientX, y: ev.clientY });
 		}

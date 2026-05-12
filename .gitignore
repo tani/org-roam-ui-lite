@@ -138,3 +138,6 @@ dist
 .direnv/
 **/dist/
 .lsmcp/
+
+# Examples
+examples/org/

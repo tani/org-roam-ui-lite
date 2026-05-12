@@ -12,7 +12,7 @@ import type {
 } from "./graph-types.ts";
 import { Layouts, Renderers, Themes } from "./graph-types.ts";
 
-const api = createClient<paths>({ baseUrl: "./" });
+const api = createClient<paths>();
 
 export type { GraphInstance, GraphLink, GraphNode, Layout, Renderer, Theme };
 export { Layouts, Renderers, Themes };
@@ -22,26 +22,33 @@ interface GraphData {
 	edges: GraphLink[];
 }
 
-/** Fetch graph data from the backend API. */
+/** Fetch graph data from the backend API with retry (exponential backoff). */
 async function fetchGraphData(): Promise<GraphData> {
-	const { data, error } = await api.GET("api/graph.json");
-
-	if (error || !data)
-		throw new Error(`API error: ${error || "No data received"}`);
-
-	const nodes: GraphNode[] = data.nodes.map((n) => ({
-		id: n.id,
-		label: n.title,
-		color: pickColor(n.id),
-	}));
-	const edgeColor = getCssVariable("--bs-secondary");
-	const edges: GraphLink[] = data.edges.map((e) => ({
-		source: e.source,
-		target: e.dest,
-		color: edgeColor,
-	}));
-
-	return { nodes, edges };
+	const MAX_RETRIES = 15;
+	let attempt = 0;
+	while (true) {
+		try {
+			const { data, error } = await api.GET("/api/graph.json");
+			if (error || !data)
+				throw new Error(`API error: ${error || "No data received"}`);
+			const nodes: GraphNode[] = data.nodes.map((n) => ({
+				id: n.id,
+				label: n.title,
+				color: pickColor(n.id),
+			}));
+			const edgeColor = getCssVariable("--bs-secondary");
+			const edges: GraphLink[] = data.edges.map((e) => ({
+				source: e.source,
+				target: e.dest,
+				color: edgeColor,
+			}));
+			return { nodes, edges };
+		} catch (err) {
+			attempt++;
+			if (attempt >= MAX_RETRIES) throw err;
+			await new Promise((r) => setTimeout(r, attempt * 200));
+		}
+	}
 }
 
 const rendererMap: Record<

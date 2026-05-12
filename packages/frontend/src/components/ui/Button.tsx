@@ -1,5 +1,3 @@
-import type { ReactNode } from "react";
-
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 	variant?: "primary" | "secondary" | "outline-secondary" | "close";
 	size?: "sm" | "md" | "lg";

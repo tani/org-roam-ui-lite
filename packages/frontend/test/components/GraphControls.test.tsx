@@ -29,8 +29,8 @@ describe("GraphControls Component", () => {
 			"position-fixed",
 		);
 		expect(settingsButton).toHaveStyle({
-			top: "1rem",
-			left: "1rem",
+			top: "16px",
+			left: "16px",
 			zIndex: "1",
 		});
 
@@ -42,8 +42,8 @@ describe("GraphControls Component", () => {
 			"position-fixed",
 		);
 		expect(detailsButton).toHaveStyle({
-			top: "1rem",
-			right: "1rem",
+			top: "16px",
+			right: "16px",
 			zIndex: "1",
 		});
 	});
@@ -123,11 +123,11 @@ describe("GraphControls Component", () => {
 				"position-fixed",
 			);
 			expect(button).toHaveStyle("zIndex: 1");
-			expect(button).toHaveStyle("top: 1rem");
+			expect(button).toHaveStyle("top: 16px");
 		});
 
 		// Check specific positioning
-		expect(buttons[0]).toHaveStyle("left: 1rem");
-		expect(buttons[1]).toHaveStyle("right: 1rem");
+		expect(buttons[0]).toHaveStyle("left: 16px");
+		expect(buttons[1]).toHaveStyle("right: 16px");
 	});
 });

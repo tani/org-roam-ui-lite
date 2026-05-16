@@ -25,7 +25,7 @@ export default defineConfig({
 				test: {
 					name: "frontend",
 					include: ["packages/frontend/test/**/*.test.{ts,tsx}"],
-					environment: "jsdom", // frontend uses jsdom
+					environment: "happy-dom", // frontend uses happy-dom for better React support
 					setupFiles: ["packages/frontend/test/setup.ts"],
 				},
 			},

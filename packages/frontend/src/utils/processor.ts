@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { Fragment, jsx, jsxs } from "react/jsx-runtime";
-import type { RehypeMermaidOptions } from "rehype-mermaid";
+
 import rehypeRaw from "rehype-raw";
 import rehypeReact from "rehype-react";
 import { unified } from "unified";
@@ -70,12 +70,10 @@ export function createOrgHtmlProcessor<Theme extends string>(
 		}
 
 		if (detected.mermaid) {
-			const mod = await import("rehype-mermaid");
-			const rehypeMermaid = mod.default;
+			const { rehypeMermaid } = await import("rehype-beautiful-mermaid");
 			processor.use(rehypeMermaid, {
-				strategy: "img-svg",
-				dark: theme.endsWith("dark"),
-			} as RehypeMermaidOptions);
+				theme: theme.endsWith("dark") ? "github-dark" : "default",
+			});
 		}
 
 		if (detected.languages.length > 0) {

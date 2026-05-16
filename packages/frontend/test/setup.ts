@@ -1,7 +1,7 @@
 import "@testing-library/jest-dom/vitest";
 import { vi } from "vitest";
 
-// Mock window.matchMedia for Vitest/JSDOM
+// Mock window.matchMedia for Vitest/Happy-DOM
 Object.defineProperty(window, "matchMedia", {
 	writable: true,
 	value: vi.fn().mockImplementation((query: string) => ({

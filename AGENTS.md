@@ -1,67 +1,98 @@
-# CLAUDE.md
+# AGENTS.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This file provides guidance for coding agents working in this repository.
 
 ## Project Overview
 
-org-roam-ui-lite is a TypeScript monorepo for visualizing Org-roam knowledge graphs. It provides both Node.js and Emacs backends with a React frontend for interactive graph exploration.
+org-roam-ui-lite is a TypeScript monorepo for visualizing Org-roam knowledge
+graphs. It includes a Node backend, a React frontend, an Emacs integration, and
+an example workspace with sample Org-roam files.
 
-## Common Development Commands
+## Common Commands
 
-### Essential Commands
-- `npm install` - Install all dependencies for the monorepo
-- `npm run dev` - Start both frontend (port 5173) and backend development servers
-- `npm run build` - Build all packages for production
-- `npm run export` - Create a static site export
-- `npm run lint` - Check code with Biome linter
-- `npm run lint:fix` - Auto-fix linting issues
+- `npm install` - Install monorepo dependencies
+- `npm run typegen` - Generate API types from `openapi.yaml`
+- `npm run dev` - Start frontend and backend dev servers
+- `npm run build` - Generate types, build workspaces, and assemble `dist/`
+- `npm run export` - Build and export a static site
+- `npm run populate -- -i DIR -d DB` - Create a SQLite database from Org files
+- `npm run serve -- -d DB -p 5174` - Serve the backend API and frontend bundle
+- `npm run dump -- -d DB -o OUT/api` - Dump JSON API files
+- `npm run example:populate` - Generate the example SQLite database
+- `npm run example:export` - Generate the example static site
+- `npm run example:serve` - Generate and serve the example static site
 - `npm run check` - Run TypeScript type checking
-- `npm run test` - Run all tests with Vitest
-- `npm run test:ui` - Run tests with interactive UI
+- `npm run lint` - Run Biome checks
+- `npm run lint:fix` - Apply Biome fixes
+- `npm run test` - Run Vitest tests
+- `npm run test:ui` - Run Vitest UI
 
-### Running a Single Test
+Run a single test with:
+
 ```bash
 npm run test -- path/to/test-file.test.ts
 ```
 
-## Architecture Overview
+## Monorepo Structure
 
-### Monorepo Structure
-The project uses npm workspaces with three main packages:
+The project uses npm workspaces under `packages/*`.
 
-1. **packages/backend/** - Hono-based Node.js server
-   - Serves JSON API endpoints defined in openapi.yaml
-   - Reads from Org-roam SQLite database
-   - Entry point: src/serve.ts
+1. `packages/backend/`
+   - Hono-based Node server and CLI
+   - Uses Drizzle ORM to access SQLite
+   - Imports Org files with `populate`
+   - Serves API endpoints and dumps static JSON
+   - CLI entry point: `src/cli.ts`
 
-2. **packages/frontend/** - React SPA with Vite
-   - Graph visualization using Cytoscape.js and Force Graph
-   - Multiple themes and layout options
+2. `packages/frontend/`
+   - React SPA built with Vite
+   - Graph visualization with Cytoscape.js, Force Graph, and 3D Force Graph
    - Backlinks panel with Org content rendering
-   - Entry point: src/main.tsx
+   - Entry point: `src/main.tsx`
 
-3. **packages/emacs/** - Emacs Lisp integration
+3. `packages/emacs/`
+   - Emacs Lisp integration
    - Single-file server using simple-httpd
-   - Direct Emacs integration for local use
 
-### Key Technologies
-- **TypeScript** with strict mode enabled
-- **API Contract**: openapi.yaml with openapi-typescript for type safety
-- **Testing**: Vitest with separate configurations for frontend (jsdom) and backend (node)
-- **Build Tools**: Vite for frontend, tsdown for backend
-- **Code Quality**: Biome for linting/formatting, Lefthook for git hooks
+4. `packages/example/`
+   - Sample Org-roam files in `org/`
+   - Example scripts for populate, static export, and serving
+   - Generated outputs are ignored: `org-roam-example.db` and `static/`
 
-### API Endpoints
-- `GET /api/graph.json` - Returns complete graph data (nodes and edges)
-- `GET /api/node/{id}.json` - Returns specific node with backlinks
+## API
 
-### Development Workflow
-1. The frontend proxies API requests to the backend during development (see vite.config.ts)
-2. Types are generated from openapi.yaml and shared between packages
-3. Git hooks run type checking and linting before commits
-4. Tests are located in `test/` directories within each package
+- `GET /api/graph.json` - Complete graph data with nodes and edges
+- `GET /api/node/{id}.json` - Specific node with backlinks
 
-### Code Style
-- Tabs for indentation (configured in biome.json)
-- Double quotes for strings in JavaScript/TypeScript
-- Imports are automatically organized by Biome
+The API contract is defined in `openapi.yaml`. Generated TypeScript types are
+written to:
+
+- `packages/backend/src/api.d.ts`
+- `packages/frontend/src/api/api.d.ts`
+
+## Build Flow
+
+Root `npm run build` runs:
+
+1. `npm run typegen`
+2. `npm run build:workspaces`
+3. `npm run build:dist`
+
+Workspace builds are run with `--if-present`, so utility workspaces such as
+`packages/example` do not need no-op build scripts.
+
+## Development Workflow
+
+1. Frontend dev server proxies `/api` requests to the backend.
+2. Backend dev server accepts CLI flags through `npm run dev -- ...`.
+3. Tests live in package-local `test/` directories.
+4. Keep `openapi.yaml` and generated API types in sync with `npm run typegen`.
+5. Before finishing changes, run at least `npm run check` and `npm run lint`.
+
+## Code Style
+
+- TypeScript strict mode is enabled.
+- Biome handles linting and formatting.
+- Tabs are used for indentation.
+- JavaScript and TypeScript strings use double quotes.
+- Imports are organized by Biome.

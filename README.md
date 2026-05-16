@@ -64,6 +64,7 @@ $ python3 -m http.server -d /path/to/output
 $ git clone https://github.com/tani/org-roam-ui-lite.git
 $ cd org-roam-ui-lite
 $ npm install
+$ npm run populate -- -i /path/to/org-roam-directory -d /path/to/database.db
 $ npm run dev -- -d /path/to/database.db
 ```
 
@@ -75,8 +76,19 @@ Open [<http://localhost:5173>](http://localhost:5173) and start clicking nodes!
 $ git clone github.com/tani/org-roam-ui-lite.git
 $ cd org-roam-ui-lite
 $ npm install
+$ npm run populate -- -i /path/to/org-roam-directory -d /path/to/database.db
 $ npm run export -- -d /path/to/database.db -o /path/to/output
 $ python3 -m http.server -d /path/to/output
+```
+
+# CLI
+
+The backend package also exposes a single command surface:
+
+```bash
+$ node packages/backend/src/cli.ts populate -i /path/to/org-roam-directory -d /path/to/database.db
+$ node packages/backend/src/cli.ts serve -d /path/to/database.db -p 5174
+$ node packages/backend/src/cli.ts dump -d /path/to/database.db -o /path/to/output/api
 ```
 
 # Nix

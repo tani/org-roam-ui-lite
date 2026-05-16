@@ -2,10 +2,15 @@
 	"name": "backend",
 	"private": true,
 	"type": "module",
+	"bin": {
+		"org-roam-ui-lite": "./dist/cli.mjs"
+	},
 	"scripts": {
-		"dev": "node src/serve.ts",
+		"dev": "node src/cli.ts serve",
+		"populate": "node src/cli.ts populate",
+		"dump": "node src/cli.ts dump",
 		"build": "tsdown",
-		"example": "tsx ../../examples/org-roam-example.ts"
+		"example": "node src/cli.ts populate -i ../../examples/org -d ../../examples/org-roam-example.db"
 	},
 	"dependencies": {
 		"@hono/node-server": "^2.0.2",

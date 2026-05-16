@@ -1,0 +1,109 @@
+import * as path from "node:path";
+import process from "node:process";
+import { parseArgs } from "node:util";
+import { dump } from "./dump.ts";
+import { populate } from "./populate.ts";
+import { serve } from "./serve.ts";
+
+function usage(exitCode = 0): never {
+	console.log(`Usage: org-roam-ui-lite <command> [options]
+
+Commands:
+  populate   Create a SQLite database from a directory of Org-roam files
+  serve      Serve the backend server and frontend bundle
+  dump       Dump JSON API files for static hosting
+
+Options:
+  -h, --help  Show help
+
+Command options:
+  populate -i DIR -d DB
+  serve    -d DB  -p PORT
+  dump     -d DB  -o OUT
+`);
+	process.exit(exitCode);
+}
+
+function databaseDefault(): string {
+	return process.env.DATABASE ?? `${process.env.HOME}/.emacs.d/org-roam.db`;
+}
+
+function cliPath(value: string): string {
+	if (path.isAbsolute(value)) return value;
+	return path.resolve(process.env.INIT_CWD ?? process.cwd(), value);
+}
+
+const [command, ...commandArgs] = process.argv.slice(2);
+
+if (!command || command === "-h" || command === "--help") {
+	usage(0);
+}
+
+switch (command) {
+	case "populate": {
+		const { values } = parseArgs({
+			args: commandArgs,
+			options: {
+				input: {
+					type: "string",
+					short: "i",
+					default: process.env.ORG_ROAM_DIRECTORY ?? process.cwd(),
+				},
+				database: {
+					type: "string",
+					short: "d",
+					default: process.env.DATABASE ?? `${process.cwd()}/org-roam.db`,
+				},
+				help: { type: "boolean", short: "h" },
+			},
+		});
+		if (values.help) usage(0);
+		await populate(cliPath(values.input), cliPath(values.database));
+		break;
+	}
+	case "serve": {
+		const { values } = parseArgs({
+			args: commandArgs,
+			options: {
+				database: {
+					type: "string",
+					short: "d",
+					default: databaseDefault(),
+				},
+				port: {
+					type: "string",
+					short: "p",
+					default: process.env.PORT ?? "5174",
+				},
+				help: { type: "boolean", short: "h" },
+			},
+		});
+		if (values.help) usage(0);
+		await serve(cliPath(values.database), Number(values.port));
+		break;
+	}
+	case "dump": {
+		const { values } = parseArgs({
+			args: commandArgs,
+			options: {
+				database: {
+					type: "string",
+					short: "d",
+					default: databaseDefault(),
+				},
+				output: {
+					type: "string",
+					short: "o",
+					default: process.env.OUTPUT ?? `${process.cwd()}/out`,
+				},
+				help: { type: "boolean", short: "h" },
+			},
+		});
+		if (values.help) usage(0);
+		await dump(cliPath(values.database), cliPath(values.output));
+		break;
+	}
+	default:
+		console.error(`Unknown command: ${command}`);
+		usage(1);
+}

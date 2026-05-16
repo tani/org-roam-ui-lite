@@ -6,11 +6,11 @@
 		"org-roam-ui-lite": "./dist/cli.mjs"
 	},
 	"scripts": {
-		"dev": "node src/cli.ts serve",
-		"populate": "node src/cli.ts populate",
-		"dump": "node src/cli.ts dump",
 		"build": "tsdown",
-		"example": "node src/cli.ts populate -i ../../examples/org -d ../../examples/org-roam-example.db"
+		"dev": "node src/cli.ts serve",
+		"serve": "node src/cli.ts serve",
+		"populate": "node src/cli.ts populate",
+		"dump": "node src/cli.ts dump"
 	},
 	"dependencies": {
 		"@hono/node-server": "^2.0.2",

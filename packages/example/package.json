@@ -1,0 +1,10 @@
+{
+	"name": "example",
+	"private": true,
+	"type": "module",
+	"scripts": {
+		"populate": "npm --prefix ../.. run populate -- -i \"$PWD/org\" -d \"$PWD/org-roam-example.db\"",
+		"export": "npm run populate && npm --prefix ../.. run export -- -d \"$PWD/org-roam-example.db\" -o \"$PWD/static\"",
+		"serve": "npm run export && serve static --listen tcp://127.0.0.1:3000"
+	}
+}

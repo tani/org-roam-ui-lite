@@ -55,5 +55,5 @@ await cp(join(ROOT_DIR, "frontend", "dist"), OUTPUT_DIR, { recursive: true });
 await chmod(OUTPUT_DIR, 0o777);
 
 console.log("Generating JSON API…");
-const { dump } = await import(join(ROOT_DIR, "backend", "dist", "dump.js"));
+const { dump } = await import(join(ROOT_DIR, "backend", "dist", "dump.mjs"));
 await dump(db, join(OUTPUT_DIR, "api"));

@@ -1,0 +1,15 @@
+#+title: Plant Nutrition
+:PROPERTIES:
+:ID: 112ef7cb-6ad3-4e7b-addf-bdb7ae986995
+:END:
+
+* Plant Nutrition
+
+Plant nutrition describes how plants acquire and use water, minerals, and carbon.
+
+** Related
+- [[id:ea3bb15b-2fc8-4051-ab98-9123b82ecd33][Photosynthesis]], [[id:ed310302-32cb-4d86-8240-064de4553b24][Mycorrhizae]], [[id:32723103-1772-4356-88d5-88e1b2655710][Soil Science]]
+
+** Details
+
+Roots take up nutrients from soil while leaves exchange gases with the atmosphere. Mycorrhizae often expand the effective root system.

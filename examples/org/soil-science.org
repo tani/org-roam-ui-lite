@@ -1,0 +1,15 @@
+#+title: Soil Science
+:PROPERTIES:
+:ID: 32723103-1772-4356-88d5-88e1b2655710
+:END:
+
+* Soil Science
+
+Soil science studies the structure, chemistry, organisms, and water dynamics of soil.
+
+** Related
+- [[id:112ef7cb-6ad3-4e7b-addf-bdb7ae986995][Plant Nutrition]], [[id:ed310302-32cb-4d86-8240-064de4553b24][Mycorrhizae]], [[id:ea3bb15b-2fc8-4051-ab98-9123b82ecd33][Photosynthesis]]
+
+** Details
+
+Soil properties shape nutrient availability and root growth. Soil communities, including fungi, connect mineral cycling with plant productivity.

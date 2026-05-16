@@ -1,0 +1,19 @@
+#+title: Photosynthesis
+:PROPERTIES:
+:ID: ea3bb15b-2fc8-4051-ab98-9123b82ecd33
+:END:
+
+* Photosynthesis
+
+Photosynthesis is the process by which plants convert light energy into chemical energy.
+
+** Related
+- [[id:9120fc20-89d7-4bf8-8774-96c1e051927b][Chlorophyll]], [[id:112ef7cb-6ad3-4e7b-addf-bdb7ae986995][Plant Nutrition]], [[id:735409f2-f99d-404c-8ff7-6c5160ba8ff8][Plant Reproduction]]
+
+** Details
+
+Plants use chlorophyll to capture light, combine carbon dioxide with water, and produce sugars. This note links into the nutrient, pigment, and reproduction parts of the example graph.
+
+** References
+
+See also: ~org-roam-ui-lite~ for visualizing these connections.

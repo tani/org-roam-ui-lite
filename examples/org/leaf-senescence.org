@@ -1,0 +1,15 @@
+#+title: Leaf Senescence
+:PROPERTIES:
+:ID: 38e9da1c-933b-4f95-b17b-06a1cf05cec0
+:END:
+
+* Leaf Senescence
+
+Leaf senescence is the controlled aging process that lets a plant recover nutrients before leaves are shed.
+
+** Related
+- [[id:9120fc20-89d7-4bf8-8774-96c1e051927b][Chlorophyll]], [[id:5ace649c-3f20-45f4-9194-c51d7481f399][Plant Pigments]], [[id:112ef7cb-6ad3-4e7b-addf-bdb7ae986995][Plant Nutrition]]
+
+** Details
+
+As chlorophyll breaks down, other pigments become visible. Nutrient recycling during senescence supports later growth and reproduction.

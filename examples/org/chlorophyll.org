@@ -1,0 +1,15 @@
+#+title: Chlorophyll
+:PROPERTIES:
+:ID: 9120fc20-89d7-4bf8-8774-96c1e051927b
+:END:
+
+* Chlorophyll
+
+Chlorophyll is the green pigment that captures light energy for photosynthesis.
+
+** Related
+- [[id:ea3bb15b-2fc8-4051-ab98-9123b82ecd33][Photosynthesis]], [[id:5ace649c-3f20-45f4-9194-c51d7481f399][Plant Pigments]], [[id:38e9da1c-933b-4f95-b17b-06a1cf05cec0][Leaf Senescence]]
+
+** Details
+
+Chlorophyll molecules absorb light most strongly in blue and red wavelengths. Their behavior connects pigment chemistry with the larger energy cycle of plants.

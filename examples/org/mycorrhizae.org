@@ -1,0 +1,15 @@
+#+title: Mycorrhizae
+:PROPERTIES:
+:ID: ed310302-32cb-4d86-8240-064de4553b24
+:END:
+
+* Mycorrhizae
+
+Mycorrhizae are symbiotic relationships between fungi and plant roots.
+
+** Related
+- [[id:112ef7cb-6ad3-4e7b-addf-bdb7ae986995][Plant Nutrition]], [[id:32723103-1772-4356-88d5-88e1b2655710][Soil Science]], [[id:581edafc-8add-4a7c-9ffe-f7fdeff7a0d5][Plant Defense]]
+
+** Details
+
+The fungal partner increases access to water and nutrients, while the plant supplies carbohydrates. These relationships connect soil ecology with plant health.

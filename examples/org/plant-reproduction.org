@@ -1,0 +1,15 @@
+#+title: Plant Reproduction
+:PROPERTIES:
+:ID: 735409f2-f99d-404c-8ff7-6c5160ba8ff8
+:END:
+
+* Plant Reproduction
+
+Plant reproduction includes flowering, pollination, fertilization, seed formation, and dispersal.
+
+** Related
+- [[id:ea3bb15b-2fc8-4051-ab98-9123b82ecd33][Photosynthesis]], [[id:ed310302-32cb-4d86-8240-064de4553b24][Mycorrhizae]], [[id:581edafc-8add-4a7c-9ffe-f7fdeff7a0d5][Plant Defense]]
+
+** Details
+
+Reproduction requires stored energy and protection from stress. It depends on photosynthetic output and often interacts with soil and defense systems.

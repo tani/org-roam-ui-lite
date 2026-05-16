@@ -1,0 +1,15 @@
+#+title: Plant Pigments
+:PROPERTIES:
+:ID: 5ace649c-3f20-45f4-9194-c51d7481f399
+:END:
+
+* Plant Pigments
+
+Plant pigments absorb light and contribute to color, signaling, and protection.
+
+** Related
+- [[id:9120fc20-89d7-4bf8-8774-96c1e051927b][Chlorophyll]], [[id:38e9da1c-933b-4f95-b17b-06a1cf05cec0][Leaf Senescence]], [[id:581edafc-8add-4a7c-9ffe-f7fdeff7a0d5][Plant Defense]]
+
+** Details
+
+Chlorophyll, carotenoids, and anthocyanins each absorb different wavelengths. Pigment changes make senescence visible and can protect tissues from stress.

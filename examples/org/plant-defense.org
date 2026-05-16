@@ -1,0 +1,15 @@
+#+title: Plant Defense
+:PROPERTIES:
+:ID: 581edafc-8add-4a7c-9ffe-f7fdeff7a0d5
+:END:
+
+* Plant Defense
+
+Plant defense covers the physical and chemical strategies plants use against stress and herbivores.
+
+** Related
+- [[id:735409f2-f99d-404c-8ff7-6c5160ba8ff8][Plant Reproduction]], [[id:ed310302-32cb-4d86-8240-064de4553b24][Mycorrhizae]], [[id:5ace649c-3f20-45f4-9194-c51d7481f399][Plant Pigments]]
+
+** Details
+
+Defenses include barriers, bitter compounds, signaling chemicals, and relationships with other organisms. Pigments and root symbioses can both participate in protection.

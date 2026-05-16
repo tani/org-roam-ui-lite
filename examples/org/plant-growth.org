@@ -1,0 +1,15 @@
+#+title: Plant Growth
+:PROPERTIES:
+:ID: 77629f09-859e-4515-ad19-45c366f3674b
+:END:
+
+* Plant Growth
+
+Plant growth integrates energy capture, nutrient uptake, and developmental timing.
+
+** Related
+- [[id:ea3bb15b-2fc8-4051-ab98-9123b82ecd33][Photosynthesis]], [[id:735409f2-f99d-404c-8ff7-6c5160ba8ff8][Plant Reproduction]], [[id:77629f09-859e-4515-ad19-45c366f3674b][Plant Growth]], [[id:32723103-1772-4356-88d5-88e1b2655710][Soil Science]]
+
+** Details
+
+Growth depends on available carbon, minerals, water, and environmental signals. This note intentionally includes a self-link to show how cyclic edges render.

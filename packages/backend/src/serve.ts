@@ -1,9 +1,9 @@
+import { readFile } from "node:fs/promises";
 import * as path from "node:path";
 import process from "node:process";
 import * as url from "node:url";
 import { parseArgs } from "node:util";
 import * as nodeServer from "@hono/node-server";
-import { serveStatic } from "@hono/node-server/serve-static";
 import { Hono } from "hono";
 import { lookup } from "mime-types";
 import { fetchGraph, fetchNode, fetchResource } from "./query.ts";
@@ -15,20 +15,23 @@ import { fetchGraph, fetchNode, fetchResource } from "./query.ts";
  * @param port - TCP port to listen on
  */
 export async function serve(databasePath: string, port: number): Promise<void> {
-	const frontendDistPath = path.relative(
-		process.cwd(),
-		path.join(import.meta.dirname ?? "", "../../frontend/dist"),
+	const frontendDistPath = path.join(
+		import.meta.dirname ?? "",
+		"../../frontend/dist",
 	);
+	const indexHtmlPath = path.join(frontendDistPath, "index.html");
+	const indexHtml = await readFile(indexHtmlPath, "utf-8");
 
 	const app = new Hono();
 
-	/* Static files (frontend) */
-	app.use(
-		"/*",
-		serveStatic({
-			root: frontendDistPath,
-		}),
-	);
+	/* Serve single-file HTML */
+	app.get("/", (context) => {
+		return context.html(indexHtml);
+	});
+
+	app.get("/index.html", (context) => {
+		return context.html(indexHtml);
+	});
 
 	/* Node and edge list */
 	app.get("/api/graph.json", async (context) => {

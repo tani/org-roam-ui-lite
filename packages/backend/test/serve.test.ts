@@ -59,17 +59,23 @@ beforeEach(() => {
 describe("serve", () => {
 	it("registers routes and handles requests", async () => {
 		await serve("db", 123);
-		expect(mocks.use).toHaveBeenCalled();
-		expect(mocks.get).toHaveBeenCalledTimes(3);
+		expect(mocks.get).toHaveBeenCalledTimes(5);
 		expect(mocks.serveImpl).toHaveBeenCalledWith({ fetch: "fetch", port: 123 });
 
-		const graphHandler = mocks.get.mock.calls[0]?.[1];
+		// Test HTML endpoints (/, /index.html)
+		const htmlHandler = mocks.get.mock.calls[0]?.[1];
+		const htmlCtx = { html: vi.fn() };
+		await htmlHandler(htmlCtx as never);
+		expect(htmlCtx.html).toHaveBeenCalled();
+
+		// Test graph endpoint
+		const graphHandler = mocks.get.mock.calls[2]?.[1];
 		const graphCtx = { json: vi.fn(), req: { param: vi.fn() } };
 		await graphHandler(graphCtx as never);
 		expect(mocks.fetchGraph).toHaveBeenCalledWith("db");
 		expect(graphCtx.json).toHaveBeenCalledWith({}, 200);
 
-		const nodeHandler = mocks.get.mock.calls[1]?.[1];
+		const nodeHandler = mocks.get.mock.calls[3]?.[1];
 		const nodeCtx = {
 			json: vi.fn(),
 			req: { param: vi.fn(() => "id.json") },
@@ -77,7 +83,7 @@ describe("serve", () => {
 		await nodeHandler(nodeCtx as never);
 		expect(mocks.fetchNode).toHaveBeenCalledWith("db", "id");
 
-		const resHandler = mocks.get.mock.calls[2]?.[1];
+		const resHandler = mocks.get.mock.calls[4]?.[1];
 		const resCtxOk = {
 			req: { param: vi.fn((n) => (n === "id" ? "1" : "pic.png")) },
 			json: vi.fn(),

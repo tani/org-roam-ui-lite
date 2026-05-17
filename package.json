@@ -6,7 +6,12 @@
 		"org-roam-ui-lite": "./dist/backend/dist/cli.mjs"
 	},
 	"workspaces": [
-		"packages/*"
+		"packages/backend",
+		"packages/rehype-mathjax",
+		"packages/rehype-mermaid",
+		"packages/frontend",
+		"packages/emacs",
+		"packages/example"
 	],
 	"devDependencies": {
 		"@biomejs/biome": "^2.4.15",

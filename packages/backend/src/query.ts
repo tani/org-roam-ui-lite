@@ -163,6 +163,23 @@ export async function fetchResource(
 	const decodedBasename = Buffer.from(name, "base64").toString("utf8");
 	const filePath = `${decodedBasename}${ext}`;
 	const resolvedPath = path.resolve(basePath, filePath);
+	const resourceRoot = path.resolve(basePath);
+	if (
+		resolvedPath !== resourceRoot &&
+		!resolvedPath.startsWith(`${resourceRoot}${path.sep}`)
+	) {
+		return [
+			404,
+			{
+				headers: {},
+				content: {
+					"application/json": {
+						error: "not_found",
+					},
+				},
+			},
+		];
+	}
 
 	const buffer = await fs.readFile(resolvedPath);
 

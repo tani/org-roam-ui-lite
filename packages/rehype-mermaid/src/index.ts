@@ -1,0 +1,157 @@
+/*
+ * This code is borrow from https://github.com/mosugi/notro/tree/main/packages/rehype-beautiful-mermaid
+ * The license of the original code is MIT.
+ */
+
+import type { DiagramColors } from "beautiful-mermaid";
+
+import { renderMermaidSVG, THEMES } from "beautiful-mermaid";
+import type { Element, ElementContent, Parents, Root } from "hast";
+import { fromHtml } from "hast-util-from-html";
+import { toString as hastToString } from "hast-util-to-string";
+import { visit } from "unist-util-visit";
+
+// ---------------------------------------------------------------------------
+// Types
+// ---------------------------------------------------------------------------
+
+/**
+ * Rehype plugin options.
+ *
+ * @property theme - Key of a built-in beautiful-mermaid theme (e.g. `"default"`,
+ * `"github-dark"`).  When omitted the plugin falls back to the library's
+ * defaults.
+ *
+ * @property className - CSS class name applied to the wrapper `<div>` that
+ * contains the rendered SVG.  When omitted a `data-mermaid=""` attribute is
+ * used instead.
+ *
+ * @public
+ */
+export interface RehypeMermaidOptions {
+	theme?: string;
+	className?: string;
+}
+
+// ---------------------------------------------------------------------------
+// Plugin
+// ---------------------------------------------------------------------------
+
+/**
+ * Rehype plugin that renders Mermaid diagrams inside `<pre><code
+ * class="language-mermaid">` blocks to inline SVG at build time.
+ *
+ * @example
+ * // Default theme
+ * const processor = unified().use(rehypeMermaid);
+ *
+ * @example
+ * // GitHub Dark theme
+ * const processor = unified().use(rehypeMermaid, { theme: "github-dark" });
+ *
+ * @param options
+ * @returns A unified transformer.
+ * @public
+ */
+export function rehypeMermaid(
+	options: RehypeMermaidOptions = {},
+): (tree: Root) => void {
+	return (tree: Root): void => {
+		const { theme: themeName, className } = options;
+
+		let theme: DiagramColors | undefined;
+		if (themeName) {
+			const themeColors = THEMES[themeName];
+			if (themeColors) {
+				theme = themeColors;
+			}
+		}
+
+		interface MermaidNode {
+			node: Element;
+			index: number;
+			parent: Parents;
+		}
+
+		const nodes: MermaidNode[] = [];
+
+		visit(
+			tree,
+			"element",
+			(
+				node: Element,
+				index: number | undefined,
+				parent: Parents | undefined,
+			) => {
+				if (index === undefined || !parent) return;
+				if (node.tagName !== "pre") return;
+
+				const firstChild = node.children[0];
+				if (
+					!firstChild ||
+					firstChild.type !== "element" ||
+					firstChild.tagName !== "code"
+				) {
+					return;
+				}
+
+				const cls = firstChild.properties?.className;
+				if (!Array.isArray(cls) || !cls.includes("language-mermaid")) {
+					return;
+				}
+
+				nodes.push({ node, index, parent });
+			},
+		);
+
+		if (nodes.length === 0) return;
+
+		for (const { node, index, parent } of nodes.reverse()) {
+			const firstChild = node.children[0] as ElementContent | undefined;
+			const code =
+				firstChild?.type === "element" ? hastToString(firstChild).trim() : "";
+
+			const svgString = theme
+				? renderMermaidSVG(code, theme)
+				: renderMermaidSVG(code);
+
+			const svgResult = fromHtml(svgString, { fragment: true });
+
+			let svgChildren: ElementContent[];
+			if (Array.isArray(svgResult)) {
+				svgChildren = svgResult;
+			} else if (
+				"children" in svgResult &&
+				Array.isArray((svgResult as Root).children)
+			) {
+				svgChildren = (svgResult as Root).children as ElementContent[];
+			} else {
+				svgChildren = [];
+			}
+
+			const divNode: Element = {
+				type: "element",
+				tagName: "div",
+				properties: className
+					? { className: [className] }
+					: { "data-mermaid": "" },
+				children: svgChildren,
+			};
+
+			parent.children.splice(index, 1, divNode);
+		}
+	};
+}
+
+// ---------------------------------------------------------------------------
+// Re-export types so consumers get typings without importing beautiful-mermaid
+// directly.
+// ---------------------------------------------------------------------------
+
+export type { DiagramColors };
+
+// ---------------------------------------------------------------------------
+// Default export
+// ---------------------------------------------------------------------------
+
+export default rehypeMermaid;

@@ -1,0 +1,37 @@
+{
+	"name": "rehype-mermaid",
+	"type": "module",
+	"version": "0.1.0",
+	"main": "./dist/index.mjs",
+	"types": "./dist/index.d.mts",
+	"exports": {
+		"import": "./dist/index.mjs",
+		"types": "./dist/index.d.mts"
+	},
+	"scripts": {
+		"build": "tsdown"
+	},
+	"dependencies": {
+		"beautiful-mermaid": "^1.1.3",
+		"hast-util-from-html": "^2.0.3",
+		"hast-util-to-string": "^3.0.0",
+		"unist-util-visit": "^5.1.0"
+	},
+	"peerDependencies": {
+		"unified": ">=11"
+	},
+	"peerDependenciesMeta": {
+		"unified": {
+			"optional": false
+		}
+	},
+	"devDependencies": {
+		"@types/hast": "^3.0.4",
+		"rehype-parse": "^9.0.1",
+		"rehype-stringify": "^10.0.1",
+		"tsdown": "^0.22.0",
+		"typescript": "^5.9.3",
+		"unified": "^11.0.5",
+		"vitest": "^4.1.5"
+	}
+}

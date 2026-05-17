@@ -1,3 +1,4 @@
+import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, test } from "vitest";
 import { createOrgHtmlProcessor } from "../../src/utils/processor.ts";
 
@@ -55,6 +56,22 @@ print("hello")
 
 		const result = await processor(orgContent);
 		expect(result).toBeDefined();
+	});
+
+	test("emits rehype-highlight classes for code blocks", async () => {
+		const processor = createOrgHtmlProcessor("light", "test-node");
+		const result = await processor(
+			`
+#+begin_src javascript
+const answer = 42;
+#+end_src
+		`.trim(),
+		);
+
+		const html = renderToStaticMarkup(result);
+		expect(html).toContain("hljs");
+		expect(html).toContain("language-javascript");
+		expect(html).toContain("hljs-keyword");
 	});
 
 	test("handles math content", async () => {

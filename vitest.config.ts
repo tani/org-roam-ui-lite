@@ -15,9 +15,10 @@ export default defineConfig({
 			enabled: true,
 			reporter: ["text", "json", "html"],
 			include: ["packages/*/src/**"],
+			exclude: ["**/*~"],
 		},
 
-		// define two inline projects
+		// define inline projects
 		projects: [
 			{
 				// inherit root settings
@@ -35,6 +36,22 @@ export default defineConfig({
 					name: "backend",
 					include: ["packages/backend/test/**/*.test.ts"],
 					environment: "node", // backend uses node
+				},
+			},
+			{
+				extends: true,
+				test: {
+					name: "rehype-mermaid",
+					include: ["packages/rehype-mermaid/test/**/*.test.ts"],
+					environment: "node",
+				},
+			},
+			{
+				extends: true,
+				test: {
+					name: "rehype-mathjax",
+					include: ["packages/rehype-mathjax/test/**/*.test.ts"],
+					environment: "node",
 				},
 			},
 		],

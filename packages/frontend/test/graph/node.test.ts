@@ -1,8 +1,16 @@
 import { beforeEach, describe, expect, test, vi } from "vitest";
 import type { components } from "../../src/api/api.d.ts";
 
+// Use vi.hoisted to define mocks
+const { mockGET, processorMocks } = vi.hoisted(() => ({
+	mockGET: vi.fn(),
+	processorMocks: {
+		createOrgHtmlProcessor: vi.fn(),
+		process: vi.fn(),
+	},
+}));
+
 // Mock the API client
-const mockGET = vi.fn();
 vi.mock("openapi-fetch", () => ({
 	default: vi.fn(() => ({
 		GET: mockGET,
@@ -10,21 +18,21 @@ vi.mock("openapi-fetch", () => ({
 }));
 
 // Mock the processor
-const mockCreateOrgHtmlProcessor = vi.fn();
-const mockProcess = vi.fn();
 vi.mock("../../src/utils/processor.ts", () => ({
-	createOrgHtmlProcessor: mockCreateOrgHtmlProcessor,
+	createOrgHtmlProcessor: processorMocks.createOrgHtmlProcessor,
 }));
+
+import { openNode } from "../../src/graph/node.ts";
 
 describe("openNode", () => {
 	beforeEach(() => {
 		vi.clearAllMocks();
-		mockCreateOrgHtmlProcessor.mockReturnValue(mockProcess);
+		processorMocks.createOrgHtmlProcessor.mockReturnValue(
+			processorMocks.process,
+		);
 	});
 
 	test("fetches node data and processes content successfully", async () => {
-		const { openNode } = await import("../../src/graph/node.ts");
-
 		const mockNodeData: components["schemas"]["Node"] = {
 			id: "test-node",
 			title: "Test Node",
@@ -37,18 +45,20 @@ describe("openNode", () => {
 			data: mockNodeData,
 			error: undefined,
 		});
-		mockProcess.mockResolvedValue(mockProcessedBody);
+		processorMocks.process.mockResolvedValue(mockProcessedBody);
 
 		const result = await openNode("dark", "test-node");
 
 		expect(mockGET).toHaveBeenCalledWith("/api/node/{id}.json", {
 			params: { path: { id: "test-node" } },
 		});
-		expect(mockCreateOrgHtmlProcessor).toHaveBeenCalledWith(
+		expect(processorMocks.createOrgHtmlProcessor).toHaveBeenCalledWith(
 			"dark",
 			"test-node",
 		);
-		expect(mockProcess).toHaveBeenCalledWith("* Test heading\nSome content");
+		expect(processorMocks.process).toHaveBeenCalledWith(
+			"* Test heading\nSome content",
+		);
 		expect(result).toEqual({
 			...mockNodeData,
 			body: mockProcessedBody,
@@ -56,8 +66,6 @@ describe("openNode", () => {
 	});
 
 	test("throws error when API returns error", async () => {
-		const { openNode } = await import("../../src/graph/node.ts");
-
 		const apiError = { message: "Node not found", status: 404 };
 		mockGET.mockResolvedValue({
 			data: undefined,
@@ -67,13 +75,11 @@ describe("openNode", () => {
 		await expect(openNode("light", "nonexistent-node")).rejects.toEqual(
 			apiError,
 		);
-		expect(mockCreateOrgHtmlProcessor).not.toHaveBeenCalled();
-		expect(mockProcess).not.toHaveBeenCalled();
+		expect(processorMocks.createOrgHtmlProcessor).not.toHaveBeenCalled();
+		expect(processorMocks.process).not.toHaveBeenCalled();
 	});
 
 	test("passes correct theme to processor", async () => {
-		const { openNode } = await import("../../src/graph/node.ts");
-
 		const mockNodeData: components["schemas"]["Node"] = {
 			id: "theme-test",
 			title: "Theme Test",
@@ -84,19 +90,17 @@ describe("openNode", () => {
 			data: mockNodeData,
 			error: undefined,
 		});
-		mockProcess.mockResolvedValue("Content");
+		processorMocks.process.mockResolvedValue("Content");
 
 		await openNode("light", "theme-test");
 
-		expect(mockCreateOrgHtmlProcessor).toHaveBeenCalledWith(
+		expect(processorMocks.createOrgHtmlProcessor).toHaveBeenCalledWith(
 			"light",
 			"theme-test",
 		);
 	});
 
 	test("handles different themes correctly", async () => {
-		const { openNode } = await import("../../src/graph/node.ts");
-
 		const mockNodeData: components["schemas"]["Node"] = {
 			id: "multi-theme",
 			title: "Multi Theme",
@@ -107,26 +111,24 @@ describe("openNode", () => {
 			data: mockNodeData,
 			error: undefined,
 		});
-		mockProcess.mockResolvedValue("Processed");
+		processorMocks.process.mockResolvedValue("Processed");
 
 		// Test dark theme
 		await openNode("dark", "multi-theme");
-		expect(mockCreateOrgHtmlProcessor).toHaveBeenLastCalledWith(
+		expect(processorMocks.createOrgHtmlProcessor).toHaveBeenLastCalledWith(
 			"dark",
 			"multi-theme",
 		);
 
 		// Test light theme
 		await openNode("light", "multi-theme");
-		expect(mockCreateOrgHtmlProcessor).toHaveBeenLastCalledWith(
+		expect(processorMocks.createOrgHtmlProcessor).toHaveBeenLastCalledWith(
 			"light",
 			"multi-theme",
 		);
 	});
 
 	test("preserves all node properties and adds body", async () => {
-		const { openNode } = await import("../../src/graph/node.ts");
-
 		const mockNodeData: components["schemas"]["Node"] = {
 			id: "comprehensive-node",
 			title: "Comprehensive Node",
@@ -139,7 +141,7 @@ describe("openNode", () => {
 			data: mockNodeData,
 			error: undefined,
 		});
-		mockProcess.mockResolvedValue(mockProcessedBody);
+		processorMocks.process.mockResolvedValue(mockProcessedBody);
 
 		const result = await openNode("dark", "comprehensive-node");
 
@@ -152,8 +154,7 @@ describe("openNode", () => {
 	});
 
 	test("module structure is correct", async () => {
-		const nodeModule = await import("../../src/graph/node.ts");
-		expect(nodeModule).toHaveProperty("openNode");
-		expect(typeof nodeModule.openNode).toBe("function");
+		expect(openNode).toBeDefined();
+		expect(typeof openNode).toBe("function");
 	});
 });

@@ -142,3 +142,4 @@ dist
 # Generated example outputs
 packages/example/*.db
 packages/example/static/
+/.agent-shell/

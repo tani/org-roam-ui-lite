@@ -2,6 +2,7 @@ import { useId } from "react";
 import type { Layout, Renderer, Theme } from "../graph/graph-types.ts";
 import { Button } from "./ui/Button.tsx";
 import { FormGroup } from "./ui/FormGroup.tsx";
+import { Icon } from "./ui/Icon.tsx";
 import { RangeSlider } from "./ui/RangeSlider.tsx";
 import { Select } from "./ui/Select.tsx";
 import { Switch } from "./ui/Switch.tsx";
@@ -63,7 +64,7 @@ export function SettingsPanel({
 		>
 			<div className="offcanvas-header">
 				<h4 id={labelId} className="offcanvas-title">
-					<i className="bi bi-gear-fill"></i> Settings
+					<Icon name="gear-fill" /> Settings
 				</h4>
 				<Button variant="close" aria-label="Close" onClick={onClose} />
 			</div>

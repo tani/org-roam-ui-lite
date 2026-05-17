@@ -7,8 +7,17 @@ function createMockGraphInstance(overrides: Record<string, unknown> = {}) {
 	};
 }
 
+// Use vi.hoisted to define mocks that will be used in vi.mock
+const { rendererMocks, mockGET } = vi.hoisted(() => ({
+	rendererMocks: {
+		cytoscape: vi.fn().mockResolvedValue({ type: "cytoscape" }),
+		forceGraph: vi.fn().mockResolvedValue({ type: "force-graph" }),
+		forceGraph3d: vi.fn().mockResolvedValue({ type: "3d-force-graph" }),
+	},
+	mockGET: vi.fn(),
+}));
+
 // Mock openapi-fetch
-const mockGET = vi.fn();
 vi.mock("openapi-fetch", () => ({
 	default: vi.fn(() => ({
 		GET: mockGET,
@@ -21,33 +30,23 @@ vi.mock("../../src/utils/style.ts", () => ({
 	pickColor: vi.fn((id: string) => `#color-${id}`),
 }));
 
-// Mock renderers
-const mockCytoscapeRenderer = vi.fn().mockResolvedValue({ type: "cytoscape" });
-const mockForceGraphRenderer = vi
-	.fn()
-	.mockResolvedValue({ type: "force-graph" });
-const mock3DForceGraphRenderer = vi
-	.fn()
-	.mockResolvedValue({ type: "3d-force-graph" });
-
 vi.mock("../../src/graph/renderers/cytoscape.ts", () => ({
-	default: mockCytoscapeRenderer,
+	default: rendererMocks.cytoscape,
 }));
 
 vi.mock("../../src/graph/renderers/force-graph.ts", () => ({
-	default: mockForceGraphRenderer,
+	default: rendererMocks.forceGraph,
 }));
 
 vi.mock("../../src/graph/renderers/force-graph-3d.ts", () => ({
-	default: mock3DForceGraphRenderer,
+	default: rendererMocks.forceGraph3d,
 }));
 
-describe("Graph Module", () => {
-	let graphModule: typeof import("../../src/graph/graph.ts");
+import * as graphModule from "../../src/graph/graph.ts";
 
-	beforeEach(async () => {
+describe("Graph Module", () => {
+	beforeEach(() => {
 		vi.clearAllMocks();
-		graphModule = await import("../../src/graph/graph.ts");
 	});
 
 	describe("fetchGraphData", () => {
@@ -79,7 +78,7 @@ describe("Graph Module", () => {
 			);
 
 			expect(mockGET).toHaveBeenCalledWith("/api/graph.json");
-			expect(mockCytoscapeRenderer).toHaveBeenCalledWith(
+			expect(rendererMocks.cytoscape).toHaveBeenCalledWith(
 				expect.arrayContaining([
 					expect.objectContaining({
 						id: "node1",
@@ -146,7 +145,7 @@ describe("Graph Module", () => {
 				false,
 			);
 
-			expect(mockCytoscapeRenderer).toHaveBeenCalled();
+			expect(rendererMocks.cytoscape).toHaveBeenCalled();
 			expect(result).toEqual({ type: "cytoscape" });
 		});
 
@@ -164,7 +163,7 @@ describe("Graph Module", () => {
 				true,
 			);
 
-			expect(mockForceGraphRenderer).toHaveBeenCalled();
+			expect(rendererMocks.forceGraph).toHaveBeenCalled();
 			expect(result).toEqual({ type: "force-graph" });
 		});
 
@@ -182,7 +181,7 @@ describe("Graph Module", () => {
 				true,
 			);
 
-			expect(mock3DForceGraphRenderer).toHaveBeenCalled();
+			expect(rendererMocks.forceGraph3d).toHaveBeenCalled();
 			expect(result).toEqual({ type: "3d-force-graph" });
 		});
 
@@ -203,7 +202,7 @@ describe("Graph Module", () => {
 				true,
 			);
 
-			expect(mockCytoscapeRenderer).toHaveBeenCalledWith(
+			expect(rendererMocks.cytoscape).toHaveBeenCalledWith(
 				expect.any(Array),
 				expect.any(Array),
 				"cose",

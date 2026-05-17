@@ -35,14 +35,14 @@ vi.mock("../../src/utils/style.ts", () => ({
 	),
 }));
 
+import * as graphStyleModule from "../../src/graph/graph-style.ts";
+import * as styleUtils from "../../src/utils/style.ts";
+
 describe("Graph Style Module", () => {
-	let graphStyleModule: typeof import("../../src/graph/graph-style.ts");
 	let alphaColorMock: ReturnType<typeof vi.fn>;
 
-	beforeEach(async () => {
+	beforeEach(() => {
 		vi.clearAllMocks();
-		graphStyleModule = await import("../../src/graph/graph-style.ts");
-		const styleUtils = await import("../../src/utils/style.ts");
 		alphaColorMock = styleUtils.alphaColor as ReturnType<typeof vi.fn>;
 	});
 

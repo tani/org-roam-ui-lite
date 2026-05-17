@@ -1,7 +1,10 @@
 import { act, renderHook } from "@testing-library/react";
 import type { ReactNode } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import * as graphModule from "../../src/graph/graph.ts";
+import * as styleModule from "../../src/graph/graph-style.ts";
 import type { Theme } from "../../src/graph/graph-types.ts";
+import * as nodeModule from "../../src/graph/node.ts";
 import { useGraphManager } from "../../src/hooks/useGraphManager.ts";
 import { UiProvider } from "../../src/store/provider.tsx";
 
@@ -44,14 +47,10 @@ describe("useGraphManager Hook", () => {
 		showLabels: true,
 	};
 
-	beforeEach(async () => {
+	beforeEach(() => {
 		vi.clearAllMocks();
 
 		// Get the mocked functions
-		const graphModule = await import("../../src/graph/graph.ts");
-		const styleModule = await import("../../src/graph/graph-style.ts");
-		const nodeModule = await import("../../src/graph/node.ts");
-
 		mockDrawGraph = graphModule.drawGraph as ReturnType<typeof vi.fn>;
 		mockHighlightNeighborhood = styleModule.highlightNeighborhood as ReturnType<
 			typeof vi.fn
@@ -143,8 +142,7 @@ describe("useGraphManager Hook", () => {
 			await result.current.setNodeSize(15);
 		});
 
-		const { applyNodeStyle } = await import("../../src/graph/graph-style.ts");
-		expect(applyNodeStyle).toHaveBeenCalledWith(mockGraphInstance, {
+		expect(styleModule.applyNodeStyle).toHaveBeenCalledWith(mockGraphInstance, {
 			width: 15,
 			height: 15,
 		});

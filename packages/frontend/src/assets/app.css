@@ -1,8 +1,6 @@
 @import url("./themes.css");
 @import url("./code.css");
 @import url("bootstrap/dist/css/bootstrap.min.css");
-@import url("bootstrap-icons/font/bootstrap-icons.css");
-/* Removed webfonts */
 
 :root {
 	--bs-font-monospace:

@@ -1,4 +1,5 @@
 import { Button } from "./ui/Button.tsx";
+import { Icon } from "./ui/Icon.tsx";
 
 interface GraphControlsProps {
 	onToggleSettings: () => void;
@@ -17,7 +18,7 @@ export function GraphControls({
 				style={{ top: "1rem", left: "1rem", zIndex: 1 }}
 				onClick={onToggleSettings}
 			>
-				<i className="bi bi-gear"></i>
+				<Icon name="gear" />
 			</Button>
 
 			<Button
@@ -26,7 +27,7 @@ export function GraphControls({
 				style={{ top: "1rem", right: "1rem", zIndex: 1 }}
 				onClick={onToggleDetails}
 			>
-				<i className="bi bi-chevron-left"></i>
+				<Icon name="chevron-left" />
 			</Button>
 		</>
 	);

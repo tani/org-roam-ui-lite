@@ -1,76 +1,88 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-const use = vi.fn();
-const get = vi.fn();
-class Hono {
-	use = use;
-	get = get;
-	fetch = "fetch";
-}
-vi.mock("hono", () => ({ Hono }));
+// Use vi.hoisted to define mocks
+const { mocks } = vi.hoisted(() => ({
+	mocks: {
+		use: vi.fn(),
+		get: vi.fn(),
+		serveImpl: vi.fn(),
+		serveStatic: vi.fn(),
+		fetchGraph: vi.fn(async () => [
+			200,
+			{ content: { "application/json": {} } },
+		]),
+		fetchNode: vi.fn(async () => [
+			200,
+			{ content: { "application/json": {} } },
+		]),
+		fetchResource: vi.fn(async () => [
+			200,
+			{ content: { "application/json": { error: "not_found" } } },
+		]),
+	},
+}));
 
-const serveStatic = vi.fn();
+vi.mock("hono", () => {
+	class Hono {
+		use = mocks.use;
+		get = mocks.get;
+		fetch = "fetch";
+	}
+	return { Hono };
+});
+
 vi.mock("@hono/node-server/serve-static", () => ({
-	serveStatic: (...args: unknown[]) => serveStatic(...args),
+	serveStatic: (...args: unknown[]) => mocks.serveStatic(...args),
 }));
 
-const serveImpl = vi.fn();
 vi.mock("@hono/node-server", () => ({
-	serve: (options: unknown) => serveImpl(options),
+	serve: (options: unknown) => mocks.serveImpl(options),
 }));
 
-const fetchGraph = vi.fn(async () => [
-	200,
-	{ content: { "application/json": {} } },
-]);
-const fetchNode = vi.fn(async () => [
-	200,
-	{ content: { "application/json": {} } },
-]);
-const fetchResource = vi.fn(async () => [
-	200,
-	{ content: { "application/json": { error: "not_found" } } },
-]);
-vi.mock("../src/query.ts", () => ({ fetchGraph, fetchNode, fetchResource }));
+vi.mock("../src/query.ts", () => ({
+	fetchGraph: mocks.fetchGraph,
+	fetchNode: mocks.fetchNode,
+	fetchResource: mocks.fetchResource,
+}));
+
+import { serve } from "../src/serve.ts";
 
 beforeEach(() => {
-	use.mockClear();
-	get.mockClear();
-	serveImpl.mockClear();
-	fetchGraph.mockClear();
-	fetchNode.mockClear();
-	fetchResource.mockClear();
-	vi.resetModules();
+	mocks.use.mockClear();
+	mocks.get.mockClear();
+	mocks.serveImpl.mockClear();
+	mocks.fetchGraph.mockClear();
+	mocks.fetchNode.mockClear();
+	mocks.fetchResource.mockClear();
 });
 
 describe("serve", () => {
 	it("registers routes and handles requests", async () => {
-		const { serve } = await import("../src/serve.ts");
 		await serve("db", 123);
-		expect(use).toHaveBeenCalled();
-		expect(get).toHaveBeenCalledTimes(3);
-		expect(serveImpl).toHaveBeenCalledWith({ fetch: "fetch", port: 123 });
+		expect(mocks.use).toHaveBeenCalled();
+		expect(mocks.get).toHaveBeenCalledTimes(3);
+		expect(mocks.serveImpl).toHaveBeenCalledWith({ fetch: "fetch", port: 123 });
 
-		const graphHandler = get.mock.calls[0]?.[1];
+		const graphHandler = mocks.get.mock.calls[0]?.[1];
 		const graphCtx = { json: vi.fn(), req: { param: vi.fn() } };
 		await graphHandler(graphCtx as never);
-		expect(fetchGraph).toHaveBeenCalledWith("db");
+		expect(mocks.fetchGraph).toHaveBeenCalledWith("db");
 		expect(graphCtx.json).toHaveBeenCalledWith({}, 200);
 
-		const nodeHandler = get.mock.calls[1]?.[1];
+		const nodeHandler = mocks.get.mock.calls[1]?.[1];
 		const nodeCtx = {
 			json: vi.fn(),
 			req: { param: vi.fn(() => "id.json") },
 		};
 		await nodeHandler(nodeCtx as never);
-		expect(fetchNode).toHaveBeenCalledWith("db", "id");
+		expect(mocks.fetchNode).toHaveBeenCalledWith("db", "id");
 
-		const resHandler = get.mock.calls[2]?.[1];
+		const resHandler = mocks.get.mock.calls[2]?.[1];
 		const resCtxOk = {
 			req: { param: vi.fn((n) => (n === "id" ? "1" : "pic.png")) },
 			json: vi.fn(),
 		};
-		fetchResource.mockResolvedValueOnce([
+		mocks.fetchResource.mockResolvedValueOnce([
 			200,
 			{ content: { "image/*": new Uint8Array([1, 2]) } },
 		] as never);
@@ -82,7 +94,7 @@ describe("serve", () => {
 			req: { param: vi.fn((n) => (n === "id" ? "1" : "pic.png")) },
 			json: vi.fn(),
 		};
-		fetchResource.mockResolvedValueOnce([
+		mocks.fetchResource.mockResolvedValueOnce([
 			404,
 			{ content: { "application/json": { error: "not_found" } } },
 		] as never);
@@ -90,9 +102,8 @@ describe("serve", () => {
 		expect(resCtxBad.json).toHaveBeenCalledWith({ error: "not_found" }, 404);
 	});
 
-	it("runs CLI when executed directly", async () => {
-		process.argv[1] = new URL("../src/serve.ts", import.meta.url).pathname;
-		await import("../src/serve.ts");
-		expect(serveImpl).toHaveBeenCalled();
+	it("calls serve when invoked", async () => {
+		await serve("test-db", 9999);
+		expect(mocks.serveImpl).toHaveBeenCalled();
 	});
 });

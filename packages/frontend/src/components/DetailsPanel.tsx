@@ -7,6 +7,7 @@ import { MathJaxTheater } from "./MathJaxTheater.tsx";
 import { PreviewPopover } from "./PreviewPopover.tsx";
 import { Button } from "./ui/Button.tsx";
 import { For } from "./ui/For.tsx";
+import { Icon } from "./ui/Icon.tsx";
 import { When } from "./ui/When.tsx";
 
 function getIdLinkNodeId(anchor: HTMLAnchorElement): string | null {
@@ -129,7 +130,7 @@ export function DetailsPanel({
 			>
 				<div className="offcanvas-header">
 					<h4 id={labelId} className="offcanvas-title">
-						<i className="bi bi-file-earmark-text"></i>
+						<Icon name="file-earmark-text" />
 						<span>{selected?.title ?? "Click a node to view details"}</span>
 					</h4>
 					<Button variant="close" aria-label="Close" onClick={handleClose} />
@@ -151,7 +152,8 @@ export function DetailsPanel({
 					>
 						<div className="mt-3">
 							<h5>
-								<i className="bi bi-link-45deg"></i>Backlinks
+								<Icon name="link-45deg" />
+								Backlinks
 							</h5>
 							<ul className="list-unstyled">
 								<For list={selected?.backlinks || []}>
@@ -162,7 +164,7 @@ export function DetailsPanel({
 												className="btn btn-sm btn-link p-0"
 												onClick={() => onOpenNode(b.source)}
 											>
-												<i className="bi bi-chevron-right"></i>
+												<Icon name="chevron-right" />
 												<span>{b.title}</span>
 											</button>
 										</li>

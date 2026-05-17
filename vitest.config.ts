@@ -1,11 +1,22 @@
 // vitest.config.ts
 
+import { fileURLToPath } from "node:url";
 import { defineConfig } from "vitest/config";
 
 /**
  * Configure Vitest with project settings.
  */
 export default defineConfig({
+	resolve: {
+		alias: {
+			"rehype-mathjax": fileURLToPath(
+				new URL("./packages/rehype-mathjax/src/browser.ts", import.meta.url),
+			),
+			"rehype-mermaid": fileURLToPath(
+				new URL("./packages/rehype-mermaid/src/index.ts", import.meta.url),
+			),
+		},
+	},
 	test: {
 		// default environment for the root project
 		environment: "node",

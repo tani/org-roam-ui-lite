@@ -3,10 +3,10 @@
 	"type": "module",
 	"version": "0.1.0",
 	"main": "./dist/index.mjs",
-	"types": "./dist/index.d.mts",
+	"types": "./src/index.ts",
 	"exports": {
 		"import": "./dist/index.mjs",
-		"types": "./dist/index.d.mts"
+		"types": "./src/index.ts"
 	},
 	"scripts": {
 		"build": "tsdown"

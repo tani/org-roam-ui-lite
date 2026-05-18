@@ -1,0 +1,8 @@
+{
+	"name": "openapi",
+	"private": true,
+	"type": "module",
+	"scripts": {
+		"typegen": "node openapi.ts | tee ../frontend/src/api/api.d.ts ../backend/src/api.d.ts > /dev/null && biome format --write ../frontend/src/api/api.d.ts ../backend/src/api.d.ts"
+	}
+}

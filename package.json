@@ -9,6 +9,7 @@
 		"packages/backend",
 		"packages/rehype-mathjax",
 		"packages/rehype-mermaid",
+		"packages/openapi",
 		"packages/frontend",
 		"packages/emacs",
 		"packages/example"
@@ -43,7 +44,7 @@
 		"vitest": "^4.1.5"
 	},
 	"scripts": {
-		"typegen": "node openapi.ts | tee packages/frontend/src/api/api.d.ts packages/backend/src/api.d.ts > /dev/null && biome format --write packages/frontend/src/api/api.d.ts packages/backend/src/api.d.ts",
+		"typegen": "npm --workspace=packages/openapi run typegen",
 		"dev": "npm-run-all -p dev:frontend 'dev:backend -- {@}' --",
 		"dev:backend": "npm --workspace=packages/backend run dev --",
 		"dev:frontend": "npm --workspace=packages/frontend run dev --",

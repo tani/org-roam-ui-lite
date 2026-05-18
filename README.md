@@ -25,10 +25,10 @@ org-roam-ui-lite/
 ├── packages/
 │   ├── backend/    Node CLI, Hono API, SQLite/Drizzle access
 │   ├── frontend/   Vite + React graph UI
+│   ├── openapi/    shared API contract and type generator
 │   ├── emacs/      org-roam-ui-lite.el
 │   └── example/    sample Org-roam files and example scripts
 ├── scripts/        build and export helpers
-├── openapi.yaml    shared API contract
 └── flake.nix       Nix development and package definitions
 ```
 
@@ -109,7 +109,7 @@ Generated example outputs are ignored by Git:
 
 | Script                 | Purpose                                      |
 | ---------------------- | -------------------------------------------- |
-| `npm run typegen`      | Generate TypeScript types from `openapi.yaml` |
+| `npm run typegen`      | Generate TypeScript types from `packages/openapi/openapi.yaml` |
 | `npm run dev`          | Start frontend and backend dev servers       |
 | `npm run build`        | Generate types, build workspaces, and assemble `dist/` |
 | `npm run export`       | Build and export a static site with HTML + JSON API |
@@ -149,7 +149,7 @@ Visit <http://localhost:5174/index.html>.
 | `GET /api/graph.json`   | Whole graph with nodes and edges |
 | `GET /api/node/{id}.json` | One node with backlinks       |
 
-The full contract is defined in `openapi.yaml` and kept in sync with generated
+The full contract is defined in `packages/openapi/openapi.yaml` and kept in sync with generated
 TypeScript types.
 
 # Contributing

@@ -11,7 +11,7 @@ an example workspace with sample Org-roam files.
 ## Common Commands
 
 - `npm install` - Install monorepo dependencies
-- `npm run typegen` - Generate API types from `openapi.yaml`
+- `npm run typegen` - Generate API types from `packages/openapi/openapi.yaml`
 - `npm run dev` - Start frontend and backend dev servers
 - `npm run build` - Generate types, build workspaces, and assemble `dist/`
 - `npm run export -- -d DB -o OUT` - Build and export a static site (HTML + JSON API)
@@ -64,7 +64,7 @@ The project uses npm workspaces under `packages/*`.
 - `GET /api/graph.json` - Complete graph data with nodes and edges
 - `GET /api/node/{id}.json` - Specific node with backlinks
 
-The API contract is defined in `openapi.yaml`. Generated TypeScript types are
+The API contract is defined in `packages/openapi/openapi.yaml`. Generated TypeScript types are
 written to:
 
 - `packages/backend/src/api.d.ts`
@@ -86,7 +86,7 @@ Workspace builds are run with `--if-present`, so utility workspaces such as
 1. Frontend dev server proxies `/api` requests to the backend.
 2. Backend dev server accepts CLI flags through `npm run dev -- ...`.
 3. Tests live in package-local `test/` directories.
-4. Keep `openapi.yaml` and generated API types in sync with `npm run typegen`.
+4. Keep `packages/openapi/openapi.yaml` and generated API types in sync with `npm run typegen`.
 5. Before finishing changes, run at least `npm run check` and `npm run lint`.
 
 ## Code Style

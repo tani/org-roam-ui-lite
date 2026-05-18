@@ -3,7 +3,16 @@
  * Build script that regenerates the dist directory and copies artifacts.
  * Requires Node.js ≥18 with ES modules enabled.
  */
-import { chmod, cp, mkdir, readdir, rm, stat } from "node:fs/promises";
+import {
+	chmod,
+	cp,
+	mkdir,
+	readdir,
+	readFile,
+	rm,
+	stat,
+	writeFile,
+} from "node:fs/promises";
 import path from "node:path";
 import process from "node:process";
 import { promisify } from "node:util";
@@ -19,9 +28,6 @@ const FILES: [string, string][] = [
 	["packages/backend/dist/org-roam-ui-lite.mjs", `${DIST}/org-roam-ui-lite.js`],
 	["packages/emacs/org-roam-ui-lite.el", `${DIST}/org-roam-ui-lite.el`],
 ];
-
-/** Replace non-alphanumeric characters with underscores */
-const slugify = (s: string): string => s.replace(/[^a-zA-Z0-9]+/g, "_");
 
 /** Create directory recursively */
 const mkdirP = (dir: string): Promise<string | undefined> =>
@@ -47,14 +53,11 @@ try {
 	const pkgs = await promisify(checker.init)({ start: process.cwd() });
 	const LICENSES = Object.entries(pkgs)
 		.filter(([, v]) => v.licenseFile)
-		.map(
-			([n, v]) =>
-				[v.licenseFile, `${DIST}/licenses/${slugify(n)}`] as [string, string],
-		);
+		.map(([n, v]) => [n, v.licenseFile] as [string, string]);
 
-	const TARGETS: [string, string][] = [...FILES, ...LICENSES];
+	const TARGETS: [string, string][] = FILES;
 
-	/* 3) copy files and licenses */
+	/* 2) copy files */
 	await Promise.all(
 		TARGETS.map(async ([src, dst]) => {
 			try {
@@ -65,6 +68,33 @@ try {
 			}
 		}),
 	);
+
+	/* 3) combine licenses into single file with markdown separators */
+	const projectLicense = await readFile("LICENSE.md", "utf-8");
+
+	const combinedLicenses = await Promise.all(
+		LICENSES.map(async ([name, licenseFile]) => {
+			try {
+				const content = await readFile(licenseFile, "utf-8");
+				const quotedContent = content
+					.split("\n")
+					.map((line) => `> ${line}`)
+					.join("\n");
+				return `---\n\n## ${name}\n\n${quotedContent}`;
+			} catch {
+				return null;
+			}
+		}),
+	);
+
+	const dependencyLicenses = combinedLicenses
+		.filter((l) => l !== null)
+		.join("\n\n");
+
+	const licenseContent = `${projectLicense}\n\n---\n\n# Dependencies\n\n${dependencyLicenses}`;
+
+	await mkdirP(DIST);
+	await writeFile(path.join(DIST, "LICENSE.md"), licenseContent);
 
 	/* 4) make everything under dist world-writable */
 	await chmodR(DIST, 0o777);

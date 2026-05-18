@@ -32,10 +32,9 @@ describe("rehypeClassNames", () => {
 		const processor = createProcessor({
 			classNameMap: { blockquote: "blockquote border-start" },
 		});
-		const input = "<div><blockquote>q</blockquote></div>";
+		const input = ["<div>", "<blockquote>q</blockquote>", "</div>"].join("");
 		const result = await processor.process(input);
 		const output = String(result.value);
-
 		expect(output).toContain("blockquote border-start");
 	});
 

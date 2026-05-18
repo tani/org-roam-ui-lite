@@ -32,9 +32,7 @@
 			"performance": {
 				"recommended": true
 			},
-			"security": {
-				"noSecrets": "off"
-			},
+			"security": "error",
 			"suspicious": "error",
 			"correctness": {
 				"recommended": true,

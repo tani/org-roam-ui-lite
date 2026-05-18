@@ -3,7 +3,7 @@
 	"private": true,
 	"type": "module",
 	"bin": {
-		"org-roam-ui-lite": "./dist/backend/dist/cli.mjs"
+		"org-roam-ui-lite": "./dist/org-roam-ui-lite.js"
 	},
 	"workspaces": [
 		"packages/backend",

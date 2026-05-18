@@ -3,14 +3,14 @@
 	"private": true,
 	"type": "module",
 	"bin": {
-		"org-roam-ui-lite": "./dist/cli.mjs"
+		"org-roam-ui-lite": "./dist/org-roam-ui-lite.js"
 	},
 	"scripts": {
 		"build": "tsdown",
-		"dev": "node src/cli.ts serve",
-		"serve": "node src/cli.ts serve",
-		"populate": "node src/cli.ts populate",
-		"dump": "node src/cli.ts dump"
+		"dev": "node src/org-roam-ui-lite.ts serve",
+		"serve": "node src/org-roam-ui-lite.ts serve",
+		"populate": "node src/org-roam-ui-lite.ts populate",
+		"dump": "node src/org-roam-ui-lite.ts dump"
 	},
 	"dependencies": {
 		"@hono/node-server": "^2.0.2",

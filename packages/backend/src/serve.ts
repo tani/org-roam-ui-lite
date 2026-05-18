@@ -15,12 +15,33 @@ import { fetchGraph, fetchNode, fetchResource } from "./query.ts";
  * @param port - TCP port to listen on
  */
 export async function serve(databasePath: string, port: number): Promise<void> {
-	const frontendDistPath = path.join(
-		import.meta.dirname ?? "",
-		"../../frontend/dist",
+	// Try to find index.html in multiple locations
+	// 1. In the same directory as the bundled file (dist/)
+	// 2. In the source structure (for dev)
+	const possiblePaths: string[] = [];
+	if (process.argv[1]) {
+		possiblePaths.push(path.join(path.dirname(process.argv[1]), "index.html"));
+	}
+	possiblePaths.push(
+		path.join(import.meta.dirname ?? "", "../../frontend/dist/index.html"),
 	);
-	const indexHtmlPath = path.join(frontendDistPath, "index.html");
-	const indexHtml = await readFile(indexHtmlPath, "utf-8");
+
+	let indexHtml: string | undefined;
+
+	for (const candidatePath of possiblePaths) {
+		try {
+			indexHtml = await readFile(candidatePath, "utf-8");
+			break;
+		} catch {
+			// Continue to next path
+		}
+	}
+
+	if (indexHtml === undefined) {
+		throw new Error(
+			`Could not find index.html in any of: ${possiblePaths.join(", ")}`,
+		);
+	}
 
 	const app = new Hono();
 

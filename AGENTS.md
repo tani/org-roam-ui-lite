@@ -14,10 +14,9 @@ an example workspace with sample Org-roam files.
 - `npm run typegen` - Generate API types from `openapi.yaml`
 - `npm run dev` - Start frontend and backend dev servers
 - `npm run build` - Generate types, build workspaces, and assemble `dist/`
-- `npm run export` - Build and export a static site
+- `npm run export -- -d DB -o OUT` - Build and export a static site (HTML + JSON API)
 - `npm run populate -- -i DIR -d DB` - Create a SQLite database from Org files
 - `npm run serve -- -d DB -p 5174` - Serve the backend API and frontend bundle
-- `npm run dump -- -d DB -o OUT/api` - Dump JSON API files
 - `npm run example:populate` - Generate the example SQLite database
 - `npm run example:export` - Generate the example static site
 - `npm run example:serve` - Generate and serve the example static site
@@ -40,9 +39,10 @@ The project uses npm workspaces under `packages/*`.
 1. `packages/backend/`
    - Hono-based Node server and CLI
    - Uses Drizzle ORM to access SQLite
-   - Imports Org files with `populate`
-   - Serves API endpoints and dumps static JSON
-   - CLI entry point: `src/cli.ts`
+   - Imports Org files with `populate` subcommand
+   - Serves API endpoints and frontend with `serve` subcommand
+   - Exports static HTML + JSON API with `export` subcommand
+   - CLI entry point: `src/org-roam-ui-lite.ts`
 
 2. `packages/frontend/`
    - React SPA built with Vite

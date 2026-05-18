@@ -51,7 +51,7 @@ The root scripts delegate to `packages/backend`.
 ```bash
 $ npm run populate -- -i /path/to/org-roam-directory -d /path/to/org-roam.db
 $ npm run serve -- -d /path/to/org-roam.db -p 5174
-$ npm run dump -- -d /path/to/org-roam.db -o /path/to/output/api
+$ npm run export -- -d /path/to/org-roam.db -o /path/to/output
 ```
 
 Available backend subcommands:
@@ -60,11 +60,11 @@ Available backend subcommands:
 | ---------- | --------------------------------------------------- |
 | `populate` | Create a SQLite database from a directory of Org files |
 | `serve`    | Serve the backend API and frontend bundle           |
-| `dump`     | Dump static JSON API files                          |
+| `export`   | Export a static site (HTML + JSON API)              |
 
 # Static Export
 
-Use `export` when you want a self-contained static site.
+Use `export` to generate a self-contained static site with the frontend bundle and JSON API.
 
 ```bash
 $ npm run populate -- -i /path/to/org-roam-directory -d /path/to/org-roam.db
@@ -72,8 +72,12 @@ $ npm run export -- -d /path/to/org-roam.db -o /path/to/output
 $ npx serve /path/to/output
 ```
 
-The export command builds the frontend, copies it into the output directory, and
-writes JSON API files under `/api`.
+The `export` command:
+1. Builds the entire project
+2. Copies the frontend bundle to `output/index.html`
+3. Dumps the JSON API to `output/api/`
+
+The result is a complete static website that can be hosted anywhere without a backend.
 
 # Example Site
 
@@ -108,7 +112,7 @@ Generated example outputs are ignored by Git:
 | `npm run typegen`      | Generate TypeScript types from `openapi.yaml` |
 | `npm run dev`          | Start frontend and backend dev servers       |
 | `npm run build`        | Generate types, build workspaces, and assemble `dist/` |
-| `npm run export`       | Build and export a static site               |
+| `npm run export`       | Build and export a static site with HTML + JSON API |
 | `npm run check`        | Run TypeScript type checking                 |
 | `npm run lint`         | Run Biome checks                             |
 | `npm run lint:fix`     | Apply Biome fixes                            |

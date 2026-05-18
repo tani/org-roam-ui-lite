@@ -7,6 +7,7 @@ const { mocks } = vi.hoisted(() => ({
 		get: vi.fn(),
 		serveImpl: vi.fn(),
 		serveStatic: vi.fn(),
+		readFile: vi.fn(async () => "<html>test</html>"),
 		fetchGraph: vi.fn(async () => [
 			200,
 			{ content: { "application/json": {} } },
@@ -39,6 +40,10 @@ vi.mock("@hono/node-server", () => ({
 	serve: (options: unknown) => mocks.serveImpl(options),
 }));
 
+vi.mock("node:fs/promises", () => ({
+	readFile: mocks.readFile,
+}));
+
 vi.mock("../src/query.ts", () => ({
 	fetchGraph: mocks.fetchGraph,
 	fetchNode: mocks.fetchNode,
@@ -51,6 +56,7 @@ beforeEach(() => {
 	mocks.use.mockClear();
 	mocks.get.mockClear();
 	mocks.serveImpl.mockClear();
+	mocks.readFile.mockClear();
 	mocks.fetchGraph.mockClear();
 	mocks.fetchNode.mockClear();
 	mocks.fetchResource.mockClear();

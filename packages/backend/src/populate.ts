@@ -1,9 +1,6 @@
 import * as fs from "node:fs/promises";
 import * as path from "node:path";
-import process from "node:process";
 import { DatabaseSync } from "node:sqlite";
-import * as url from "node:url";
-import { parseArgs } from "node:util";
 import { drizzle } from "drizzle-orm/node-sqlite";
 import { files, links, nodes } from "./schema.ts";
 
@@ -243,26 +240,4 @@ export async function populate(
 		`Populated ${result.nodes} nodes and ${result.links} links from ${result.files} files into ${output}`,
 	);
 	return result;
-}
-
-const isMain = process.argv[1] === url.fileURLToPath(import.meta.url);
-
-if (isMain) {
-	const args = parseArgs({
-		options: {
-			input: {
-				type: "string",
-				short: "i",
-				default: process.env.ORG_ROAM_DIRECTORY ?? process.cwd(),
-			},
-			database: {
-				type: "string",
-				short: "d",
-				default: process.env.DATABASE ?? `${process.cwd()}/org-roam.db`,
-			},
-		},
-		allowPositionals: true,
-	});
-
-	await populate(args.values.input, args.values.database);
 }

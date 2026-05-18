@@ -2,6 +2,7 @@ import * as fs from "node:fs/promises";
 import * as path from "node:path";
 import { eq } from "drizzle-orm";
 import type { paths } from "./api.d.ts";
+import { decodeBase64url } from "./base64url.ts";
 import { createDatabase } from "./database.ts";
 import { files, links, nodes } from "./schema.ts";
 
@@ -160,7 +161,7 @@ export async function fetchResource(
 
 	const basePath = path.dirname(row.file);
 	const { ext, name } = path.parse(encodedPath);
-	const decodedBasename = Buffer.from(name, "base64").toString("utf8");
+	const decodedBasename = decodeBase64url(name);
 	const filePath = `${decodedBasename}${ext}`;
 	const resolvedPath = path.resolve(basePath, filePath);
 	const resourceRoot = path.resolve(basePath);

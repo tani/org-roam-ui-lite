@@ -1,9 +1,6 @@
 // scripts/dump-json.ts
 import * as fs from "node:fs/promises";
 import * as path from "node:path";
-import process from "node:process";
-import * as url from "node:url";
-import { parseArgs } from "node:util";
 import { eq } from "drizzle-orm";
 import type { Element, Root } from "hast";
 import raw from "rehype-raw";
@@ -127,27 +124,4 @@ export async function dump(
 	await dumpGraphJson(databasePath, outputPath);
 	await dumpNodeJsons(databasePath, outputPath);
 	console.log(`✅ All JSON files dumped to ${outputPath}`);
-}
-
-const isMain = process.argv[1] === url.fileURLToPath(import.meta.url);
-
-if (isMain) {
-	const args = parseArgs({
-		options: {
-			output: {
-				type: "string",
-				short: "o",
-				default: process.env.OUTPUT ?? `${process.cwd()}/dist`,
-			},
-			database: {
-				type: "string",
-				short: "d",
-				default:
-					process.env.DATABASE ?? `${process.env.HOME}/.emacs.d/org-roam.db`,
-			},
-		},
-		allowPositionals: true,
-	});
-
-	await dump(args.values.database, args.values.output);
 }

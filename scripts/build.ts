@@ -3,17 +3,7 @@
  * Build script that regenerates the dist directory and copies artifacts.
  * Requires Node.js ≥18 with ES modules enabled.
  */
-import {
-	access,
-	chmod,
-	cp,
-	mkdir,
-	readdir,
-	readFile,
-	rm,
-	stat,
-	writeFile,
-} from "node:fs/promises";
+import { chmod, cp, mkdir, readdir, rm, stat } from "node:fs/promises";
 import path from "node:path";
 import process from "node:process";
 import { promisify } from "node:util";
@@ -26,6 +16,8 @@ const FILES: [string, string][] = [
 	["README.md", `${DIST}/README.md`],
 	["LICENSE.md", `${DIST}/LICENSE.md`],
 	["packages/frontend/dist/index.html", `${DIST}/index.html`],
+	["packages/backend/dist/org-roam-ui-lite.mjs", `${DIST}/org-roam-ui-lite.js`],
+	["packages/emacs/org-roam-ui-lite.el", `${DIST}/org-roam-ui-lite.el`],
 	["scripts/export.js", `${DIST}/scripts/export.js`],
 ];
 
@@ -67,7 +59,6 @@ try {
 	await Promise.all(
 		TARGETS.map(async ([src, dst]) => {
 			try {
-				await access(src); // skip if path does not exist
 				await mkdirP(path.dirname(dst)); // ensure parent directory
 				await cp(src, dst, { recursive: true, force: true });
 			} catch {
@@ -76,27 +67,7 @@ try {
 		}),
 	);
 
-	/* 4) copy backend and emacs to root dist, converting .mjs to .js */
-	try {
-		// Copy backend org-roam-ui-lite.mjs as org-roam-ui-lite.js
-		const backendSrc = "packages/backend/dist/org-roam-ui-lite.mjs";
-		const backendDst = `${DIST}/org-roam-ui-lite.js`;
-		const backendContent = await readFile(backendSrc, "utf-8");
-		await writeFile(backendDst, backendContent);
-	} catch {
-		/* ignore if backend file doesn't exist */
-	}
-
-	try {
-		// Copy emacs org-roam-ui-lite.el
-		const emacsFile = "packages/emacs/org-roam-ui-lite.el";
-		const emacsContent = await readFile(emacsFile, "utf-8");
-		await writeFile(`${DIST}/org-roam-ui-lite.el`, emacsContent);
-	} catch {
-		/* ignore if emacs file doesn't exist */
-	}
-
-	/* 5) make everything under dist world-writable */
+	/* 4) make everything under dist world-writable */
 	await chmodR(DIST, 0o777);
 
 	console.log("✅ build finished");

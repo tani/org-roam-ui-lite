@@ -1,6 +1,5 @@
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import * as path from "node:path";
-import process from "node:process";
 import { dump } from "./dump.ts";
 
 /**
@@ -13,13 +12,10 @@ export async function exportSite(
 	databasePath: string,
 	outputPath: string,
 ): Promise<void> {
-	const possiblePaths: string[] = [];
-	if (process.argv[1]) {
-		possiblePaths.push(path.join(path.dirname(process.argv[1]), "index.html"));
-	}
-	possiblePaths.push(
+	const possiblePaths = [
+		path.join(import.meta.dirname ?? "", "index.html"),
 		path.join(import.meta.dirname ?? "", "../../frontend/dist/index.html"),
-	);
+	];
 
 	let indexHtml: string | undefined;
 

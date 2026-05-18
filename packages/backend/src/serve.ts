@@ -1,6 +1,5 @@
 import { readFile } from "node:fs/promises";
 import * as path from "node:path";
-import process from "node:process";
 import * as nodeServer from "@hono/node-server";
 import { Hono } from "hono";
 import { lookup } from "mime-types";
@@ -13,13 +12,10 @@ import { fetchGraph, fetchNode, fetchResource } from "./query.ts";
  * @param port - TCP port to listen on
  */
 export async function serve(databasePath: string, port: number): Promise<void> {
-	const possiblePaths: string[] = [];
-	if (process.argv[1]) {
-		possiblePaths.push(path.join(path.dirname(process.argv[1]), "index.html"));
-	}
-	possiblePaths.push(
+	const possiblePaths = [
+		path.join(import.meta.dirname ?? "", "index.html"),
 		path.join(import.meta.dirname ?? "", "../../frontend/dist/index.html"),
-	);
+	];
 
 	let indexHtml: string | undefined;
 

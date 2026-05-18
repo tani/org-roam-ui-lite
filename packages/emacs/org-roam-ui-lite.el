@@ -1,4 +1,4 @@
-;;; org-roam-ui-lite.el --- Lightweight HTTP backend for org‑roam‑ui‑lite  -*- lexical-binding: t; -*-
+;;; org-roam-ui-lite.el --- Lightweight HTTP backend for org-roam-ui-lite  -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2025  Masaya Taniguchi
 ;;
@@ -13,24 +13,21 @@
 
 ;;; Commentary:
 ;; This single file turns Emacs into a tiny JSON API server that the
-;; org‑roam‑ui‑lite front‑end (compiled into ../frontend/dist/) can consume.
+;; org-roam-ui-lite front-end can consume.
 ;;
-;; ────────────────────────────────────────────────────────────────────────────
 ;;  ENDPOINTS
-;;  •  GET /api/graph            → graph of every node + edge
-;;  •  GET /api/node/<id>        → single note payload or 404 JSON
+;;    GET /api/graph.json              graph of every node and edge
+;;    GET /api/node/<id>.json          single note payload or 404 JSON
+;;    GET /api/node/<id>/<asset-path>  note-local binary asset
 ;;
 ;;  QUICK START
-;;  ───────────
-;;  1.  Place the built front‑end under ../frontend/dist/ relative to this file.
+;;  1.  Build the front-end with `npm run build`, or use the assembled dist/.
 ;;  2.  Add to init.el:
 ;;        (require 'org-roam-ui-lite)
 ;;        ;; Optional custom port/root:
 ;;        ;; (setq org-roam-ui-lite-port 8000)
 ;;        (org-roam-ui-lite-mode)
 ;;  3.  Browse to http://localhost:5174/index.html (or your port).
-;;
-;; ────────────────────────────────────────────────────────────────────────────
 
 ;;; Code:
 
@@ -41,7 +38,7 @@
 
 ;;;; Customization ------------------------------------------------------------
 (defgroup org-roam-ui-lite nil
-  "Serve Org‑roam graph data to the org‑roam‑ui‑lite front‑end."
+  "Serve Org-roam graph data to the org-roam-ui-lite front-end."
   :group 'applications)
 
 (defcustom org-roam-ui-lite-port 5174
@@ -53,18 +50,35 @@
   (or load-file-name buffer-file-name)
   "Absolute path to this file.")
 
-(defconst org-roam-ui-lite--project-root
-  (file-name-directory org-roam-ui-lite--this-file))
+(defconst org-roam-ui-lite--package-directory
+  (file-name-directory org-roam-ui-lite--this-file)
+  "Directory containing this Emacs Lisp file.")
+
+(defun org-roam-ui-lite--default-static-root ()
+  "Return the most likely built front-end directory.
+When loaded from the assembled `dist/' directory, `index.html' sits next to this
+file. When loaded from the source tree, Vite writes it to `../frontend/dist/'."
+  (let ((dist-copy (expand-file-name "index.html"
+                                     org-roam-ui-lite--package-directory))
+        (workspace-copy (expand-file-name "../frontend/dist/index.html"
+                                          org-roam-ui-lite--package-directory)))
+    (file-name-as-directory
+     (cond
+      ((file-exists-p dist-copy)
+       org-roam-ui-lite--package-directory)
+      ((file-exists-p workspace-copy)
+       (file-name-directory workspace-copy))
+      (t
+       (file-name-directory workspace-copy))))))
 
 (defcustom org-roam-ui-lite-static-root
-  (expand-file-name "../frontend/dist/" org-roam-ui-lite--project-root)
+  (org-roam-ui-lite--default-static-root)
   "Directory containing *index.html* and bundled assets."
   :type 'directory
   :group 'org-roam-ui-lite)
 
 ;;;; Init simple-httpd -------------------------------------------------------
-(setq httpd-host "0.0.0.0"
-      httpd-root org-roam-ui-lite-static-root)
+(setq httpd-host "0.0.0.0")
 
 ;;;; Utility: dequote ---------------------------------------------------------
 (defun org-roam-ui-lite--dequote (str)
@@ -126,7 +140,7 @@
       (httpd-send-header proc "application/json" status))
     (insert (json-encode body))))
 
-;;;; API: /api/graph.json -----------------------------------------------------
+;;;; API: /api/graph.json ----------------------------------------------------
 (defservlet* api/graph.json text/plain ()
   (org-roam-ui-lite--json
    proc
@@ -139,92 +153,86 @@
                                 `((source . ,src) (dest . ,dst)))
                               (org-roam-ui-lite--links)))))))
 
-
-
 (defun org-roam-ui-lite--decode-base64url (b64url)
-  "Convert URL-safe Base64 B64URL to standard Base64 and add padding."
-  (let* ((s (replace-regexp-in-string "-" "+" 
+  "Decode URL-safe Base64 B64URL as a UTF-8 string."
+  (let* ((s (replace-regexp-in-string "-" "+"
              (replace-regexp-in-string "_" "/" b64url)))
-         ;; パディング長を計算して“=”を足す
-         (pad   (% (- 4 (mod (length s) 4)) 4))
+         (pad (% (- 4 (mod (length s) 4)) 4))
          (s-padded (concat s (make-string pad ?=))))
-    s-padded))
+    (with-temp-buffer
+      (insert s-padded)
+      (base64-decode-region (point-min) (point-max))
+      (decode-coding-string (buffer-string) 'utf-8))))
+
+(defun org-roam-ui-lite--descendant-path-p (parent child)
+  "Return non-nil when CHILD is inside PARENT."
+  (let ((parent-root (file-name-as-directory (file-truename parent)))
+        (child-path (file-truename child)))
+    (string-prefix-p parent-root child-path)))
 
 (defun org-roam-ui-lite--serve-node-asset (proc id path)
   "Serve a file attached to node ID, where PATH is BASE64URL_FILENAME.ext."
-  (let* ((row       (org-roam-ui-lite--node-row id)))
+  (let ((row (org-roam-ui-lite--node-row id)))
     (if (null row)
         (org-roam-ui-lite--json proc '((error . "not_found")) 404)
-      (let* ((file       (nth 2 row))
-             (base-dir   (file-name-directory file))
-             (ext        (file-name-extension path t))
-             (b64url     (file-name-sans-extension path))
-             ;; URL-safe Base64 → 標準 Base64 + padding
-             (b64        (org-roam-ui-lite--decode-base64url b64url))
-             ;; デコード
-             (decoded    (with-temp-buffer
-                           (insert b64)
-                           (base64-decode-region (point-min) (point-max))
-                           (buffer-string)))
-             (rel-path   (concat decoded ext))
-             (full-path  (expand-file-name rel-path base-dir)))
-        (if (file-exists-p full-path)
+      (let* ((file (org-roam-ui-lite--dequote (nth 2 row)))
+             (base-dir (file-name-directory file))
+             (ext (file-name-extension path t))
+             (b64url (file-name-sans-extension path))
+             (decoded (org-roam-ui-lite--decode-base64url b64url))
+             (rel-path (concat decoded ext))
+             (full-path (expand-file-name rel-path base-dir)))
+        (if (and (file-exists-p full-path)
+                 (not (file-directory-p full-path))
+                 (org-roam-ui-lite--descendant-path-p base-dir full-path))
             (httpd-send-file proc full-path)
           (org-roam-ui-lite--json proc '((error . "not_found")) 404))))))
 
 ;;;; API: /api/node/... (Unified Handler) ------------------------------------
-;; /api/node/ 以下の様々なパターンをこの単一のサーブレットで処理します。
-;; simple-httpdのディスパッチは最も長い固定プレフィックス(/api/node/)でサーブレットを選択するため、
-;; 異なる可変パターン(例: /:id.json と /:id/:path)は一つのサーブレットで判別する必要があります。
-(defservlet* api/node/:part1/:part2 nil () ;; パスコンポーネントを part1, part2 としてバインド
+;; simple-httpd dispatches this servlet for the fixed /api/node/ prefix, so the
+;; variable shapes used by the TypeScript backend are split here.
+(defservlet* api/node/:part1/:part2 nil ()
   "Handle requests for /api/node/:id.json and /api/node/:id/:path.
 Dispatches based on the number of path components after /api/node/."
 
-  (let* ((split-path (split-string (substring httpd-path 1) "/")) ;; ルートスラッシュを除去し、パス全体を分割
-         (num-components (length split-path)) ;; パス全体のコンポーネント数 (api, node, ...)
-         (api-node-idx 1)                     ;; "node" コンポーネントのインデックス (通常1)
-         (part1-comp (nth (+ api-node-idx 1) split-path)) ;; /api/node/ の直後のコンポーネント
-         (part2-comp (nth (+ api-node-idx 2) split-path)) ;; part1-comp の直後のコンポーネント (または nil)
+  (let* ((split-path (split-string (substring httpd-path 1) "/"))
+         (num-components (length split-path))
+         (api-node-idx 1)
+         (part1-comp (nth (+ api-node-idx 1) split-path))
+         (part2-comp (nth (+ api-node-idx 2) split-path))
          (proc httpd-current-proc))
 
     (cond
-     ;; パターン: /api/node/:id/:path (コンポーネント数が 4)
-     ;; 例: /api/node/UUID/encoded_filename.png
-     ((and (= num-components (+ api-node-idx 3)) ;; api, node, part1, part2 の計4コンポーネント
+     ((and (= num-components (+ api-node-idx 3))
            (stringp part1-comp)
            (stringp part2-comp))
-      (let ((node-id part1-comp)    ;; ここでは拡張子除去はせず、そのままIDとして扱う
+      (let ((node-id part1-comp)
             (asset-path part2-comp))
         (httpd-log (list 'api/node/dispatch 'asset :id node-id :path asset-path))
-        ;; ノードIDとアセットパスを渡してアセットサービング関数を呼び出し
         (org-roam-ui-lite--serve-node-asset proc node-id asset-path)))
 
-     ;; パターン: /api/node/:id.json または /api/node/:id (コンポーネント数が 3)
-     ;; 例: /api/node/UUID.json または /api/node/UUID
-     ((and (= num-components (+ api-node-idx 2)) ;; api, node, part1 の計3コンポーネント
+     ((and (= num-components (+ api-node-idx 2))
            (stringp part1-comp))
       (let ((node-id-with-ext part1-comp)
-            (node-id (file-name-sans-extension part1-comp))) ;; .json など拡張子を除去
+            (node-id (file-name-sans-extension part1-comp)))
         (httpd-log (list 'api/node/dispatch 'json :id-with-ext node-id-with-ext :id node-id))
-        ;; ノードの詳細JSONを返すロジックを実行
         (let ((row (org-roam-ui-lite--node-row node-id)))
           (if (null row)
               (org-roam-ui-lite--json proc '((error . "not_found")) 404)
             (pcase-let ((`(,nid ,ntitle ,nfile ,_) row))
-              (let* ((id     (org-roam-ui-lite--dequote nid))
-                     (title  (org-roam-ui-lite--dequote ntitle))
-                     (file   (org-roam-ui-lite--dequote nfile))
-                     (raw    (with-temp-buffer
+              (let* ((id (org-roam-ui-lite--dequote nid))
+                     (title (org-roam-ui-lite--dequote ntitle))
+                     (file (org-roam-ui-lite--dequote nfile))
+                     (raw (with-temp-buffer
                                (insert-file-contents file)
                                (buffer-string)))
-                     (backs  (apply #'vector (org-roam-ui-lite--backlinks id))))
+                     (backs (apply #'vector (org-roam-ui-lite--backlinks id))))
                 (org-roam-ui-lite--json
                  proc `((id . ,id)
                        (title . ,title)
                        (raw . ,raw)
                        (backlinks . ,backs)))))))))
 
-     ;; どのパターンにも一致しない場合
      (t
       (httpd-log (list 'api/node/dispatch 'nomatch :path httpd-path :components split-path))
       (httpd-error proc 404 (format "Path '%s' does not match expected /api/node/ patterns." httpd-path))))))
@@ -236,10 +244,11 @@ Dispatches based on the number of path components after /api/node/."
   "Start org-roam-ui-lite JSON server."
   (interactive)
   (org-roam-db-autosync-mode 1)
-  (setq httpd-port org-roam-ui-lite-port)
+  (setq httpd-port org-roam-ui-lite-port
+        httpd-root org-roam-ui-lite-static-root)
   (httpd-start)
   (browse-url (format "http://localhost:%d/index.html" httpd-port))
-  (message "org-roam-ui-lite ▶ http://localhost:%d/index.html" httpd-port))
+  (message "org-roam-ui-lite: http://localhost:%d/index.html" httpd-port))
 
 (provide 'org-roam-ui-lite)
 ;;; org-roam-ui-lite.el ends here

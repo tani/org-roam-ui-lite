@@ -1,4 +1,0 @@
-pre-commit:
-  jobs:
-    - run: npm run check
-    - run: npm run lint

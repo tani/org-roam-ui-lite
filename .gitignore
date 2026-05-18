@@ -143,3 +143,4 @@ dist
 packages/example/*.db
 packages/example/static/
 /.agent-shell/
+org-roam.db

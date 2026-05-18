@@ -18,7 +18,6 @@ const FILES: [string, string][] = [
 	["packages/frontend/dist/index.html", `${DIST}/index.html`],
 	["packages/backend/dist/org-roam-ui-lite.mjs", `${DIST}/org-roam-ui-lite.js`],
 	["packages/emacs/org-roam-ui-lite.el", `${DIST}/org-roam-ui-lite.el`],
-	["scripts/export.js", `${DIST}/scripts/export.js`],
 ];
 
 /** Replace non-alphanumeric characters with underscores */

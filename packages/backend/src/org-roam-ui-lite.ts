@@ -1,7 +1,7 @@
 import * as path from "node:path";
 import process from "node:process";
 import { parseArgs } from "node:util";
-import { dump } from "./dump.ts";
+import { exportSite } from "./export.ts";
 import { populate } from "./populate.ts";
 import { serve } from "./serve.ts";
 
@@ -11,7 +11,7 @@ function usage(exitCode = 0): never {
 Commands:
   populate   Create a SQLite database from a directory of Org-roam files
   serve      Serve the backend server and frontend bundle
-  dump       Dump JSON API files for static hosting
+  export     Export a static site with HTML and JSON API
 
 Options:
   -h, --help  Show help
@@ -19,7 +19,7 @@ Options:
 Command options:
   populate -i DIR -d DB
   serve    -d DB  -p PORT
-  dump     -d DB  -o OUT
+  export   -d DB  -o OUT
 `);
 	process.exit(exitCode);
 }
@@ -82,7 +82,7 @@ switch (command) {
 		await serve(cliPath(values.database), Number(values.port));
 		break;
 	}
-	case "dump": {
+	case "export": {
 		const { values } = parseArgs({
 			args: commandArgs,
 			options: {
@@ -100,7 +100,7 @@ switch (command) {
 			},
 		});
 		if (values.help) usage(0);
-		await dump(cliPath(values.database), cliPath(values.output));
+		await exportSite(cliPath(values.database), cliPath(values.output));
 		break;
 	}
 	default:

@@ -10,7 +10,7 @@
 		"dev": "node src/org-roam-ui-lite.ts serve",
 		"serve": "node src/org-roam-ui-lite.ts serve",
 		"populate": "node src/org-roam-ui-lite.ts populate",
-		"dump": "node src/org-roam-ui-lite.ts dump"
+		"export": "node src/org-roam-ui-lite.ts export"
 	},
 	"dependencies": {
 		"@hono/node-server": "^2.0.2",

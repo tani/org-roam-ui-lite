@@ -53,10 +53,10 @@ const renderCytoscape: RendererFunction = (
 		},
 	];
 
-	layout = (layout as string) === "fcose" ? "cose" : layout;
+	const cytoscapeLayout = (layout as string) === "fcose" ? "cose" : layout;
 
 	const cyLayout = {
-		name: layout,
+		name: cytoscapeLayout,
 		tile: false,
 		animate: "end",
 	} as LayoutOptions;

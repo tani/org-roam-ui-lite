@@ -58,14 +58,14 @@ export function alphaColor(color: string, alpha: number): string {
 				.map((c) => c + c)
 				.join("");
 		}
-		const r = parseInt(hex.slice(0, 2), 16);
-		const g = parseInt(hex.slice(2, 4), 16);
-		const b = parseInt(hex.slice(4, 6), 16);
+		const r = Number.parseInt(hex.slice(0, 2), 16);
+		const g = Number.parseInt(hex.slice(2, 4), 16);
+		const b = Number.parseInt(hex.slice(4, 6), 16);
 		return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 	}
 	if (color.startsWith("rgba")) {
 		const [r, g, b] = color
-			.replace(/rgba\(|\)/g, "")
+			.replace(/rgba\(|\)/gu, "")
 			.split(",")
 			.slice(0, 3)
 			.map((v) => Number(v.trim()));
@@ -73,7 +73,7 @@ export function alphaColor(color: string, alpha: number): string {
 	}
 	if (color.startsWith("rgb")) {
 		const [r, g, b] = color
-			.replace(/rgb\(|\)/g, "")
+			.replace(/rgb\(|\)/gu, "")
 			.split(",")
 			.map((v) => Number(v.trim()));
 		return `rgba(${r}, ${g}, ${b}, ${alpha})`;

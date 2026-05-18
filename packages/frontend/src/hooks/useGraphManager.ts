@@ -60,7 +60,9 @@ export function useGraphManager(initialConfig: UseGraphManagerProps) {
 
 	const bindGraphEvents = useCallback(() => {
 		const graph = graphInstanceRef.current;
-		if (!graph) return;
+		if (!graph) {
+			return;
+		}
 		if (configRef.current.renderer === "cytoscape") {
 			const cy = graph as Core;
 			if (typeof cy.off === "function" && typeof cy.on === "function") {
@@ -85,7 +87,9 @@ export function useGraphManager(initialConfig: UseGraphManagerProps) {
 
 	const refreshGraph = useCallback(async () => {
 		const container = graphElementRef.current;
-		if (!container) return;
+		if (!container) {
+			return;
+		}
 		graphInstanceRef.current = await drawGraph(
 			configRef.current.renderer,
 			configRef.current.layout,

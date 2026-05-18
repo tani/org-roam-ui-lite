@@ -21,6 +21,7 @@ import checker from "license-checker";
 /* ----------------------------- constants and utils ------------------------------- */
 
 const DIST = "dist";
+const DIST_MODE = 0o777;
 const FILES: [string, string][] = [
 	["README.md", `${DIST}/README.md`],
 	["LICENSE.md", `${DIST}/LICENSE.md`],
@@ -32,6 +33,14 @@ const FILES: [string, string][] = [
 /** Create directory recursively */
 const mkdirP = (dir: string): Promise<string | undefined> =>
 	mkdir(dir, { recursive: true });
+
+function writeOutput(message: string): void {
+	process.stdout.write(`${message}\n`);
+}
+
+function writeError(message: string): void {
+	process.stderr.write(`${message}\n`);
+}
 
 /**
  * Recursively change permissions of a path.
@@ -97,10 +106,10 @@ try {
 	await writeFile(path.join(DIST, "LICENSE.md"), licenseContent);
 
 	/* 4) make everything under dist world-writable */
-	await chmodR(DIST, 0o777);
+	await chmodR(DIST, DIST_MODE);
 
-	console.log("✅ build finished");
+	writeOutput("build finished");
 } catch (e) {
-	console.error("❌ build failed:", e);
+	writeError(`build failed: ${String(e)}`);
 	process.exit(1);
 }

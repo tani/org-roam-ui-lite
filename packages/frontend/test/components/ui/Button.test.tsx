@@ -47,7 +47,7 @@ describe("Button Component", () => {
 	});
 
 	it("supports disabled state", () => {
-		render(<Button disabled>Disabled</Button>);
+		render(<Button disabled={true}>Disabled</Button>);
 		const button = screen.getByRole("button");
 		expect(button).toBeDisabled();
 	});

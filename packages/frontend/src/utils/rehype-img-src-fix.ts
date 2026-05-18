@@ -9,7 +9,7 @@ import { encodeBase64url } from "./base64url.ts";
  * @returns Transformer for the rehype pipeline
  */
 export default function rehypeImgSrcFix(nodeId: string): (tree: Root) => void {
-	const ignorePattern = /^(data:|https?:|\/\/|\/api\/node\/|#|\s*$)/;
+	const ignorePattern = /^(data:|https?:|\/\/|\/api\/node\/|#|\s*$)/u;
 	return (tree: Root) => {
 		visit(tree, "element", (node: Element) => {
 			if (node.tagName !== "img" || typeof node.properties?.src !== "string") {
@@ -17,9 +17,11 @@ export default function rehypeImgSrcFix(nodeId: string): (tree: Root) => void {
 			}
 
 			const src = node.properties.src.trim();
-			if (ignorePattern.test(src)) return;
+			if (ignorePattern.test(src)) {
+				return;
+			}
 
-			const [base, extension = ""] = src.split(/(?=\.[^.]+$)/);
+			const [base, extension = ""] = src.split(/(?=\.[^.]+$)/u);
 			if (node.properties && base) {
 				node.properties.src = `/api/node/${nodeId}/${encodeBase64url(
 					base,

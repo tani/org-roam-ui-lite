@@ -1,5 +1,6 @@
 import * as fs from "node:fs/promises";
 import * as path from "node:path";
+import process from "node:process";
 import { DatabaseSync } from "node:sqlite";
 import { drizzle } from "drizzle-orm/node-sqlite";
 import { files, links, nodes } from "./schema.ts";
@@ -33,9 +34,11 @@ function jsonText(value: string): string {
 async function walkOrgFiles(directory: string): Promise<string[]> {
 	const entries = await fs.readdir(directory, { withFileTypes: true });
 	const nested = await Promise.all(
-		entries.map(async (entry) => {
+		entries.map((entry) => {
 			const entryPath = path.join(directory, entry.name);
-			if (entry.isDirectory()) return walkOrgFiles(entryPath);
+			if (entry.isDirectory()) {
+				return walkOrgFiles(entryPath);
+			}
 			if (entry.isFile() && entry.name.endsWith(ORG_FILE_EXTENSION)) {
 				return [entryPath];
 			}
@@ -48,27 +51,29 @@ async function walkOrgFiles(directory: string): Promise<string[]> {
 
 function cleanHeadlineTitle(value: string): string {
 	return value
-		.replace(/^\s*(TODO|DONE|NEXT|WAIT|CANCELLED)\s+/i, "")
+		.replace(/^\s*(TODO|DONE|NEXT|WAIT|CANCELLED)\s+/iu, "")
 		.replace(/\s+:[\w:@#%]+:\s*$/u, "")
 		.trim();
 }
 
 function titleAt(content: string, position: number, fileTitle: string): string {
 	const before = content.slice(0, position);
-	const headlines = [...before.matchAll(/^\*+\s+(.+)$/gm)];
+	const headlines = [...before.matchAll(/^\*+\s+(.+)$/gmu)];
 	const lastHeadline = headlines.at(-1);
-	if (lastHeadline?.[1]) return cleanHeadlineTitle(lastHeadline[1]);
+	if (lastHeadline?.[1]) {
+		return cleanHeadlineTitle(lastHeadline[1]);
+	}
 	return fileTitle;
 }
 
 function extractFileTitle(content: string, filePath: string): string {
-	const title = content.match(/^#\+title:\s*(.+)$/im)?.[1]?.trim();
+	const title = content.match(/^#\+title:\s*(.+)$/imu)?.[1]?.trim();
 	return title || path.basename(filePath, ORG_FILE_EXTENSION);
 }
 
 function maskIgnoredBlocks(content: string): string {
 	return content.replace(
-		/^#\+begin_(src|example|comment)\b[\s\S]*?^#\+end_\1\s*$/gim,
+		/^#\+begin_(src|example|comment)\b[\s\S]*?^#\+end_\1\s*$/gimu,
 		(match) => " ".repeat(match.length),
 	);
 }
@@ -81,13 +86,15 @@ function extractNodes(
 	const nodes: OrgNode[] = [];
 	const seen = new Set<string>();
 	const drawerMatches = content.matchAll(
-		/^\s*:PROPERTIES:\s*$[\s\S]*?^\s*:END:\s*$/gim,
+		/^\s*:PROPERTIES:\s*$[\s\S]*?^\s*:END:\s*$/gimu,
 	);
 
 	for (const drawerMatch of drawerMatches) {
 		const drawer = drawerMatch[0];
-		const id = drawer.match(/^\s*:ID:\s*(\S+)\s*$/im)?.[1];
-		if (!id || seen.has(id)) continue;
+		const id = drawer.match(/^\s*:ID:\s*(\S+)\s*$/imu)?.[1];
+		if (!id || seen.has(id)) {
+			continue;
+		}
 		seen.add(id);
 		const pos = drawerMatch.index ?? 0;
 		nodes.push({
@@ -107,7 +114,9 @@ function sourceNodeForLink(
 ): OrgNode | undefined {
 	let source = nodes[0];
 	for (const node of nodes) {
-		if (node.pos > position) break;
+		if (node.pos > position) {
+			break;
+		}
 		source = node;
 	}
 	return source;
@@ -120,13 +129,17 @@ function extractLinks(orgFiles: OrgFile[], knownNodeIds: Set<string>) {
 	for (const orgFile of orgFiles) {
 		const linkableContent = maskIgnoredBlocks(orgFile.content);
 		for (const match of linkableContent.matchAll(
-			/\[\[id:([^\][]+)\](?:\[[^\]]*\])?\]|(?<![[\w-])id:([^\s\]]+)/g,
+			/\[\[id:([^\][]+)\](?:\[[^\]]*\])?\]|(?<![[\w-])id:([^\s\]]+)/gu,
 		)) {
 			const dest = match[1] ?? match[2];
 			const source = sourceNodeForLink(orgFile.nodes, match.index ?? 0);
-			if (!source || !dest || !knownNodeIds.has(dest)) continue;
+			if (!(source && dest && knownNodeIds.has(dest))) {
+				continue;
+			}
 			const key = `${source.id}\0${dest}`;
-			if (seen.has(key)) continue;
+			if (seen.has(key)) {
+				continue;
+			}
 			seen.add(key);
 			links.push({ source: source.id, dest });
 		}
@@ -197,7 +210,9 @@ export async function populate(
 			transaction.delete(files).run();
 
 			for (const orgFile of orgFiles) {
-				if (orgFile.nodes.length === 0) continue;
+				if (orgFile.nodes.length === 0) {
+					continue;
+				}
 				transaction
 					.insert(files)
 					.values({
@@ -236,8 +251,8 @@ export async function populate(
 		nodes: allNodes.length,
 		links: allLinks.length,
 	};
-	console.log(
-		`Populated ${result.nodes} nodes and ${result.links} links from ${result.files} files into ${output}`,
+	process.stdout.write(
+		`Populated ${result.nodes} nodes and ${result.links} links from ${result.files} files into ${output}\n`,
 	);
 	return result;
 }

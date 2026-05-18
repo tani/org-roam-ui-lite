@@ -60,12 +60,12 @@ describe("GraphControls Component", () => {
 			/>,
 		);
 
-		// Check for SVG icons with bi class (use direct children of buttons to avoid nested SVGs)
+		// Check for bootstrap icon elements.
 		const buttons = screen.getAllByRole("button");
-		const svgInSettings = (buttons[0] as HTMLElement).querySelector("svg.bi");
-		const svgInDetails = (buttons[1] as HTMLElement).querySelector("svg.bi");
-		expect(svgInSettings).toBeInTheDocument();
-		expect(svgInDetails).toBeInTheDocument();
+		const iconInSettings = (buttons[0] as HTMLElement).querySelector(".bi");
+		const iconInDetails = (buttons[1] as HTMLElement).querySelector(".bi");
+		expect(iconInSettings).toBeInTheDocument();
+		expect(iconInDetails).toBeInTheDocument();
 	});
 
 	it("handles settings button click", () => {

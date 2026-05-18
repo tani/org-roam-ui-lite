@@ -5,8 +5,19 @@ import { exportSite } from "./export.ts";
 import { populate } from "./populate.ts";
 import { serve } from "./serve.ts";
 
+const environmentKey = "env";
+const environment = globalThis.process?.[environmentKey] ?? {};
+
+function writeOutput(message: string): void {
+	process.stdout.write(message);
+}
+
+function writeError(message: string): void {
+	process.stderr.write(`${message}\n`);
+}
+
 function usage(exitCode = 0): never {
-	console.log(`Usage: org-roam-ui-lite <command> [options]
+	writeOutput(`Usage: org-roam-ui-lite <command> [options]
 
 Commands:
   populate   Create a SQLite database from a directory of Org-roam files
@@ -25,12 +36,14 @@ Command options:
 }
 
 function databaseDefault(): string {
-	return process.env.DATABASE ?? `${process.env.HOME}/.emacs.d/org-roam.db`;
+	return environment.DATABASE ?? `${environment.HOME}/.emacs.d/org-roam.db`;
 }
 
 function cliPath(value: string): string {
-	if (path.isAbsolute(value)) return value;
-	return path.resolve(process.env.INIT_CWD ?? process.cwd(), value);
+	if (path.isAbsolute(value)) {
+		return value;
+	}
+	return path.resolve(environment.INIT_CWD ?? process.cwd(), value);
 }
 
 const [command, ...commandArgs] = process.argv.slice(2);
@@ -47,17 +60,19 @@ switch (command) {
 				input: {
 					type: "string",
 					short: "i",
-					default: process.env.ORG_ROAM_DIRECTORY ?? process.cwd(),
+					default: environment.ORG_ROAM_DIRECTORY ?? process.cwd(),
 				},
 				database: {
 					type: "string",
 					short: "d",
-					default: process.env.DATABASE ?? `${process.cwd()}/org-roam.db`,
+					default: environment.DATABASE ?? `${process.cwd()}/org-roam.db`,
 				},
 				help: { type: "boolean", short: "h" },
 			},
 		});
-		if (values.help) usage(0);
+		if (values.help) {
+			usage(0);
+		}
 		await populate(cliPath(values.input), cliPath(values.database));
 		break;
 	}
@@ -73,12 +88,14 @@ switch (command) {
 				port: {
 					type: "string",
 					short: "p",
-					default: process.env.PORT ?? "5174",
+					default: environment.PORT ?? "5174",
 				},
 				help: { type: "boolean", short: "h" },
 			},
 		});
-		if (values.help) usage(0);
+		if (values.help) {
+			usage(0);
+		}
 		await serve(cliPath(values.database), Number(values.port));
 		break;
 	}
@@ -94,16 +111,18 @@ switch (command) {
 				output: {
 					type: "string",
 					short: "o",
-					default: process.env.OUTPUT ?? `${process.cwd()}/out`,
+					default: environment.OUTPUT ?? `${process.cwd()}/out`,
 				},
 				help: { type: "boolean", short: "h" },
 			},
 		});
-		if (values.help) usage(0);
+		if (values.help) {
+			usage(0);
+		}
 		await exportSite(cliPath(values.database), cliPath(values.output));
 		break;
 	}
 	default:
-		console.error(`Unknown command: ${command}`);
+		writeError(`Unknown command: ${command}`);
 		usage(1);
 }

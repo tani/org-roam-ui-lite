@@ -13,10 +13,12 @@ import type {
 /**
  * Type guard to check if a GraphInstance is a ForceGraph3DInstance
  */
-function isForceGraph3DInstance(
+function isForceGraph3dInstance(
 	instance: GraphInstance | Record<string, unknown>,
 ): instance is ForceGraph3DInstance<NodeObject, LinkObject<NodeObject>> {
-	if (!instance) return false;
+	if (!instance) {
+		return false;
+	}
 
 	// Check if instance has the required methods for ForceGraph3D
 	const obj = instance as {
@@ -36,7 +38,7 @@ function isForceGraph3DInstance(
  * Safely create a ForceGraph3D instance with proper typing
  * Returns the base instance which works with NodeObject/LinkObject types
  */
-function createForceGraph3DInstance(
+function createForceGraph3dInstance(
 	container: HTMLElement,
 ): ForceGraph3DInstance<NodeObject, LinkObject<NodeObject>> {
 	return new ForceGraph3D(container);
@@ -67,10 +69,10 @@ const renderForceGraph3D: RendererFunction = (
 	void showLabels;
 
 	let fg: ForceGraph3DInstance<NodeObject, LinkObject<NodeObject>>;
-	if (existing && isForceGraph3DInstance(existing)) {
+	if (existing && isForceGraph3dInstance(existing)) {
 		fg = existing;
 	} else {
-		fg = createForceGraph3DInstance(container);
+		fg = createForceGraph3dInstance(container);
 	}
 
 	// Configure with custom node size

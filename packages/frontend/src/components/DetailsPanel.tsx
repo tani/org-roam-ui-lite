@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { useCallback, useId, useRef, useState } from "react";
-import type { components } from "../api/api.d.ts";
+import type { Components } from "../api/api.d.ts";
 import type { Theme } from "../graph/graph-types.ts";
 import { openNode } from "../graph/node.ts";
 import { MathJaxTheater } from "./MathJaxTheater.tsx";
@@ -12,13 +12,15 @@ import { When } from "./ui/When.tsx";
 
 function getIdLinkNodeId(anchor: HTMLAnchorElement): string | null {
 	const href = anchor.getAttribute("href");
-	if (!href?.startsWith("id:")) return null;
+	if (!href?.startsWith("id:")) {
+		return null;
+	}
 	return href.slice("id:".length);
 }
 
 interface DetailsPanelProps {
 	open: boolean;
-	selected: components["schemas"]["Node"] & { body?: ReactNode };
+	selected: Components["schemas"]["node"] & { body?: ReactNode };
 	theme: Theme;
 	onClose: () => void;
 	onOpenNode: (id: string) => void;
@@ -55,9 +57,26 @@ export function DetailsPanel({
 
 		// Check for links
 		const a = target.closest("a");
-		if (!a) return;
+		if (!a) {
+			return;
+		}
 		const nodeId = getIdLinkNodeId(a);
-		if (!nodeId) return;
+		if (!nodeId) {
+			return;
+		}
+		ev.preventDefault();
+		onOpenNode(nodeId);
+	};
+
+	const handleRenderedKeyDown = (ev: React.KeyboardEvent<HTMLElement>) => {
+		if (ev.key !== "Enter" && ev.key !== " ") {
+			return;
+		}
+		const anchor = (ev.target as HTMLElement).closest("a");
+		const nodeId = anchor ? getIdLinkNodeId(anchor) : null;
+		if (!nodeId) {
+			return;
+		}
 		ev.preventDefault();
 		onOpenNode(nodeId);
 	};
@@ -66,15 +85,21 @@ export function DetailsPanel({
 		ev: React.MouseEvent<HTMLElement> | React.FocusEvent<HTMLElement>,
 	) => {
 		const anchor = (ev.target as HTMLElement).closest("a");
-		if (!anchor || !getIdLinkNodeId(anchor)) return;
-		if (previewAnchorRef.current === anchor) return;
+		if (!(anchor && getIdLinkNodeId(anchor))) {
+			return;
+		}
+		if (previewAnchorRef.current === anchor) {
+			return;
+		}
 		showPreview(anchor, ev as React.MouseEvent<HTMLElement>);
 	};
 
 	const handleRenderedMouseOut = (
 		ev: React.MouseEvent<HTMLElement> | React.FocusEvent<HTMLElement>,
 	) => {
-		if (!previewAnchorRef.current) return;
+		if (!previewAnchorRef.current) {
+			return;
+		}
 		const related = ev.relatedTarget as Node | null;
 		if (
 			related &&
@@ -92,7 +117,9 @@ export function DetailsPanel({
 	) => {
 		previewAnchorRef.current = anchor;
 		const nodeId = getIdLinkNodeId(anchor);
-		if (!nodeId) return;
+		if (!nodeId) {
+			return;
+		}
 		const node = await openNode(theme, nodeId);
 		if (previewAnchorRef.current === anchor) {
 			setPreview({ body: node.body, x: ev.clientX, y: ev.clientY });
@@ -139,7 +166,7 @@ export function DetailsPanel({
 					className="offcanvas-body"
 					ref={containerRef}
 					onClick={handleRenderedOnClick}
-					onKeyDown={(_) => {}}
+					onKeyDown={handleRenderedKeyDown}
 					onMouseOver={handleRenderedMouseOver}
 					onMouseOut={handleRenderedMouseOut}
 					onFocus={handleRenderedMouseOver}

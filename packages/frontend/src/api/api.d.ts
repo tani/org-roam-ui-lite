@@ -1,4 +1,4 @@
-export interface paths {
+export interface Paths {
 	"/": {
 		parameters: {
 			query?: never;
@@ -141,7 +141,7 @@ export interface paths {
 						[name: string]: unknown;
 					};
 					content: {
-						"application/json": components["schemas"]["Graph"];
+						"application/json": Components["schemas"]["graph"];
 					};
 				};
 			};
@@ -179,7 +179,7 @@ export interface paths {
 						[name: string]: unknown;
 					};
 					content: {
-						"application/json": components["schemas"]["Node"];
+						"application/json": Components["schemas"]["node"];
 					};
 				};
 				/** @description Node not found */
@@ -259,30 +259,30 @@ export interface paths {
 		trace?: never;
 	};
 }
-export type webhooks = Record<string, never>;
-export interface components {
+export type Webhooks = Record<string, never>;
+export interface Components {
 	schemas: {
-		Graph: {
-			nodes: components["schemas"]["NodeSummary"][];
-			edges: components["schemas"]["Edge"][];
+		graph: {
+			nodes: Components["schemas"]["nodeSummary"][];
+			edges: Components["schemas"]["edge"][];
 		};
-		NodeSummary: {
+		nodeSummary: {
 			id: string;
 			title: string;
 		};
-		Edge: {
+		edge: {
 			source: string;
 			dest: string;
 		};
-		Backlink: {
+		backlink: {
 			source: string;
 			title: string;
 		};
-		Node: {
+		node: {
 			id: string;
 			title: string;
 			raw: string;
-			backlinks?: components["schemas"]["Backlink"][];
+			backlinks?: Components["schemas"]["backlink"][];
 		};
 	};
 	responses: never;
@@ -291,5 +291,5 @@ export interface components {
 	headers: never;
 	pathItems: never;
 }
-export type $defs = Record<string, never>;
-export type operations = Record<string, never>;
+export type Defs = Record<string, never>;
+export type Operations = Record<string, never>;

@@ -12,11 +12,11 @@ import uniorgRehype from "uniorg-rehype";
 
 import rehypeImgSrcFix from "./rehype-img-src-fix.ts";
 
-type Detect = {
+interface Detect {
 	mermaid: boolean;
 	math: boolean;
 	languages: string[];
-};
+}
 
 /**
  * Inspect the Org string and determine which processors are needed.
@@ -25,7 +25,7 @@ type Detect = {
  * @returns Flags indicating required plugins
  */
 function detect(orgContent: string): Detect {
-	const languageRegex = /^#\+begin_src\s+(\S+)/gm;
+	const languageRegex = /^#\+begin_src\s+(\S+)/gmu;
 	const languages = new Set<string>();
 	let match = languageRegex.exec(orgContent);
 	while (match) {
@@ -36,8 +36,8 @@ function detect(orgContent: string): Detect {
 	}
 
 	return {
-		mermaid: /#\+begin_src\s+mermaid/i.test(orgContent),
-		math: /\$[^\n$]+\$|\\\(|\\\[/m.test(orgContent),
+		mermaid: /#\+begin_src\s+mermaid/iu.test(orgContent),
+		math: /\$[^\n$]+\$|\\\(|\\\[/mu.test(orgContent),
 		languages: [...languages],
 	};
 }
@@ -80,17 +80,19 @@ export function createOrgHtmlProcessor<Theme extends string>(
 			});
 		}
 
+		const reactRuntime = Object.fromEntries([
+			["Fragment", Fragment],
+			["jsx", jsx],
+			["jsxs", jsxs],
+			["elementAttributeNameCase", "react"],
+		]);
+
 		processor
 			.use(rehypeClassNames, {
 				table: "table table-bordered table-hover",
 				blockquote: "blockquote",
 			})
-			.use(rehypeReact, {
-				Fragment,
-				jsx,
-				jsxs,
-				elementAttributeNameCase: "react",
-			});
+			.use(rehypeReact, reactRuntime);
 
 		return (await processor.process(orgContent)).result;
 	};

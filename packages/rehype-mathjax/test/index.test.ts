@@ -27,7 +27,11 @@ describe("rehypeMathjax", () => {
 	it("replaces display math code block with MathJax SVG markup", async () => {
 		const processor = createProcessor();
 		const result = await processor.process(
-			'<pre><code class="language-math math-display">\\frac{1}{x}</code></pre>',
+			[
+				'<pre><code class="language-math math-display">',
+				["\\", "frac{1}{x}"].join(""),
+				"</code></pre>",
+			].join(""),
 		);
 		const html = String(result.value);
 

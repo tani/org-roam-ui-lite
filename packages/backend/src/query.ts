@@ -1,7 +1,7 @@
 import * as fs from "node:fs/promises";
 import * as path from "node:path";
 import { eq } from "drizzle-orm";
-import type { paths } from "./api.d.ts";
+import type { Paths } from "./api.d.ts";
 import { decodeBase64url } from "./base64url.ts";
 import { createDatabase } from "./database.ts";
 import { files, links, nodes } from "./schema.ts";
@@ -13,14 +13,14 @@ import { files, links, nodes } from "./schema.ts";
  * @returns True if the value matches UUID format
  */
 function isUuid(str: unknown): str is string {
-	const UUID_REGEX =
-		/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-	return typeof str === "string" && UUID_REGEX.test(str);
+	const UuidRegex =
+		/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/iu;
+	return typeof str === "string" && UuidRegex.test(str);
 }
 
-type KVPair<T> = { [K in keyof T]: [K, T[K]] }[keyof T];
+type KvPair<T> = { [K in keyof T]: [K, T[K]] }[keyof T];
 
-type GraphResponse = KVPair<paths["/api/graph.json"]["get"]["responses"]>;
+type GraphResponse = KvPair<Paths["/api/graph.json"]["get"]["responses"]>;
 
 /**
  * Return the entire graph as nodes and edges.
@@ -42,7 +42,7 @@ export async function fetchGraph(databasePath: string): Promise<GraphResponse> {
 	// Only allow edges whose dest is a valid UUID
 	const cleanEdges = edgeRows
 		.filter((edge) => isUuid(edge.dest))
-		.map(({ source, dest }) => ({ source: source, dest: dest }));
+		.map(({ source, dest }) => ({ source, dest }));
 
 	return [
 		200,
@@ -58,7 +58,7 @@ export async function fetchGraph(databasePath: string): Promise<GraphResponse> {
 	];
 }
 
-type NodeResponse = KVPair<paths["/api/node/{id}.json"]["get"]["responses"]>;
+type NodeResponse = KvPair<Paths["/api/node/{id}.json"]["get"]["responses"]>;
 
 /**
  * Fetch a single node and its backlinks.
@@ -122,8 +122,8 @@ export async function fetchNode(
 	];
 }
 
-type ResourceResponse = KVPair<
-	paths["/api/node/{id}/{path}"]["get"]["responses"]
+type ResourceResponse = KvPair<
+	Paths["/api/node/{id}/{path}"]["get"]["responses"]
 >;
 /**
  * Serve a binary resource attached to a node.

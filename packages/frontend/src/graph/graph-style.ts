@@ -12,7 +12,9 @@ export function highlightNeighborhood(
 	graph: GraphInstance | undefined | Record<string, unknown>,
 	focusId: string,
 ): void {
-	if (!graph) return;
+	if (!graph) {
+		return;
+	}
 
 	const graphObj = graph as {
 		elements?: () => { forEach: (fn: (el: unknown) => void) => void };
@@ -39,14 +41,20 @@ export function highlightNeighborhood(
 	}
 
 	const data = graphObj.graphData?.();
-	if (!data) return;
+	if (!data) {
+		return;
+	}
 
 	const neighbors = new Set<string>([focusId]);
 	data.links.forEach((l) => {
 		const s = typeof l.source === "object" ? l.source.id : l.source;
 		const t = typeof l.target === "object" ? l.target.id : l.target;
-		if (String(s) === focusId) neighbors.add(String(t));
-		if (String(t) === focusId) neighbors.add(String(s));
+		if (String(s) === focusId) {
+			neighbors.add(String(t));
+		}
+		if (String(t) === focusId) {
+			neighbors.add(String(s));
+		}
 	});
 	graphObj.nodeColor?.((node: GraphNode) =>
 		neighbors.has(String(node.id)) ? node.color : alphaColor(node.color, 0.15),
@@ -101,7 +109,9 @@ export function applyNodeStyle(
 export function resetHighlight(
 	graph: GraphInstance | undefined | Record<string, unknown>,
 ): void {
-	if (!graph) return;
+	if (!graph) {
+		return;
+	}
 	const graphObj = graph as {
 		elements?: unknown;
 		nodeColor?: (c: string) => void;

@@ -1,6 +1,7 @@
 // scripts/dump-json.ts
 import * as fs from "node:fs/promises";
 import * as path from "node:path";
+import process from "node:process";
 import { eq } from "drizzle-orm";
 import type { Element, Root } from "hast";
 import raw from "rehype-raw";
@@ -123,5 +124,5 @@ export async function dump(
 ): Promise<void> {
 	await dumpGraphJson(databasePath, outputPath);
 	await dumpNodeJsons(databasePath, outputPath);
-	console.log(`✅ All JSON files dumped to ${outputPath}`);
+	process.stdout.write(`All JSON files dumped to ${outputPath}\n`);
 }

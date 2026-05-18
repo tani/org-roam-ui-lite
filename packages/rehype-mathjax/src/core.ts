@@ -60,8 +60,8 @@ function createWrapper(
 export function createRehypeMathjax(
 	renderSvg: RenderMathSvg,
 ): (options?: RehypeMathjaxOptions) => (tree: Root) => Promise<void> {
-	return (options: RehypeMathjaxOptions = {}) => {
-		return async (tree: Root): Promise<void> => {
+	return (options: RehypeMathjaxOptions = {}) =>
+		async (tree: Root): Promise<void> => {
 			const targets: MathTarget[] = [];
 
 			visit(
@@ -72,7 +72,9 @@ export function createRehypeMathjax(
 					index: number | undefined,
 					parent: Parents | undefined,
 				) => {
-					if (index === undefined || !parent) return;
+					if (index === undefined || !parent) {
+						return;
+					}
 
 					if (node.tagName === "pre") {
 						const code = node.children[0];
@@ -106,7 +108,9 @@ export function createRehypeMathjax(
 
 			for (const target of targets.reverse()) {
 				const value = hastToString(target.code).trim();
-				if (!value) continue;
+				if (!value) {
+					continue;
+				}
 
 				target.parent.children.splice(
 					target.index,
@@ -119,5 +123,4 @@ export function createRehypeMathjax(
 				);
 			}
 		};
-	};
 }

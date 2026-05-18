@@ -67,10 +67,10 @@ describe("rehypeMermaid", () => {
 			mermaidInput("sequenceDiagram\n  A->>B");
 		const result = await processor.process(input);
 
-		const svgCount = (String(result.value).match(/<svg/g) || []).length;
+		const svgCount = (String(result.value).match(/<svg/gu) || []).length;
 		expect(svgCount).toBe(2);
 
-		const preCount = (String(result.value).match(/<pre/g) || []).length;
+		const preCount = (String(result.value).match(/<pre/gu) || []).length;
 		expect(preCount).toBe(0);
 	});
 

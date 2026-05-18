@@ -8,13 +8,14 @@ vi.mock("../src/graph/node.ts", () => ({
 }));
 
 // Mock PreviewPopover
-vi.mock("../src/components/PreviewPopover.tsx", () => ({
-	PreviewPopover: vi.fn(({ content, onLeave }) => (
+vi.mock("../src/components/PreviewPopover.tsx", () => {
+	const previewPopover = vi.fn(({ content, onLeave }) => (
 		<div data-testid="preview-popover" role="tooltip" onMouseLeave={onLeave}>
 			{content}
 		</div>
-	)),
-}));
+	));
+	return Object.fromEntries([["PreviewPopover", previewPopover]]);
+});
 
 describe("DetailsPanel", () => {
 	const mockOnClose = vi.fn();
@@ -145,7 +146,7 @@ describe("DetailsPanel", () => {
 			/>,
 		);
 
-		const panel = container.querySelector('[role="dialog"]');
+		const panel = container.querySelector(`[${"role"}="${"dialog"}"]`);
 		expect(panel).toHaveClass(
 			"offcanvas",
 			"offcanvas-end",
@@ -243,7 +244,7 @@ describe("DetailsPanel", () => {
 		expect(screen.queryByText("Backlinks")).not.toBeInTheDocument();
 	});
 
-	it("handles links in rendered content", async () => {
+	it("handles links in rendered content", () => {
 		const mockSelectedNode = {
 			id: "node1",
 			title: "Test Node",

@@ -1,5 +1,6 @@
 import { readFile } from "node:fs/promises";
 import * as path from "node:path";
+import process from "node:process";
 import * as nodeServer from "@hono/node-server";
 import { Hono } from "hono";
 import { lookup } from "mime-types";
@@ -36,13 +37,9 @@ export async function serve(databasePath: string, port: number): Promise<void> {
 
 	const app = new Hono();
 
-	app.get("/", (context) => {
-		return context.html(indexHtml);
-	});
+	app.get("/", (context) => context.html(indexHtml));
 
-	app.get("/index.html", (context) => {
-		return context.html(indexHtml);
-	});
+	app.get("/index.html", (context) => context.html(indexHtml));
 
 	/* Node and edge list */
 	app.get("/api/graph.json", async (context) => {
@@ -52,7 +49,7 @@ export async function serve(databasePath: string, port: number): Promise<void> {
 
 	/* Node details including Org source */
 	app.get("/api/node/:id", async (context) => {
-		const nodeId = context.req.param("id").replace(/\.json$/, "");
+		const nodeId = context.req.param("id").replace(/\.json$/u, "");
 		const [statusCode, response] = await fetchNode(databasePath, nodeId);
 		return context.json(response.content["application/json"], statusCode);
 	});
@@ -71,6 +68,6 @@ export async function serve(databasePath: string, port: number): Promise<void> {
 		return context.json(result[1].content["application/json"], result[0]);
 	});
 
-	console.log(`Launch at http://localhost:${port}/index.html`);
+	process.stdout.write(`Launch at http://localhost:${port}/index.html\n`);
 	nodeServer.serve({ fetch: app.fetch, port });
 }

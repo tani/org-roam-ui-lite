@@ -83,8 +83,12 @@ export function rehypeMermaid(
 				index: number | undefined,
 				parent: Parents | undefined,
 			) => {
-				if (index === undefined || !parent) return;
-				if (node.tagName !== "pre") return;
+				if (index === undefined || !parent) {
+					return;
+				}
+				if (node.tagName !== "pre") {
+					return;
+				}
 
 				const firstChild = node.children[0];
 				if (
@@ -96,7 +100,7 @@ export function rehypeMermaid(
 				}
 
 				const cls = firstChild.properties?.className;
-				if (!Array.isArray(cls) || !cls.includes("language-mermaid")) {
+				if (!(Array.isArray(cls) && cls.includes("language-mermaid"))) {
 					return;
 				}
 
@@ -104,7 +108,9 @@ export function rehypeMermaid(
 			},
 		);
 
-		if (nodes.length === 0) return;
+		if (nodes.length === 0) {
+			return;
+		}
 
 		for (const { node, index, parent } of nodes.reverse()) {
 			const firstChild = node.children[0] as ElementContent | undefined;

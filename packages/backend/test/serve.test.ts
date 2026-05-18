@@ -29,7 +29,7 @@ vi.mock("hono", () => {
 		get = mocks.get;
 		fetch = "fetch";
 	}
-	return { Hono };
+	return Object.fromEntries([["Hono", Hono]]);
 });
 
 vi.mock("@hono/node-server/serve-static", () => ({

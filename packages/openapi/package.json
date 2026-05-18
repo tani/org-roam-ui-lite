@@ -4,5 +4,9 @@
 	"type": "module",
 	"scripts": {
 		"typegen": "node openapi.ts | tee ../frontend/src/api/api.d.ts ../backend/src/api.d.ts > /dev/null && biome format --write ../frontend/src/api/api.d.ts ../backend/src/api.d.ts"
+	},
+	"devDependencies": {
+		"openapi-typescript": "^7.13.0",
+		"typescript": "^5.9.3"
 	}
 }

@@ -12,8 +12,8 @@ export function Button({
 	...props
 }: ButtonProps) {
 	const baseClasses = variant === "close" ? "btn-close" : "btn";
-	const variantClass = variant !== "close" ? `btn-${variant}` : "";
-	const sizeClass = size !== "md" ? `btn-${size}` : "";
+	const variantClass = variant === "close" ? "" : `btn-${variant}`;
+	const sizeClass = size === "md" ? "" : `btn-${size}`;
 
 	const classes = [baseClasses, variantClass, sizeClass, className]
 		.filter(Boolean)

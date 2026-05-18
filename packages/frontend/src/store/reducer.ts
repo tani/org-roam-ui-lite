@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import type { components } from "../api/api.d.ts";
+import type { Components } from "../api/api.d.ts";
 import type { Layout, Renderer, Theme } from "../graph/graph-types.ts";
 
 /** UI state interface */
@@ -12,7 +12,7 @@ export interface UiState {
 	showLabels: boolean;
 	settingsOpen: boolean;
 	detailsOpen: boolean;
-	selected: components["schemas"]["Node"] & { body?: ReactNode };
+	selected: Components["schemas"]["node"] & { body?: ReactNode };
 }
 
 // Define actions for the reducer
@@ -34,7 +34,7 @@ export const initialState: UiState = {
 	showLabels: true,
 	settingsOpen: false,
 	detailsOpen: false,
-	selected: {} as components["schemas"]["Node"] & { body?: ReactNode },
+	selected: {} as Components["schemas"]["node"] & { body?: ReactNode },
 };
 
 export const persistedKeys: (keyof UiState)[] = [

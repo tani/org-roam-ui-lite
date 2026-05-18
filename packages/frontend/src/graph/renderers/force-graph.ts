@@ -35,7 +35,9 @@ const renderForceGraph: RendererFunction = (
 	const area = Math.PI * radius * radius;
 	const fgNodes = nodes.map((n) => ({ ...n, val: area }));
 	let fg = existing as ForceGraph<GraphNode, GraphLink> | undefined;
-	if (!fg) fg = new ForceGraph<GraphNode, GraphLink>(container);
+	if (!fg) {
+		fg = new ForceGraph<GraphNode, GraphLink>(container);
+	}
 	const fontSize = 36 * labelScale;
 	fg.nodeId("id")
 		.nodeLabel("label")

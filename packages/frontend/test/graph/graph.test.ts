@@ -19,9 +19,7 @@ const { rendererMocks, mockGET } = vi.hoisted(() => ({
 
 // Mock openapi-fetch
 vi.mock("openapi-fetch", () => ({
-	default: vi.fn(() => ({
-		GET: mockGET,
-	})),
+	default: vi.fn(() => Object.fromEntries([["GET", mockGET]])),
 }));
 
 // Mock style utilities

@@ -15,7 +15,7 @@ function persistUiState(state: UiState) {
 
 function applyThemeAttributes(theme: UiState["theme"]) {
 	const doc = document.documentElement;
-	doc.setAttribute("data-bs-theme", theme.replace(/.*-/, ""));
+	doc.setAttribute("data-bs-theme", theme.replace(/.*-/u, ""));
 	doc.setAttribute("data-theme", theme);
 }
 
@@ -23,8 +23,8 @@ function uiReducerWithSync(state: UiState, action: Action): UiState {
 	const next = uiReducer(state, action);
 	try {
 		persistUiState(next);
-	} catch (e) {
-		console.error("Failed to persist uiState", e);
+	} catch {
+		// Persisting UI preferences is best-effort.
 	}
 	if (state.theme !== next.theme) {
 		applyThemeAttributes(next.theme);
@@ -41,8 +41,8 @@ function initializeState(initial: UiState): UiState {
 			applyThemeAttributes(merged.theme);
 			return merged;
 		}
-	} catch (e) {
-		console.error("Failed to parse persisted state", e);
+	} catch {
+		// Invalid persisted UI state falls back to defaults.
 	}
 	applyThemeAttributes(initial.theme);
 	return initial;

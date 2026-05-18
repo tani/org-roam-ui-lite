@@ -21,7 +21,7 @@ describe("RangeSlider Component", () => {
 
 		expect(screen.getByText("Test Slider")).toBeInTheDocument();
 		expect(screen.getByRole("slider")).toHaveValue("50");
-		expect(screen.getByText(/Current:/)).toBeInTheDocument();
+		expect(screen.getByText(/Current:/u)).toBeInTheDocument();
 		expect(screen.getByText("50")).toBeInTheDocument();
 	});
 
@@ -37,7 +37,7 @@ describe("RangeSlider Component", () => {
 			/>,
 		);
 
-		expect(screen.getByText(/Current:/)).toBeInTheDocument();
+		expect(screen.getByText(/Current:/u)).toBeInTheDocument();
 		expect(screen.getByText("25")).toBeInTheDocument();
 		expect(container).toHaveTextContent("px");
 	});
@@ -58,7 +58,7 @@ describe("RangeSlider Component", () => {
 			/>,
 		);
 
-		expect(screen.getByText(/Current:/)).toBeInTheDocument();
+		expect(screen.getByText(/Current:/u)).toBeInTheDocument();
 		expect(screen.getByText("1.5")).toBeInTheDocument();
 		expect(container).toHaveTextContent("em");
 	});

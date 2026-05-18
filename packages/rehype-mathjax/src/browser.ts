@@ -19,19 +19,21 @@ interface BrowserMathJax {
 	): Promise<unknown>;
 }
 
-declare global {
-	interface Window {
-		MathJax: BrowserMathJax;
-	}
-}
+const mathJaxKey = "MathJax";
 
 async function renderSvg(
 	value: string,
 	display: boolean,
 ): Promise<ElementContent[]> {
-	await window.MathJax.startup.promise;
-	const rendered = await window.MathJax.tex2svgPromise(value, { display });
-	const html = window.MathJax.startup.adaptor.outerHTML(rendered);
+	const mathJax = (window as unknown as Record<string, BrowserMathJax>)[
+		mathJaxKey
+	];
+	if (!mathJax) {
+		throw new Error("MathJax browser runtime is not loaded");
+	}
+	await mathJax.startup.promise;
+	const rendered = await mathJax.tex2svgPromise(value, { display });
+	const html = mathJax.startup.adaptor.outerHTML(rendered);
 	const parsed = fromHtml(html, { fragment: true });
 
 	return parsed.children as ElementContent[];

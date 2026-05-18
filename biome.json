@@ -14,8 +14,54 @@
 	},
 	"linter": {
 		"enabled": true,
+		"domains": {
+			"react": "all",
+			"test": "all",
+			"project": "all",
+			"types": "all",
+			"drizzle": "all"
+		},
 		"rules": {
-			"recommended": true
+			"recommended": true,
+			"a11y": {
+				"recommended": true
+			},
+			"complexity": {
+				"recommended": true
+			},
+			"performance": {
+				"recommended": true
+			},
+			"security": "error",
+			"suspicious": "error",
+			"correctness": {
+				"recommended": true,
+				"noNodejsModules": "off",
+				"noUnresolvedImports": "off"
+			},
+			"nursery": {
+				"recommended": true
+			},
+			"style": {
+				"recommended": true,
+				"noMagicNumbers": "off",
+				"noJsxLiterals": "off",
+				"noDefaultExport": "off",
+				"useFilenamingConvention": "off",
+				"noExportedImports": "off",
+				"useNamingConvention": {
+					"level": "error",
+					"options": {
+						"strictCase": false
+					}
+				},
+				"noParameterAssign": "error",
+				"noProcessEnv": "error",
+				"useBlockStatements": "error",
+				"useConsistentTypeDefinitions": "error",
+				"noNonNullAssertion": "error",
+				"useImportType": "error"
+			}
 		}
 	},
 	"javascript": {

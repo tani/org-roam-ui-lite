@@ -1,11 +1,11 @@
 import type { ReactNode } from "react";
 import { describe, expect, it } from "vitest";
-import type { components } from "../src/api/api.d.ts";
+import type { Components } from "../src/api/api.d.ts";
 import { initialState, type UiState, uiReducer } from "../src/store/reducer.ts";
 
 const testInitialState: UiState = {
 	...initialState,
-	selected: {} as components["schemas"]["Node"] & { body?: ReactNode },
+	selected: {} as Components["schemas"]["node"] & { body?: ReactNode },
 };
 
 describe("uiReducer", () => {

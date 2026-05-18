@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, test, vi } from "vitest";
-import type { components } from "../../src/api/api.d.ts";
+import type { Components } from "../../src/api/api.d.ts";
 
 // Use vi.hoisted to define mocks
 const { mockGET, processorMocks } = vi.hoisted(() => ({
@@ -12,9 +12,7 @@ const { mockGET, processorMocks } = vi.hoisted(() => ({
 
 // Mock the API client
 vi.mock("openapi-fetch", () => ({
-	default: vi.fn(() => ({
-		GET: mockGET,
-	})),
+	default: vi.fn(() => Object.fromEntries([["GET", mockGET]])),
 }));
 
 // Mock the processor
@@ -33,7 +31,7 @@ describe("openNode", () => {
 	});
 
 	test("fetches node data and processes content successfully", async () => {
-		const mockNodeData: components["schemas"]["Node"] = {
+		const mockNodeData: Components["schemas"]["node"] = {
 			id: "test-node",
 			title: "Test Node",
 			raw: "* Test heading\nSome content",
@@ -80,7 +78,7 @@ describe("openNode", () => {
 	});
 
 	test("passes correct theme to processor", async () => {
-		const mockNodeData: components["schemas"]["Node"] = {
+		const mockNodeData: Components["schemas"]["node"] = {
 			id: "theme-test",
 			title: "Theme Test",
 			raw: "Content",
@@ -101,7 +99,7 @@ describe("openNode", () => {
 	});
 
 	test("handles different themes correctly", async () => {
-		const mockNodeData: components["schemas"]["Node"] = {
+		const mockNodeData: Components["schemas"]["node"] = {
 			id: "multi-theme",
 			title: "Multi Theme",
 			raw: "Test content",
@@ -129,7 +127,7 @@ describe("openNode", () => {
 	});
 
 	test("preserves all node properties and adds body", async () => {
-		const mockNodeData: components["schemas"]["Node"] = {
+		const mockNodeData: Components["schemas"]["node"] = {
 			id: "comprehensive-node",
 			title: "Comprehensive Node",
 			raw: "Raw org content",
@@ -153,7 +151,7 @@ describe("openNode", () => {
 		});
 	});
 
-	test("module structure is correct", async () => {
+	test("module structure is correct", () => {
 		expect(openNode).toBeDefined();
 		expect(typeof openNode).toBe("function");
 	});

@@ -1,5 +1,6 @@
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import * as path from "node:path";
+import process from "node:process";
 import { dump } from "./dump.ts";
 
 /**
@@ -37,5 +38,5 @@ export async function exportSite(
 	await mkdir(outputPath, { recursive: true });
 	await writeFile(path.join(outputPath, "index.html"), indexHtml);
 	await dump(databasePath, outputPath);
-	console.log(`✅ Exported to ${outputPath}`);
+	process.stdout.write(`Exported to ${outputPath}\n`);
 }

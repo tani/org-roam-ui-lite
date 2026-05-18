@@ -18,7 +18,9 @@ function makeGraphDb() {
 		select: vi.fn(() => ({
 			from: vi.fn(() => {
 				call++;
-				if (call === 1) return [{ id: NODE_ID, title: "t" }];
+				if (call === 1) {
+					return [{ id: NODE_ID, title: "t" }];
+				}
 				return [
 					{
 						source: NODE_ID,
@@ -99,12 +101,12 @@ describe("fetchNode", () => {
 			makeNodeDb({ id: NODE_ID, title: "t", file: "/tmp/a" }),
 		);
 		const result = await fetchNode("db", NODE_ID);
-		type NodeBody = {
+		interface NodeBody {
 			id: string;
 			title: string;
 			raw: string;
 			backlinks: { source: string; title: string }[];
-		};
+		}
 		const body = result[1].content["application/json"] as NodeBody;
 		expect(body.id).toBe(NODE_ID);
 		expect(body.backlinks[0]?.source).toBe("2");

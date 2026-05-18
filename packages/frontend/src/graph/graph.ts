@@ -1,5 +1,5 @@
 import createClient from "openapi-fetch";
-import type { paths } from "../api/api.d.ts";
+import type { Paths } from "../api/api.d.ts";
 import { getCssVariable, pickColor } from "../utils/style.ts";
 import type {
 	GraphInstance,
@@ -15,7 +15,7 @@ import cytoscapeRenderer from "./renderers/cytoscape.ts";
 import forceGraphRenderer from "./renderers/force-graph.ts";
 import forceGraph3dRenderer from "./renderers/force-graph-3d.ts";
 
-const api = createClient<paths>();
+const api = createClient<Paths>();
 
 export type { GraphInstance, GraphLink, GraphNode, Layout, Renderer, Theme };
 export { Layouts, Renderers, Themes };
@@ -27,13 +27,14 @@ interface GraphData {
 
 /** Fetch graph data from the backend API with retry (exponential backoff). */
 async function fetchGraphData(): Promise<GraphData> {
-	const MAX_RETRIES = 15;
+	const MaxRetries = 15;
 	let attempt = 0;
 	while (true) {
 		try {
 			const { data, error } = await api.GET("/api/graph.json");
-			if (error || !data)
+			if (error || !data) {
 				throw new Error(`API error: ${error || "No data received"}`);
+			}
 			const nodes: GraphNode[] = data.nodes.map((n) => ({
 				id: n.id,
 				label: n.title,
@@ -48,7 +49,9 @@ async function fetchGraphData(): Promise<GraphData> {
 			return { nodes, edges };
 		} catch (err) {
 			attempt++;
-			if (attempt >= MAX_RETRIES) throw err;
+			if (attempt >= MaxRetries) {
+				throw err;
+			}
 			await new Promise((r) => setTimeout(r, attempt * 200));
 		}
 	}
@@ -121,7 +124,9 @@ export function destroyGraph(
 	instance: GraphInstance | undefined | Record<string, unknown>,
 	container: HTMLElement,
 ): void {
-	if (!instance) return;
+	if (!instance) {
+		return;
+	}
 	if (hasDestroyMethod(instance)) {
 		instance.destroy();
 	} else if (hasPauseAnimationMethod(instance)) {

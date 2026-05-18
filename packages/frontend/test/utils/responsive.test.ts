@@ -105,10 +105,10 @@ describe("Responsive Utilities", () => {
 
 			// Check for proper CSS structure
 			expect(result).toMatch(
-				/\.responsive-wide\.offcanvas\.offcanvas-end\s*\{[\s\S]*?\}/,
+				/\.responsive-wide\.offcanvas\.offcanvas-end\s*\{[\s\S]*?\}/u,
 			);
-			expect(result).toMatch(/\.preview-popover\s*\{[\s\S]*?\}/);
-			expect(result).toMatch(/@media\s*\([^)]+\)\s*\{[\s\S]*?\}/);
+			expect(result).toMatch(/\.preview-popover\s*\{[\s\S]*?\}/u);
+			expect(result).toMatch(/@media\s*\([^)]+\)\s*\{[\s\S]*?\}/u);
 		});
 
 		it("includes all expected selectors", () => {
@@ -118,7 +118,7 @@ describe("Responsive Utilities", () => {
 			expect(result).toContain(".preview-popover");
 
 			// Count media queries (should be 8 total: 4 for each CSS block)
-			const mediaQueries = result.match(/@media/g);
+			const mediaQueries = result.match(/@media/gu);
 			expect(mediaQueries).toHaveLength(8);
 		});
 	});

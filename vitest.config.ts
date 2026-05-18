@@ -10,7 +10,7 @@ export default defineConfig({
 		// default environment for the root project
 		environment: "node",
 		pool: "threads",
-		testTimeout: 30000,
+		testTimeout: 30_000,
 		coverage: {
 			enabled: true,
 			reporter: ["text", "json", "html"],

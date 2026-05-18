@@ -3,14 +3,14 @@ import { describe, expect, test } from "vitest";
 import { useUiDispatch, useUiState } from "../../src/store/hooks.ts";
 import { UiProvider } from "../../src/store/provider.tsx";
 
-function TestWrapper({ children }: { children: React.ReactNode }) {
+function testWrapper({ children }: { children: React.ReactNode }) {
 	return <UiProvider>{children}</UiProvider>;
 }
 
 describe("useUiState", () => {
 	test("returns state when used within UiProvider", () => {
 		const { result } = renderHook(() => useUiState(), {
-			wrapper: TestWrapper,
+			wrapper: testWrapper,
 		});
 
 		expect(result.current).toBeDefined();
@@ -29,7 +29,7 @@ describe("useUiState", () => {
 describe("useUiDispatch", () => {
 	test("returns dispatch function when used within UiProvider", () => {
 		const { result } = renderHook(() => useUiDispatch(), {
-			wrapper: TestWrapper,
+			wrapper: testWrapper,
 		});
 
 		expect(result.current).toBeDefined();

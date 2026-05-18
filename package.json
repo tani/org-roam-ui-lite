@@ -7,6 +7,7 @@
 	},
 	"workspaces": [
 		"packages/backend",
+		"packages/rehype-class-names",
 		"packages/rehype-mathjax",
 		"packages/rehype-mermaid",
 		"packages/openapi",
@@ -51,7 +52,8 @@
 		"build": "npm run typegen && npm run build:workspaces && npm run build:dist",
 		"build:dist": "node ./build.ts",
 		"build:workspaces": "npm-run-all -s build:rehype build:backend build:frontend",
-		"build:rehype": "npm-run-all -s build:rehype-mathjax build:rehype-mermaid",
+		"build:rehype": "npm-run-all -s build:rehype-class-names build:rehype-mathjax build:rehype-mermaid",
+		"build:rehype-class-names": "npm --workspace=packages/rehype-class-names run build",
 		"build:rehype-mathjax": "npm --workspace=packages/rehype-mathjax run build",
 		"build:rehype-mermaid": "npm --workspace=packages/rehype-mermaid run build",
 		"build:backend": "npm --workspace=packages/backend run build",

@@ -54,6 +54,14 @@ export default defineConfig({
 					environment: "node",
 				},
 			},
+			{
+				extends: true,
+				test: {
+					name: "rehype-class-names",
+					include: ["packages/rehype-class-names/test/**/*.test.ts"],
+					environment: "node",
+				},
+			},
 		],
 	},
 });
